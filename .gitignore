@@ -1,0 +1,9 @@
+material/
+
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+*.log
+.env
+.env.*

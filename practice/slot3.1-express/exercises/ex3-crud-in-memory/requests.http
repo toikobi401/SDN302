@@ -1,0 +1,34 @@
+@base = http://localhost:3000
+
+### Tất cả sách
+GET {{base}}/books
+
+### Một cuốn
+GET {{base}}/books/2
+
+### Không tồn tại -> 404
+GET {{base}}/books/999
+
+### Thêm sách
+POST {{base}}/books
+Content-Type: application/json
+
+{ "title": "Refactoring", "author": "Martin Fowler", "year": 1999 }
+
+### Thiếu author -> 400
+POST {{base}}/books
+Content-Type: application/json
+
+{ "title": "No Author" }
+
+### Sửa một phần (thử gửi cả id để xem có bị đổi không)
+PUT {{base}}/books/1
+Content-Type: application/json
+
+{ "year": 2009, "id": 100 }
+
+### Xoá
+DELETE {{base}}/books/2
+
+### Mở rộng: lọc theo tác giả
+GET {{base}}/books?author=Tô Hoài

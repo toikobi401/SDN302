@@ -1,0 +1,67 @@
+@base = http://localhost:3000/api/students
+
+### Danh sách
+GET {{base}}
+
+### Lọc theo GPA
+GET {{base}}?minGpa=3.5
+
+### minGpa sai -> 400
+GET {{base}}?minGpa=abc
+
+### Một sinh viên
+GET {{base}}/2
+
+### id sai định dạng -> 400
+GET {{base}}/abc
+
+### Thêm hợp lệ -> 201
+POST {{base}}
+Content-Type: application/json
+
+{ "name": "Võ Thị Em", "email": "em.vt@example.com", "gpa": 3.9 }
+
+### Body rỗng -> 400 với 3 lỗi
+POST {{base}}
+Content-Type: application/json
+
+{}
+
+### gpa là chuỗi -> 400
+POST {{base}}
+Content-Type: application/json
+
+{ "name": "A", "email": "a@example.com", "gpa": "3.5" }
+
+### Email trùng (khác hoa thường) -> 409
+POST {{base}}
+Content-Type: application/json
+
+{ "name": "Copy", "email": "AN.NV@example.com", "gpa": 3 }
+
+### Sửa một phần -> 200
+PUT {{base}}/3
+Content-Type: application/json
+
+{ "gpa": 3.0 }
+
+### Đổi sang email người khác -> 409
+PUT {{base}}/3
+Content-Type: application/json
+
+{ "email": "binh.tt@example.com" }
+
+### Xoá -> 204
+DELETE {{base}}/1
+
+### PUT collection -> 403
+PUT {{base}}
+
+### JSON sai cú pháp -> 400
+POST {{base}}
+Content-Type: application/json
+
+{ "name": "Broken"
+
+### Route không tồn tại -> 404
+GET http://localhost:3000/api/teachers

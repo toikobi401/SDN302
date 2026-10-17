@@ -1,0 +1,37 @@
+@base = http://localhost:3000
+
+### indexRouter
+GET {{base}}/
+
+### Tất cả sách
+GET {{base}}/api/books
+
+### Thêm sách
+POST {{base}}/api/books
+Content-Type: application/json
+
+{ "title": "Refactoring", "author": "Martin Fowler", "year": 1999 }
+
+### PUT collection -> 403
+PUT {{base}}/api/books
+
+### DELETE collection -> 403
+DELETE {{base}}/api/books
+
+### Một cuốn
+GET {{base}}/api/books/3
+
+### POST lên 1 phần tử -> 403
+POST {{base}}/api/books/3
+
+### Sửa
+PUT {{base}}/api/books/3
+Content-Type: application/json
+
+{ "title": "Dế Mèn" }
+
+### Xoá
+DELETE {{base}}/api/books/1
+
+### Đường dẫn cũ -> 404
+GET {{base}}/books

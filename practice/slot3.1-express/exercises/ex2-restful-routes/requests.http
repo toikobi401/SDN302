@@ -1,0 +1,44 @@
+# Cài extension "REST Client" (humao.rest-client) trong VS Code, chạy server rồi bấm "Send Request".
+@base = http://localhost:3000
+
+### index
+GET {{base}}/books
+
+### create (JSON)
+POST {{base}}/books
+Content-Type: application/json
+
+{ "title": "Clean Code", "author": "Robert C. Martin" }
+
+### create (HTML form)
+POST {{base}}/books
+Content-Type: application/x-www-form-urlencoded
+
+title=Clean Code&author=Robert C. Martin
+
+### PUT trên cả collection -> 403
+PUT {{base}}/books
+
+### DELETE all
+DELETE {{base}}/books
+
+### new form (phải KHÔNG bị hiểu là id = "new")
+GET {{base}}/books/new
+
+### edit form
+GET {{base}}/books/7/edit
+
+### show
+GET {{base}}/books/42
+
+### POST trên 1 phần tử -> 403
+POST {{base}}/books/42
+
+### update
+PUT {{base}}/books/42
+Content-Type: application/json
+
+{ "title": "Clean Code", "author": "Robert C. Martin" }
+
+### destroy
+DELETE {{base}}/books/42

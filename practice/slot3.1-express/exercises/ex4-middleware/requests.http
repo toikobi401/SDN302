@@ -1,0 +1,24 @@
+@base = http://localhost:3000
+
+### Trang tĩnh (xem header X-Course trong response)
+GET {{base}}/
+
+### File CSS tĩnh
+GET {{base}}/css/style.css
+
+### requestTime
+GET {{base}}/time
+
+### requestCounter
+GET {{base}}/stats
+
+### Không có API key -> 401
+GET {{base}}/admin/dashboard
+
+### Sai API key -> 401
+GET {{base}}/admin/dashboard
+x-api-key: hacker
+
+### Đúng API key -> 200
+GET {{base}}/admin/dashboard
+x-api-key: sdn302-secret

@@ -1,0 +1,31 @@
+@base = http://localhost:3000
+
+### OK
+GET {{base}}/books/1
+
+### id không phải số -> 400
+GET {{base}}/books/abc
+
+### Không tồn tại -> 404
+GET {{base}}/books/999
+
+### Thiếu field -> 400
+POST {{base}}/books
+Content-Type: application/json
+
+{ "title": "Only title" }
+
+### Lỗi đồng bộ -> 500
+GET {{base}}/boom
+
+### Lỗi bất đồng bộ -> 500
+GET {{base}}/async-boom
+
+### Route không tồn tại -> 404
+DELETE {{base}}/books
+
+### JSON sai cú pháp (thiếu dấu }) -> 400 Invalid JSON body
+POST {{base}}/books
+Content-Type: application/json
+
+{ "title": "Broken",
