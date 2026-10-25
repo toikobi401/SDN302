@@ -1,0 +1,25 @@
+[{
+  "_id": {
+    "$oid": "64916b3b7f8a6ac6119055fa"
+  },
+  "manufacturer": "Syma",
+  "isAsia": false
+},{
+  "_id": {
+    "$oid": "64916b697f8a6ac6119055fc"
+  },
+  "manufacturer": "Reobrix",
+  "isAsia": true
+},{
+  "_id": {
+    "$oid": "64916be07f8a6ac6119055fe"
+  },
+  "manufacturer": "Cobi",
+  "isAsia": false
+},{
+  "_id": {
+    "$oid": "64916c557f8a6ac611905600"
+  },
+  "manufacturer": "Revell",
+  "isAsia": false
+}]

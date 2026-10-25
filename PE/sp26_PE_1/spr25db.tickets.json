@@ -1,0 +1,128 @@
+[{
+  "_id": {
+    "$oid": "65fe00000000000000000001"
+  },
+  "showTimeId": {
+    "$oid": "65fc00000000000000000001"
+  },
+  "seatId": "A1",
+  "userId": {
+    "$oid": "65fd00000000000000000001"
+  },
+  "price": 90000,
+  "status": "paid",
+  "bookedAt": "2026-03-01T10:00:00.000Z",
+  "paymentMethod": "credit_card"
+},
+{
+  "_id": {
+    "$oid": "65fe00000000000000000002"
+  },
+  "showTimeId": {
+    "$oid": "65fc00000000000000000001"
+  },
+  "seatId": "A2",
+  "userId": {
+    "$oid": "65fd00000000000000000002"
+  },
+  "price": 90000,
+  "status": "booked",
+  "bookedAt": "2026-03-02T11:00:00.000Z",
+  "paymentMethod": null
+},
+{
+  "_id": {
+    "$oid": "65fe00000000000000000003"
+  },
+  "showTimeId": {
+    "$oid": "65fc00000000000000000003"
+  },
+  "seatId": "A1",
+  "userId": {
+    "$oid": "65fd00000000000000000001"
+  },
+  "price": 100000,
+  "status": "paid",
+  "bookedAt": "2026-03-20T12:00:00.000Z",
+  "paymentMethod": "cash"
+},
+{
+  "_id": {
+    "$oid": "65fe00000000000000000004"
+  },
+  "showTimeId": {
+    "$oid": "65fc00000000000000000003"
+  },
+  "seatId": "A2",
+  "userId": {
+    "$oid": "65fd00000000000000000003"
+  },
+  "price": 100000,
+  "status": "canceled",
+  "bookedAt": "2026-03-21T13:00:00.000Z",
+  "paymentMethod": null
+},
+{
+  "_id": {
+    "$oid": "65fe00000000000000000005"
+  },
+  "showTimeId": {
+    "$oid": "65fc00000000000000000004"
+  },
+  "seatId": "B1",
+  "userId": {
+    "$oid": "65fd00000000000000000002"
+  },
+  "price": 95000,
+  "status": "paid",
+  "bookedAt": "2026-03-05T14:00:00.000Z",
+  "paymentMethod": "credit_card"
+},
+{
+  "_id": {
+    "$oid": "65fe00000000000000000006"
+  },
+  "showTimeId": {
+    "$oid": "65fc00000000000000000001"
+  },
+  "seatId": "A3",
+  "userId": {
+    "$oid": "65fd00000000000000000003"
+  },
+  "price": 90000,
+  "status": "paid",
+  "bookedAt": "2026-03-03T15:00:00.000Z",
+  "paymentMethod": "cash"
+},
+{
+  "_id": {
+    "$oid": "65fe00000000000000000007"
+  },
+  "showTimeId": {
+    "$oid": "65fc00000000000000000007"
+  },
+  "seatId": "B1",
+  "userId": {
+    "$oid": "65fd00000000000000000001"
+  },
+  "price": 100000,
+  "status": "booked",
+  "bookedAt": "2026-03-25T16:00:00.000Z",
+  "paymentMethod": null
+},
+{
+  "_id": {
+    "$oid": "65fe00000000000000000008"
+  },
+  "showTimeId": {
+    "$oid": "65fc00000000000000000001"
+  },
+  "seatId": "B1",
+  "userId": {
+    "$oid": "65fd00000000000000000003"
+  },
+  "price": 90000,
+  "status": "paid",
+  "bookedAt": "2026-03-04T16:00:00.000Z",
+  "paymentMethod": "cash"
+}]

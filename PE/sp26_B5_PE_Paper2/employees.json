@@ -1,0 +1,106 @@
+[{
+  "_id": {
+    "$oid": "65a200000000000000000001"
+  },
+  "empName": "Nguyen Van An",
+  "empSalary": 3000,
+  "empSex": true,
+  "empBirthdate": "1985-05-10",
+  "depId": {
+    "$oid": "65a100000000000000000001"
+  },
+  "supervisorId": null,
+  "empStartdate": "2020-01-01"
+},
+{
+  "_id": {
+    "$oid": "65a200000000000000000002"
+  },
+  "empName": "Tran Thi Binh",
+  "empSalary": 1800,
+  "empSex": false,
+  "empBirthdate": "1995-08-12",
+  "depId": {
+    "$oid": "65a100000000000000000001"
+  },
+  "supervisorId": {
+    "$oid": "65a200000000000000000001"
+  },
+  "empStartdate": "2022-02-10"
+},
+{
+  "_id": {
+    "$oid": "65a200000000000000000003"
+  },
+  "empName": "Le Van Cuong",
+  "empSalary": 1700,
+  "empSex": true,
+  "empBirthdate": "1996-11-02",
+  "depId": {
+    "$oid": "65a100000000000000000001"
+  },
+  "supervisorId": {
+    "$oid": "65a200000000000000000001"
+  },
+  "empStartdate": "2022-06-01"
+},
+{
+  "_id": {
+    "$oid": "65a200000000000000000004"
+  },
+  "empName": "Pham Thi Dung",
+  "empSalary": 2800,
+  "empSex": false,
+  "empBirthdate": "1988-09-22",
+  "depId": {
+    "$oid": "65a100000000000000000002"
+  },
+  "supervisorId": null,
+  "empStartdate": "2019-03-01"
+},
+{
+  "_id": {
+    "$oid": "65a200000000000000000005"
+  },
+  "empName": "Hoang Van Em",
+  "empSalary": 1600,
+  "empSex": true,
+  "empBirthdate": "1998-04-15",
+  "depId": {
+    "$oid": "65a100000000000000000002"
+  },
+  "supervisorId": {
+    "$oid": "65a200000000000000000004"
+  },
+  "empStartdate": "2023-01-10"
+},
+{
+  "_id": {
+    "$oid": "65a200000000000000000006"
+  },
+  "empName": "Vu Thi Hoa",
+  "empSalary": 1500,
+  "empSex": false,
+  "empBirthdate": "1999-07-30",
+  "depId": {
+    "$oid": "65a100000000000000000002"
+  },
+  "supervisorId": {
+    "$oid": "65a200000000000000000004"
+  },
+  "empStartdate": "2023-02-15"
+},
+{
+  "_id": {
+    "$oid": "65a200000000000000000007"
+  },
+  "empName": "Do Van Khanh",
+  "empSalary": 2900,
+  "empSex": true,
+  "empBirthdate": "1987-12-11",
+  "depId": {
+    "$oid": "65a100000000000000000003"
+  },
+  "supervisorId": null,
+  "empStartdate": "2018-05-01"
+}]

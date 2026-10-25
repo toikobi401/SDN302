@@ -1,0 +1,119 @@
+[
+  {
+    "_id": {
+      "$oid": "64916da37f8a6ac611905603"
+    },
+    "heliName": "Armed Forces F-35B Lightning",
+    "imgWrapper": "https://m.media-amazon.com/images/I/61ohPdshJ7L._AC_SX679_.jpg",
+    "price": 2367637,
+    "isAssembly": true,
+    "adult": true,
+    "manufacturer": {
+      "$oid": "64916be07f8a6ac6119055fe"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "64916de77f8a6ac611905607"
+    },
+    "heliName": "Gun Grumman F-14 Tomcat",
+    "imgWrapper": "https://m.media-amazon.com/images/I/61A0NXneWnL._AC_SX679_.jpg",
+    "price": 2495504,
+    "isAssembly": true,
+    "adult": false,
+    "manufacturer": {
+      "$oid": "64916be07f8a6ac6119055fe"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "64916e0b7f8a6ac61190560a"
+    },
+    "heliName": "Model Making Alouette Kit",
+    "imgWrapper": "https://m.media-amazon.com/images/I/71pM5zfU7kL._AC_SX679_.jpg",
+    "price": 1236307,
+    "isAssembly": false,
+    "adult": false,
+    "manufacturer": {
+      "$oid": "64916c557f8a6ac611905600"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "64916e727f8a6ac611905610"
+    },
+    "heliName": "Remote Control Helicopter, S52H Military Transport RC Helicopter with Altitude Hold",
+    "imgWrapper": "https://m.media-amazon.com/images/I/71biufWRRhL._AC_SX679_.jpg",
+    "price": 1578337,
+    "isAssembly": false,
+    "adult": true,
+    "manufacturer": {
+      "$oid": "64916b3b7f8a6ac6119055fa"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "64916ea17f8a6ac611905612"
+    },
+    "heliName": "Syma S107 Helicopter With Gyro-Red",
+    "imgWrapper": "https://m.media-amazon.com/images/I/71AmxEgl7AL._AC_SX679_.jpg",
+    "price": 657224,
+    "isAssembly": false,
+    "adult": true,
+    "manufacturer": {
+      "$oid": "64916b3b7f8a6ac6119055fa"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "64916f047f8a6ac611905616"
+    },
+     "heliName": "SnapTite Apache Helicopter Plastic Model Kit",
+    "imgWrapper": "https://m.media-amazon.com/images/I/616vRiCx4YS._AC_SX679_.jpg",
+    "price": 649331,
+    "isAssembly": false,
+    "adult": false,
+    "manufacturer": {
+      "$oid": "64916c557f8a6ac611905600"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "64916f317f8a6ac611905619"
+    },
+     "heliName": "Armed Forces A-10 Thunderbolt",
+    "imgWrapper": "https://m.media-amazon.com/images/I/61T64JuejFL._AC_SX679_.jpg",
+    "price": 1939047,
+    "isAssembly": false,
+    "adult": false,
+    "manufacturer": {
+      "$oid": "64916be07f8a6ac6119055fe"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "64916f877f8a6ac61190561d"
+    },
+   "heliName": "Fighter Jet Building Sets for Adults, Military Fighter Display Model",
+    "imgWrapper": "https://m.media-amazon.com/images/I/71fT6q9+HHL._AC_SX679_.jpg",
+    "price": 1709887,
+    "isAssembly": true,
+    "adult": true,
+    "manufacturer": {
+      "$oid": "64916b697f8a6ac6119055fc"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "64916fb07f8a6ac61190561f"
+    },
+    "heliName": "Fighter Jet Building Set, B2 Military Bomber Plane",
+    "imgWrapper": "https://m.media-amazon.com/images/I/71mCDgwZaNL._AC_SX679_.jpg",
+    "price": 2174258,
+    "isAssembly": true,
+    "adult": true,
+    "manufacturer": {
+      "$oid": "64916b697f8a6ac6119055fc"
+    }
+  }
+  ]

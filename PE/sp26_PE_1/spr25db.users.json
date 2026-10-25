@@ -1,0 +1,66 @@
+[{
+  "_id": {
+    "$oid": "65fd00000000000000000001"
+  },
+  "name": "Nguyen Van A",
+  "role": "customer",
+  "email": "a@example.com",
+  "password": "pass123",
+  "phone": "0123456789",
+  "access_key": "cust_key_a"
+},
+{
+  "_id": {
+    "$oid": "65fd00000000000000000002"
+  },
+  "name": "Tran Thi B",
+  "role": "customer",
+  "email": "b@example.com",
+  "password": "pass456",
+  "phone": "0987654321",
+  "access_key": "cust_key_b"
+},
+{
+  "_id": {
+    "$oid": "65fd00000000000000000003"
+  },
+  "name": "Le Van C",
+  "role": "customer",
+  "email": "c@example.com",
+  "password": "pass789",
+  "phone": "0112233445",
+  "access_key": "cust_key_c"
+},
+{
+  "_id": {
+    "$oid": "65fd00000000000000000004"
+  },
+  "name": "Admin One",
+  "role": "admin",
+  "email": "admin1@example.com",
+  "password": "adminpass1",
+  "phone": "0998877665",
+  "access_key": "admin_key_1"
+},
+{
+  "_id": {
+    "$oid": "65fd00000000000000000005"
+  },
+  "name": "Admin Two",
+  "role": "admin",
+  "email": "admin2@example.com",
+  "password": "adminpass2",
+  "phone": "0887766554",
+  "access_key": "admin_key_2"
+},
+{
+  "_id": {
+    "$oid": "65fd00000000000000000006"
+  },
+  "name": "Staff One",
+  "role": "staff",
+  "email": "staff@example.com",
+  "password": "staffpass",
+  "phone": "0776655443",
+  "access_key": "staff_key"
+}]

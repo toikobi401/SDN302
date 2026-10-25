@@ -1,0 +1,125 @@
+[{
+  "_id": {
+    "$oid": "65fb00000000000000000001"
+  },
+  "roomName": "Room A",
+  "capacity": 5,
+  "seats": [
+    {
+      "_id": "A1",
+      "type": "VIP"
+    },
+    {
+      "_id": "A2",
+      "type": "VIP"
+    },
+    {
+      "_id": "A3",
+      "type": "VIP"
+    },
+    {
+      "_id": "B1",
+      "type": "NORMAL"
+    },
+    {
+      "_id": "B2",
+      "type": "NORMAL"
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "65fb00000000000000000002"
+  },
+  "roomName": "Room B",
+  "capacity": 4,
+  "seats": [
+    {
+      "_id": "A1",
+      "type": "VIP"
+    },
+    {
+      "_id": "A2",
+      "type": "NORMAL"
+    },
+    {
+      "_id": "B1",
+      "type": "NORMAL"
+    },
+    {
+      "_id": "B2",
+      "type": "NORMAL"
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "65fb00000000000000000003"
+  },
+  "roomName": "Room C",
+  "capacity": 3,
+  "seats": [
+    {
+      "_id": "A1",
+      "type": "VIP"
+    },
+    {
+      "_id": "A2",
+      "type": "VIP"
+    },
+    {
+      "_id": "B1",
+      "type": "NORMAL"
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "65fb00000000000000000004"
+  },
+  "roomName": "Room D",
+  "capacity": 2,
+  "seats": [
+    {
+      "_id": "A1",
+      "type": "NORMAL"
+    },
+    {
+      "_id": "A2",
+      "type": "NORMAL"
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "65fb00000000000000000005"
+  },
+  "roomName": "Room E",
+  "capacity": 6,
+  "seats": [
+    {
+      "_id": "A1",
+      "type": "VIP"
+    },
+    {
+      "_id": "A2",
+      "type": "VIP"
+    },
+    {
+      "_id": "A3",
+      "type": "VIP"
+    },
+    {
+      "_id": "B1",
+      "type": "NORMAL"
+    },
+    {
+      "_id": "B2",
+      "type": "NORMAL"
+    },
+    {
+      "_id": "B3",
+      "type": "NORMAL"
+    }
+  ]
+}]

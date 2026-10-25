@@ -1,0 +1,77 @@
+[{
+  "_id": {
+    "$oid": "65fa00000000000000000001"
+  },
+  "title": "Avengers",
+  "duration": 180,
+  "status": "NOW_SHOWING",
+  "genre": [
+    "action",
+    "sci-fi"
+  ],
+  "description": "Superheroes assemble to save the world."
+},
+{
+  "_id": {
+    "$oid": "65fa00000000000000000002"
+  },
+  "title": "Avatar",
+  "duration": 185,
+  "status": "NOW_SHOWING",
+  "genre": [
+    "adventure",
+    "fantasy"
+  ],
+  "description": "A marine on an alien planet."
+},
+{
+  "_id": {
+    "$oid": "65fa00000000000000000003"
+  },
+  "title": "Inception",
+  "duration": 160,
+  "status": "NOW_SHOWING",
+  "genre": [
+    "thriller",
+    "sci-fi"
+  ],
+  "description": "Dream within a dream."
+},
+{
+  "_id": {
+    "$oid": "65fa00000000000000000004"
+  },
+  "title": "Titanic",
+  "duration": 195,
+  "status": "STOPPED",
+  "genre": [
+    "romance",
+    "drama"
+  ],
+  "description": "A tragic love story on a sinking ship."
+},
+{
+  "_id": {
+    "$oid": "65fa00000000000000000005"
+  },
+  "title": "Spider-Man",
+  "duration": 150,
+  "status": "NOW_SHOWING",
+  "genre": [
+    "action",
+    "adventure"
+  ],
+  "description": "Teenager with spider powers."
+},
+{
+  "_id": {
+    "$oid": "65fa00000000000000000006"
+  },
+  "title": "Old Movie",
+  "duration": 120,
+  "status": "STOPPED",
+  "genre": [
+    "drama"
+  ],
+  "description": "An old stopped movie for edge case."
+}]

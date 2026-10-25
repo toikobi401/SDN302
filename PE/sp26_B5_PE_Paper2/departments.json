@@ -1,0 +1,51 @@
+[{
+  "_id": {
+    "$oid": "65a100000000000000000001"
+  },
+  "depName": "Information Technology",
+  "managerId": {
+    "$oid": "65a200000000000000000001"
+  },
+  "managerAssDate": "2024-01-01",
+  "location": [
+    {
+      "locId": {
+        "$oid": "65a000000000000000000001"
+      }
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "65a100000000000000000002"
+  },
+  "depName": "Sales and Marketing",
+  "managerId": {
+    "$oid": "65a200000000000000000004"
+  },
+  "managerAssDate": "2024-03-01",
+  "location": [
+    {
+      "locId": {
+        "$oid": "65a000000000000000000002"
+      }
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "65a100000000000000000003"
+  },
+  "depName": "Research and Development",
+  "managerId": {
+    "$oid": "65a200000000000000000007"
+  },
+  "managerAssDate": "2024-05-01",
+  "location": [
+    {
+      "locId": {
+        "$oid": "65a000000000000000000003"
+      }
+    }
+  ]
+}]
