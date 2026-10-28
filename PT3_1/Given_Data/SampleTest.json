@@ -1,0 +1,49 @@
+{
+    "name": "Customer Service",
+    "description": "Handles customer inquiries and resolves issues.",
+    "employees": [
+        {
+            "name": {
+                "firstName": "Michael",
+                "lastName": "Doe",
+                "middleName": "Ryan"
+            },
+            "dateOfBirth": "1990-05-15",
+            "gender": "male",
+            "department": null,
+            "account": {
+                "email": "michael.johnson@example.com",
+                "password": "P@ssw0rd!"
+            },
+            "manager": null,
+            "dependents": [
+                {
+                    "fullname": "Alice Doe",
+                    "relation": "Daughter"
+                },
+                {
+                    "fullname": "Bob Doe",
+                    "relation": "Son"
+                }
+            ],
+            "jobs": []
+        },
+        {
+            "name": {
+                "firstName": "Emily",
+                "lastName": "Clark",
+                "middleName": "Jane"
+            },
+            "dateOfBirth": "1985-02-20",
+            "gender": "female",
+            "department": null,
+            "account": {
+                "email": "emily.clark@example.com",
+                "password": "StrongP@ssw0rd"
+            },
+            "manager": null,
+            "dependents": [],
+            "jobs": []
+        }
+    ]
+}

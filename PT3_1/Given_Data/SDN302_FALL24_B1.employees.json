@@ -1,0 +1,222 @@
+[{
+  "_id": {
+    "$oid": "6706c540be090ec1c08abf8e"
+  },
+  "name": {
+    "firstName": "Emily",
+    "lastName": "Johnson",
+    "middleName": "Catherine"
+  },
+  "dateOfBirth": {
+    "$date": "1978-03-30T00:00:00.000Z"
+  },
+  "gender": "female",
+  "department": {
+    "$oid": "6706c540be090ec1c08abf87"
+  },
+  "account": {
+    "email": "emily.johnson@example.com",
+    "password": "S3cur3P@ssword!"
+  },
+  "manager": null,
+  "dependents": [],
+  "jobs": [
+    {
+      "$oid": "67077d95923f6eb796abcaa1"
+    }
+  ],
+  "__v": 2
+},
+{
+  "_id": {
+    "$oid": "6706c540be090ec1c08abf89"
+  },
+  "name": {
+    "firstName": "John",
+    "lastName": "Doe",
+    "middleName": "Albert"
+  },
+  "dateOfBirth": {
+    "$date": "1985-05-15T00:00:00.000Z"
+  },
+  "gender": "male",
+  "department": {
+    "$oid": "6706c540be090ec1c08abf87"
+  },
+  "account": {
+    "email": "john.doe@example.com",
+    "password": "Str0ngP@ssw0rd"
+  },
+  "manager": {
+    "$oid": "6706c540be090ec1c08abf8e"
+  },
+  "dependents": [
+    {
+      "fullname": "Jane Doe",
+      "relation": "Wife",
+      "_id": {
+        "$oid": "6706c540be090ec1c08abf8a"
+      }
+    },
+    {
+      "fullname": "Jake Doe",
+      "relation": "Son",
+      "_id": {
+        "$oid": "6706c540be090ec1c08abf8b"
+      }
+    }
+  ],
+  "jobs": [
+    {
+      "$oid": "67077e36923f6eb796abcac0"
+    },
+    {
+      "$oid": "67077da2923f6eb796abcaa7"
+    }
+  ],
+  "__v": 3
+},
+{
+  "_id": {
+    "$oid": "6706c540be090ec1c08abf8c"
+  },
+  "name": {
+    "firstName": "Alice",
+    "lastName": "Smith",
+    "middleName": "B"
+  },
+  "dateOfBirth": {
+    "$date": "1990-10-20T00:00:00.000Z"
+  },
+  "gender": "female",
+  "department": {
+    "$oid": "6706c540be090ec1c08abf87"
+  },
+  "account": {
+    "email": "alice.smith@example.com",
+    "password": "P@ssw0rdAlice!"
+  },
+  "manager": {
+    "$oid": "6706c540be090ec1c08abf8e"
+  },
+  "dependents": [
+    {
+      "fullname": "Tom Smith",
+      "relation": "Brother",
+      "_id": {
+        "$oid": "6706c540be090ec1c08abf8d"
+      }
+    }
+  ],
+  "jobs": [],
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6706c6836dc6cd8fe59ffcfd"
+  },
+  "name": {
+    "firstName": "Alex",
+    "lastName": "Johnson",
+    "middleName": "Lee"
+  },
+  "dateOfBirth": {
+    "$date": "1988-03-22T00:00:00.000Z"
+  },
+  "gender": "other",
+  "department": {
+    "$oid": "6706c6836dc6cd8fe59ffcf6"
+  },
+  "account": {
+    "email": "alex.johnson@example.com",
+    "password": "MyP@ssword123!"
+  },
+  "manager": {
+    "$oid": "6706c6836dc6cd8fe59ffcf8"
+  },
+  "dependents": [],
+  "jobs": [],
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6706c6836dc6cd8fe59ffcf8"
+  },
+  "name": {
+    "firstName": "John",
+    "lastName": "Doe",
+    "middleName": "Michael"
+  },
+  "dateOfBirth": {
+    "$date": "1985-06-15T00:00:00.000Z"
+  },
+  "gender": "male",
+  "department": {
+    "$oid": "6706c6836dc6cd8fe59ffcf6"
+  },
+  "account": {
+    "email": "john.doe@example.com",
+    "password": "StrongP@ssw0rd!"
+  },
+  "manager": null,
+  "dependents": [
+    {
+      "fullname": "Alice Doe",
+      "relation": "daughter",
+      "_id": {
+        "$oid": "6706c6836dc6cd8fe59ffcf9"
+      }
+    },
+    {
+      "fullname": "Bob Doe",
+      "relation": "son",
+      "_id": {
+        "$oid": "6706c6836dc6cd8fe59ffcfa"
+      }
+    }
+  ],
+  "jobs": [],
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6706c6836dc6cd8fe59ffcfb"
+  },
+  "name": {
+    "firstName": "Jane",
+    "lastName": "Smith",
+    "middleName": "Ann"
+  },
+  "dateOfBirth": {
+    "$date": "1990-12-05T00:00:00.000Z"
+  },
+  "gender": "female",
+  "department": {
+    "$oid": "6706c6836dc6cd8fe59ffcf6"
+  },
+  "account": {
+    "email": "jane.smith@example.com",
+    "password": "SecureP@ssw1!"
+  },
+  "manager": {
+    "$oid": "6706c6836dc6cd8fe59ffcf8"
+  },
+  "dependents": [
+    {
+      "fullname": "Chris Smith",
+      "relation": "son",
+      "_id": {
+        "$oid": "6706c6836dc6cd8fe59ffcfc"
+      }
+    }
+  ],
+  "jobs": [
+    {
+      "$oid": "67077d0b923f6eb796abca94"
+    },
+    {
+      "$oid": "67077d4e923f6eb796abca9b"
+    }
+  ],
+  "__v": 2
+}]

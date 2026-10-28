@@ -1,0 +1,175 @@
+[{
+  "_id": {
+    "$oid": "67077d0b923f6eb796abca94"
+  },
+  "name": "Develop Website",
+  "issues": [
+    {
+      "title": "Design Review",
+      "date": {
+        "$date": "2023-10-01T00:00:00.000Z"
+      },
+      "isCompleted": false,
+      "_id": {
+        "$oid": "67077d0b923f6eb796abca95"
+      }
+    },
+    {
+      "title": "Backend Integration",
+      "date": {
+        "$date": "2023-10-05T00:00:00.000Z"
+      },
+      "isCompleted": false,
+      "_id": {
+        "$oid": "67077d0b923f6eb796abca96"
+      }
+    }
+  ],
+  "startDate": {
+    "$date": "2023-10-01T00:00:00.000Z"
+  },
+  "endDate": {
+    "$date": "2023-12-01T00:00:00.000Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67077d4e923f6eb796abca9b"
+  },
+  "name": "Data Analysis",
+  "issues": [
+    {
+      "title": "Collect Data from Sources",
+      "date": {
+        "$date": "2023-09-20T00:00:00.000Z"
+      },
+      "isCompleted": true,
+      "_id": {
+        "$oid": "67077d4e923f6eb796abca9c"
+      }
+    },
+    {
+      "title": "Generate Insights",
+      "date": {
+        "$date": "2023-10-15T00:00:00.000Z"
+      },
+      "isCompleted": false,
+      "_id": {
+        "$oid": "67077d4e923f6eb796abca9d"
+      }
+    }
+  ],
+  "startDate": {
+    "$date": "2023-09-20T00:00:00.000Z"
+  },
+  "endDate": {
+    "$date": "2023-10-30T00:00:00.000Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67077d95923f6eb796abcaa1"
+  },
+  "name": "Marketing Campaign",
+  "issues": [
+    {
+      "title": "Budget Approval",
+      "date": {
+        "$date": "2023-09-15T00:00:00.000Z"
+      },
+      "isCompleted": true,
+      "_id": {
+        "$oid": "67077d95923f6eb796abcaa2"
+      }
+    },
+    {
+      "title": "Social Media Strategy",
+      "date": {
+        "$date": "2023-10-10T00:00:00.000Z"
+      },
+      "isCompleted": false,
+      "_id": {
+        "$oid": "67077d95923f6eb796abcaa3"
+      }
+    }
+  ],
+  "startDate": {
+    "$date": "2023-09-01T00:00:00.000Z"
+  },
+  "endDate": {
+    "$date": "2023-11-30T00:00:00.000Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67077da2923f6eb796abcaa7"
+  },
+  "name": "Annual Report Preparation",
+  "issues": [
+    {
+      "title": "Data Compilation",
+      "date": {
+        "$date": "2023-09-30T00:00:00.000Z"
+      },
+      "isCompleted": false,
+      "_id": {
+        "$oid": "67077da2923f6eb796abcaa8"
+      }
+    },
+    {
+      "title": "Report Drafting",
+      "date": {
+        "$date": "2023-10-20T00:00:00.000Z"
+      },
+      "isCompleted": false,
+      "_id": {
+        "$oid": "67077da2923f6eb796abcaa9"
+      }
+    }
+  ],
+  "startDate": {
+    "$date": "2023-09-25T00:00:00.000Z"
+  },
+  "endDate": {
+    "$date": "2023-12-01T00:00:00.000Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67077e36923f6eb796abcac0"
+  },
+  "name": "Annual Report Preparation",
+  "issues": [
+    {
+      "title": "Data Compilation",
+      "date": {
+        "$date": "2023-09-30T00:00:00.000Z"
+      },
+      "isCompleted": false,
+      "_id": {
+        "$oid": "67077e36923f6eb796abcac1"
+      }
+    },
+    {
+      "title": "Report Drafting",
+      "date": {
+        "$date": "2023-10-20T00:00:00.000Z"
+      },
+      "isCompleted": false,
+      "_id": {
+        "$oid": "67077e36923f6eb796abcac2"
+      }
+    }
+  ],
+  "startDate": {
+    "$date": "2023-09-25T00:00:00.000Z"
+  },
+  "endDate": {
+    "$date": "2023-12-01T00:00:00.000Z"
+  },
+  "__v": 0
+}]

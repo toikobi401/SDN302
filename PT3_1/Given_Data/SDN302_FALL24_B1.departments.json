@@ -1,0 +1,16 @@
+[{
+  "_id": {
+    "$oid": "6706c540be090ec1c08abf87"
+  },
+  "name": "Human Resources",
+  "description": "Responsible for managing employee relations and benefits.",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6706c6836dc6cd8fe59ffcf6"
+  },
+  "name": "Information Technology",
+  "description": "Manages all the technology and computer systems within the organization.",
+  "__v": 0
+}]
