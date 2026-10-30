@@ -1,25 +1,45 @@
-import logo from './logo.svg';
+import StoreProvider, { useStore } from './Store';
+import StorePanel from './components/StorePanel';
 import './App.css';
+import Header from './components/Header';
+import Billboard from './components/Billboard';
+import Footer from './components/Footer';
+import {
+  BestSelling,
+  ClientHolder,
+  DownloadApp,
+  FeaturedBooks,
+  LatestBlog,
+  PopularBooks,
+  Quotation,
+  SpecialOffer,
+  Subscribe,
+} from './components/HomeSections';
 
-function App() {
+function Storefront() {
+  const { notice } = useStore();
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Header />
+      <main>
+        {notice && <p className="container" role="status">{notice}</p>}
+        <StorePanel />
+        <Billboard />
+        <ClientHolder />
+        <FeaturedBooks />
+        <BestSelling />
+        <PopularBooks />
+        <Quotation />
+        <SpecialOffer />
+        <Subscribe />
+        <LatestBlog />
+        <DownloadApp />
+      </main>
+      <Footer />
     </div>
   );
 }
 
-export default App;
+export default function App() {
+  return <StoreProvider><Storefront /></StoreProvider>;
+}

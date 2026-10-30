@@ -1,38 +1,42 @@
 .App {
-  text-align: center;
+  overflow: hidden;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+button {
+  font: inherit;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
+.tabs .tab {
+  cursor: pointer;
+}
+
+.slick-dots button {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.product-style .add-to-cart {
+  cursor: pointer;
+}
+
+@media (max-width: 767px) {
+  #header.fixed-top {
+    position: sticky;
+  }
+
+  #billboard .slick-arrow {
+    z-index: 2;
   }
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
+.store-panel { padding: 32px; margin: 24px auto; border: 1px solid #C5A992; background: #F3F2EC; }
+.store-panel form { max-width: 480px; }
+.store-panel label { display: block; }
+.store-panel input { display: block; width: 100%; }
+.cart-row { display: flex; align-items: center; flex-wrap: wrap; gap: 16px; padding: 16px 0; border-bottom: 1px solid #ddd; }
+.cart-row input { width: 90px; }
+.tabs .tab button { background: transparent; border: 0; color: inherit; padding: 8px; }
+.product-style .add-to-cart:focus-visible { bottom: 0; }
+@media (hover: none) { .product-style .add-to-cart { bottom: 0; } }
