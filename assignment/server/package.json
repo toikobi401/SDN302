@@ -7,7 +7,9 @@
     "test": "node --test",
     "start": "node index.js",
     "db:init": "node scripts/init-db.js",
-    "admin:create": "node scripts/create-admin.js",
+    "db:seed": "node scripts/seed.js",
+    "db:import": "node scripts/import-books.js",
+    "books:fetch": "node scripts/fetch-books.js",
     "cloudinary:check": "node scripts/check-cloudinary.js"
   },
   "keywords": [],
@@ -15,14 +17,15 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "cloudinary": "^2.7.0",
-    "express": "^5.3.0",
-    "mongoose": "^9.11.4",
+    "@payos/node": "^2.0.5",
     "bcryptjs": "^3.0.2",
     "body-parser": "^1.20.3",
+    "cloudinary": "^2.7.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
+    "express": "^5.3.0",
     "jsonwebtoken": "^9.0.2",
+    "mongoose": "^9.11.4",
     "morgan": "^1.10.0"
   }
 }

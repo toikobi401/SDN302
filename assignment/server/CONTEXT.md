@@ -1,5 +1,7 @@
 # Bối cảnh và yêu cầu backend quản lý mua bán sách online
 
+> Bản yêu cầu ban đầu, chỉ có COD. Hiện trạng và các quyết định mới nhất nằm ở [../context.md](../context.md).
+
 ## 1. Mục đích tài liệu
 
 Tài liệu này tổng hợp yêu cầu ban đầu, làm cơ sở thiết kế dữ liệu và API cho backend trong thư mục `server/`. Đây là đặc tả dự kiến, chưa phải mô tả chức năng đã được triển khai hoặc kiểm chứng.

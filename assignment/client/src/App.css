@@ -31,12 +31,81 @@ button {
   }
 }
 
-.store-panel { padding: 32px; margin: 24px auto; border: 1px solid #C5A992; background: #F3F2EC; }
-.store-panel form { max-width: 480px; }
-.store-panel label { display: block; }
-.store-panel input { display: block; width: 100%; }
 .cart-row { display: flex; align-items: center; flex-wrap: wrap; gap: 16px; padding: 16px 0; border-bottom: 1px solid #ddd; }
 .cart-row input { width: 90px; }
 .tabs .tab button { background: transparent; border: 0; color: inherit; padding: 8px; }
 .product-style .add-to-cart:focus-visible { bottom: 0; }
 @media (hover: none) { .product-style .add-to-cart { bottom: 0; } }
+
+.page { padding-top: 48px; padding-bottom: 64px; }
+.page h1 { margin-bottom: 32px; }
+.page h2 { font-size: 1.5rem; margin: 32px 0 16px; }
+.narrow { max-width: 480px; }
+.stack { display: flex; flex-direction: column; gap: 16px; }
+.stack.col-md-7 { padding-right: 32px; }
+.page label, .toolbar label { display: block; margin-bottom: 0; }
+.page input:not([type="radio"]):not([type="checkbox"]), .page select, .page textarea, .toolbar select { display: block; width: 100%; margin: 4px 0 0; padding: 8px 12px; min-height: 44px; border: 1px solid #757575; border-radius: 0; background: #fff; }
+.page input[type="file"] { padding: 8px; }
+.page fieldset { border: 0; padding: 0; margin: 0; }
+.page legend { font-size: inherit; font-weight: 600; margin-bottom: 8px; }
+.page .choice { display: flex; align-items: center; gap: 8px; min-height: 44px; }
+.action { display: inline-block; min-height: 44px; padding: 10px 24px; border: 1px solid var(--dark-color); border-radius: 0; background: var(--dark-color); color: var(--light-color); font-weight: 600; line-height: 1.4; text-decoration: none; cursor: pointer; transition: background-color .3s ease-out, color .3s ease-out; }
+.action:hover:not(:disabled) { background: transparent; color: var(--dark-color); }
+.action.outline { background: transparent; color: var(--dark-color); padding: 10px 16px; }
+.action.outline:hover:not(:disabled) { background: var(--dark-color); color: var(--light-color); }
+.action:disabled { opacity: .5; cursor: not-allowed; }
+.link-button { min-height: 44px; border: 0; background: none; padding: 0 8px; color: inherit; text-decoration: underline; cursor: pointer; }
+.right-element .link-button { vertical-align: middle; }
+.button-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.message { padding: 12px 16px; border-left: 4px solid; }
+.message.error { border-color: #9b2c2c; color: #7a1f1f; background: #fbeeee; }
+.message.success { border-color: #2f6b3f; color: #235230; background: #eef7f0; }
+.store-notice { position: fixed; right: 16px; bottom: 16px; z-index: 1050; max-width: calc(100vw - 32px); margin: 0; padding: 12px 24px; background: var(--dark-color); color: var(--light-color); }
+.pager { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 16px; margin: 32px 0 0; }
+.toolbar { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 16px; margin-bottom: 24px; }
+.inline-form { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 16px; margin: 24px 0; }
+.inline-form label { flex: 1 1 240px; }
+.payment-box { padding: 24px; margin-bottom: 32px; border: 1px solid var(--accent-color); background: var(--light-color); }
+.book-cover { display: block; width: 100%; max-width: 480px; margin-bottom: 16px; }
+.thumbs { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
+.thumbs button:not(.action) { padding: 0; border: 2px solid transparent; background: none; cursor: pointer; }
+.thumbs button[aria-pressed="true"] { border-color: var(--dark-color); }
+.thumbs img, .thumb { display: block; width: 80px; height: 110px; object-fit: cover; }
+.thumbs figure { margin: 0; }
+.book-description { margin-top: 24px; white-space: pre-line; max-width: 70ch; }
+.book-facts { margin: 24px 0; }
+.book-facts dt { font-weight: 600; float: left; clear: left; width: 112px; }
+.book-facts dd { margin: 0 0 8px 112px; }
+.big-number { font-size: 2.5rem; margin: 0; color: var(--dark-color); }
+.cart-row img { width: 60px; height: 84px; object-fit: cover; }
+.cart-title { flex: 1 1 240px; }
+.cart-summary { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 24px; margin-top: 24px; }
+.cart-summary p { margin: 0; }
+.admin-nav { display: flex; flex-wrap: wrap; gap: 8px 24px; margin-bottom: 32px; padding-bottom: 8px; border-bottom: 1px solid var(--accent-color); }
+.admin-nav a { padding: 8px 0; color: var(--dark-color); text-decoration: none; }
+.admin-nav a.active { font-weight: 700; text-decoration: underline; }
+.book-skeleton { aspect-ratio: 3 / 4; margin-bottom: 32px; background: #e8e6de; animation: book-skeleton 1.4s ease-in-out infinite; }
+@keyframes book-skeleton { 50% { opacity: .5; } }
+.product-style a img { transition: transform .3s ease-out; }
+.product-style a:hover img { transform: translateY(-4px); }
+@media (prefers-reduced-motion: reduce) {
+  .book-skeleton { animation: none; }
+  .product-style a img, .action { transition: none; }
+  .product-style a:hover img { transform: none; }
+}
+.hamburger { display: none; width: 44px; height: 44px; padding: 8px; border: 0; background: transparent; cursor: pointer; }
+.hamburger .bar { display: block; height: 2px; margin: 5px 0; background: var(--dark-color); }
+@media (max-width: 991px) {
+  .main-menu { display: flex; flex-direction: column; align-items: flex-end; }
+  .hamburger { display: block; order: -1; }
+  .menu-list { display: none; }
+  .menu-list.responsive { display: block; width: 100%; padding: 0; text-align: right; }
+  .menu-list.responsive .menu-item { display: block; margin: 0; }
+  .menu-list.responsive .nav-link { display: block; padding: 12px 0; }
+}
+td.button-row { display: table-cell; min-width: 180px; }
+td.button-row .action { margin: 0 8px 8px 0; font-size: .8rem; padding: 8px 12px; white-space: normal; }
+.toolbar form { margin: 0; }
+.toolbar label input, .toolbar label select { margin-bottom: 0; }
+body { font-variant-numeric: lining-nums; }
+.page :not(.admin-nav) > a:not(.action) { color: var(--dark-color); text-decoration: underline; }

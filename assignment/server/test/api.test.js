@@ -1,17 +1,18 @@
 // Offline tests: no HTTP listener, network requests or database connections.
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
-const { User, Book, Order, PurchaseReceipt, InventoryMovement } = require('../src/models');
-const commerce = require('../src/services/commerce');
-const { authenticate, admin } = require('../src/middleware/auth');
-const { number, id } = require('../src/lib/http');
+const { User, Book, Order, PurchaseReceipt, InventoryMovement } = require('../models');
+const commerce = require('../services/commerce');
+const { requireAuth, requireAdmin } = require('../middleware/auth');
+const { number, id } = require('../lib/http');
 
 const user = { _id: new mongoose.Types.ObjectId(), role: 'CUSTOMER' };
 const bookId = new mongoose.Types.ObjectId();
 const address = { recipientName: 'Customer', phone: '0900000000', addressLine: '123 Street', province: 'HCM' };
-const query = value => ({ session: async () => value, then: (resolve, reject) => Promise.resolve(value).then(resolve, reject) });
+const query = value => ({ select() { return this; }, session: async () => value, then: (resolve, reject) => Promise.resolve(value).then(resolve, reject) });
 
 function stockMocks(t, stock = 10) {
   const calls = [];
@@ -37,13 +38,12 @@ test('rejects object-shaped IDs, unsafe money and repeated book lines', () => {
 });
 
 test('registration ignores role supplied by the client and never returns the password hash', async t => {
-  const router = require('../src/routes/auth');
-  const handler = router.stack.find(layer => layer.route?.path === '/register').route.stack.at(-1).handle;
+  const { register } = require('../controllers/auth');
   let created;
   t.mock.method(User, 'create', async fields => { created = fields; return new User(fields); });
   let response;
   const res = { status() { return this; }, json(value) { response = value; return this; } };
-  await handler({ body: { name: 'Customer', email: 'a@example.com', password: 'strong-password', role: 'ADMIN' } }, res);
+  await register({ body: { name: 'Customer', email: 'a@example.com', password: 'strong-password', role: 'ADMIN' } }, res);
   assert.equal(created.role, 'CUSTOMER');
   assert.notEqual(created.passwordHash, 'strong-password');
   assert.equal(response.data.passwordHash, undefined);
@@ -56,8 +56,8 @@ test('revoked JWT versions and customer access to admin APIs are rejected', asyn
   t.after(() => { if (oldSecret === undefined) delete process.env.JWT_SECRET; else process.env.JWT_SECRET = oldSecret; });
   const token = jwt.sign({ version: 0 }, process.env.JWT_SECRET, { subject: String(user._id), issuer: 'bookstore-api', audience: 'bookstore-web', expiresIn: '1h' });
   t.mock.method(User, 'findById', () => ({ select: async () => ({ ...user, isActive: true, tokenVersion: 1 }) }));
-  await assert.rejects(() => authenticate({ get: () => `Bearer ${token}` }, {}, () => {}), { status: 401 });
-  assert.throws(() => admin({ user }, {}, () => {}), { status: 403 });
+  await assert.rejects(() => requireAuth({ get: () => `Bearer ${token}` }, {}, () => {}), { status: 401 });
+  assert.throws(() => requireAdmin({ user }, {}, () => {}), { status: 403 });
 });
 
 test('order uses server prices, snapshots and a conditional stock deduction', async t => {
@@ -132,4 +132,326 @@ test('order schema rejects integer overflow in computed totals', async () => {
   const order = new Order({ orderNumber: 'ORD-overflow', user: user._id, idempotencyKey: 'overflow', requestHash: 'hash',
     shippingAddress: address, items: [{ book: bookId, title: 'Book', unitPrice: Number.MAX_SAFE_INTEGER, quantity: 2 }] });
   await assert.rejects(() => order.validate(), { name: 'ValidationError' });
+});
+
+const payment = require('../services/payos');
+
+function paymentOrder(fields = {}) {
+  return new Order({ orderNumber: 'ORD-payos', user: user._id, idempotencyKey: 'payos', requestHash: 'hash', paymentMethod: 'PAYOS',
+    orderCode: 1700000000000123, total: 200, shippingAddress: address, checkoutUrl: 'https://pay.payos.vn/web/x',
+    items: [{ book: bookId, title: 'Book', unitPrice: 100, quantity: 2 }], ...fields });
+}
+
+function paidUpdates(t, order) {
+  const updates = [];
+  t.mock.method(Order, 'findOne', () => query(order));
+  t.mock.method(Order, 'findOneAndUpdate', async (filter, update) => {
+    updates.push(update);
+    if (order.paymentStatus !== filter.paymentStatus) return null;
+    return Object.assign(order, update.$set);
+  });
+  t.mock.method(Order, 'findById', async () => order);
+  return updates;
+}
+
+test('online order is rejected before stock writes when payOS is not configured', async t => {
+  const state = stockMocks(t);
+  t.mock.method(payment.gateway, 'assertConfigured', () => { throw Object.assign(new Error('off'), { status: 503 }); });
+  await assert.rejects(() => payment.placeOrder(user, { paymentMethod: 'PAYOS', items: [{ book: String(bookId), quantity: 1 }], shippingAddress: address }, 'k'), { status: 503 });
+  assert.equal(state.calls.length, 0);
+});
+
+test('failed payment link cancels the order and restores stock', async t => {
+  const state = stockMocks(t);
+  let order;
+  t.mock.method(Order, 'findOne', () => query(order || null));
+  t.mock.method(payment.gateway, 'assertConfigured', () => {});
+  t.mock.method(payment.gateway, 'create', async value => { order = value; throw Object.assign(new Error('down'), { status: 502 }); });
+  await assert.rejects(() => payment.placeOrder(user, { paymentMethod: 'PAYOS', items: [{ book: String(bookId), quantity: 2 }], shippingAddress: address }, 'link-fail'), { status: 502 });
+  assert.equal(state.stock(), 10);
+  assert.equal(order.status, 'CANCELLED');
+  assert.ok(Number.isSafeInteger(order.orderCode));
+});
+
+test('repeated paid webhooks record one payment and bad signatures are rejected', async t => {
+  const order = paymentOrder();
+  const updates = paidUpdates(t, order);
+  t.mock.method(payment.gateway, 'verify', async () => ({ code: '00', orderCode: order.orderCode, amount: 200, reference: 'REF1' }));
+  await payment.handleWebhook({});
+  await payment.handleWebhook({});
+  assert.equal(order.paymentStatus, 'PAID');
+  assert.equal(order.paymentReference, 'REF1');
+  assert.equal(updates.length, 2);
+  assert.equal(updates[0].$set.paymentReference, 'REF1');
+  payment.gateway.verify.mock.mockImplementation(async () => { throw Object.assign(new Error('bad'), { status: 400 }); });
+  await assert.rejects(() => payment.handleWebhook({}), { status: 400 });
+});
+
+test('underpaid webhook does not mark the order paid and unknown orders succeed', async t => {
+  const order = paymentOrder();
+  const updates = paidUpdates(t, order);
+  t.mock.method(payment.gateway, 'verify', async () => ({ code: '00', orderCode: order.orderCode, amount: 199, reference: 'REF1' }));
+  await payment.handleWebhook({});
+  assert.equal(order.paymentStatus, 'UNPAID');
+  assert.equal(updates.length, 0);
+  Order.findOne.mock.mockImplementation(() => query(null));
+  await payment.handleWebhook({});
+});
+
+test('payment after cancellation keeps the order cancelled and joins the refund queue', async t => {
+  const order = paymentOrder({ status: 'CANCELLED', cancellationReason: 'Expired' });
+  stockMocks(t);
+  paidUpdates(t, order);
+  t.mock.method(payment.gateway, 'verify', async () => ({ code: '00', orderCode: order.orderCode, amount: 200, reference: 'LATE' }));
+  await payment.handleWebhook({});
+  assert.equal(order.status, 'CANCELLED');
+  assert.equal(order.paymentStatus, 'PAID');
+  await commerce.markRefunded({ ...user, role: 'ADMIN' }, String(order._id));
+  assert.equal(order.paymentStatus, 'REFUNDED');
+});
+
+test('sync releases stock when the payment link expired', async t => {
+  const state = stockMocks(t, 8);
+  const order = paymentOrder();
+  t.mock.method(Order, 'findOne', () => query(order));
+  t.mock.method(payment.gateway, 'get', async () => ({ status: 'EXPIRED', amountPaid: 0 }));
+  await payment.syncOrder(order);
+  assert.equal(order.status, 'CANCELLED');
+  assert.equal(state.stock(), 10);
+});
+
+test('customer cannot cancel once sync finds the order paid', async t => {
+  const state = stockMocks(t, 8);
+  const order = paymentOrder();
+  paidUpdates(t, order);
+  const cancel = t.mock.method(payment.gateway, 'cancel', async () => ({}));
+  t.mock.method(payment.gateway, 'get', async () => ({ status: 'PAID', amountPaid: 200, transactions: [{ reference: 'REF2' }] }));
+  await assert.rejects(() => payment.cancelOrder(user, String(order._id), 'Changed mind'), { code: 'INVALID_TRANSITION' });
+  assert.equal(cancel.mock.callCount(), 0);
+  assert.equal(state.stock(), 8);
+});
+
+test('provider failure while cancelling leaves the order active', async t => {
+  const state = stockMocks(t, 8);
+  const order = paymentOrder();
+  t.mock.method(Order, 'findOne', () => query(order));
+  t.mock.method(payment.gateway, 'get', async () => ({ status: 'PENDING', amountPaid: 0 }));
+  t.mock.method(payment.gateway, 'cancel', async () => { throw Object.assign(new Error('down'), { status: 502 }); });
+  await assert.rejects(() => payment.cancelOrder(user, String(order._id), 'Changed mind'), { status: 502 });
+  assert.equal(order.status, 'PENDING');
+  assert.equal(state.stock(), 8);
+});
+
+test('unpaid online orders cannot be confirmed or marked paid by hand', async t => {
+  stockMocks(t);
+  const order = paymentOrder();
+  t.mock.method(Order, 'findOne', () => query(order));
+  const adminUser = { ...user, role: 'ADMIN' };
+  await assert.rejects(() => commerce.transitionOrder(adminUser, String(order._id), 'CONFIRMED'), { code: 'PAYMENT_REQUIRED' });
+  await assert.rejects(() => commerce.markPaid(adminUser, String(order._id)), { code: 'INVALID_TRANSITION' });
+});
+
+const cloudinary = require('../services/cloudinary');
+const { update: updateBook } = require('../controllers/book');
+
+function cloudinaryEnv(t) {
+  const keys = { CLOUDINARY_CLOUD_NAME: 'shop', CLOUDINARY_API_KEY: 'key', CLOUDINARY_API_SECRET: 'secret', CLOUDINARY_FOLDER: 'bookstore' };
+  const previous = Object.fromEntries(Object.keys(keys).map(key => [key, process.env[key]]));
+  Object.assign(process.env, keys);
+  t.after(() => { for (const [key, value] of Object.entries(previous)) { if (value === undefined) delete process.env[key]; else process.env[key] = value; } });
+}
+
+test('upload signature covers every signed parameter and hides the secret', t => {
+  cloudinaryEnv(t);
+  const signed = cloudinary.signUpload();
+  const expected = require('node:crypto').createHash('sha1')
+    .update(`allowed_formats=${signed.allowedFormats}&folder=${signed.folder}&timestamp=${signed.timestamp}secret`).digest('hex');
+  assert.equal(signed.signature, expected);
+  assert.equal(JSON.stringify(signed).includes('"secret"'), false);
+});
+
+test('book images must belong to the store account and folder', t => {
+  cloudinaryEnv(t);
+  const url = 'https://res.cloudinary.com/shop/image/upload/v1/bookstore/books/a.jpg';
+  assert.doesNotThrow(() => cloudinary.assertOwnImage(url, 'bookstore/books/a'));
+  assert.throws(() => cloudinary.assertOwnImage('https://evil.example/a.jpg', 'bookstore/books/a'), { code: 'INVALID_IMAGE' });
+  assert.throws(() => cloudinary.assertOwnImage('https://res.cloudinary.com/other/image/upload/a.jpg', 'bookstore/books/a'), { code: 'INVALID_IMAGE' });
+  assert.throws(() => cloudinary.assertOwnImage(url, 'someone-else/a'), { code: 'INVALID_IMAGE' });
+});
+
+test('editing a book deletes only the stored images it no longer uses', async t => {
+  cloudinaryEnv(t);
+  const url = name => `https://res.cloudinary.com/shop/image/upload/v1/bookstore/books/${name}.jpg`;
+  const book = new Book({ title: 'B', slug: 'b', authors: ['A'], price: 1, coverImageUrl: url('old'), coverImagePublicId: 'bookstore/books/old',
+    imageUrls: [url('keep'), url('drop')], imagePublicIds: ['bookstore/books/keep', 'bookstore/books/drop'] });
+  t.mock.method(Book, 'findOne', () => query(book));
+  t.mock.method(Book.prototype, 'save', async function () { return this; });
+  const destroyed = [];
+  t.mock.method(cloudinary, 'destroyImages', async ids => { destroyed.push(...ids); });
+  const body = { coverImageUrl: url('new'), coverImagePublicId: 'bookstore/books/new', imageUrls: [url('keep')], imagePublicIds: ['bookstore/books/keep'] };
+  await updateBook({ params: { id: String(book._id) }, body }, { json() {} });
+  assert.deepEqual(destroyed.sort(), ['bookstore/books/drop', 'bookstore/books/old']);
+});
+
+test('imported books keep only paths and links, with stable sample prices', () => {
+  const { toBookDocument, samplePrice } = require('../scripts/import-books');
+  const base = { id: 'openstax-x', source: 'openstax', title: 'X', authors: ['A'], description: 'D', isbn: null, license: 'L', licenseUrl: 'https://l' };
+  const withPdf = toBookDocument({ ...base, cover: 'covers/textbook/math/x.svg', ebook: { format: 'PDF', url: 'https://u/x.pdf', file: 'pdfs/openstax-x.pdf', sizeBytes: 9 } }, []);
+  assert.equal(withPdf.coverImageUrl, '/api/covers/textbook/math/x.svg');
+  assert.equal(withPdf.pdfFile, 'openstax-x.pdf');
+  assert.equal(withPdf.slug, 'x');
+  assert.equal(withPdf.price, samplePrice(base));
+  assert.equal(withPdf.price % 5000, 0);
+  const noPdf = toBookDocument({ ...base, id: 'gutenberg-1', source: 'gutenberg', cover: 'covers/literature/romance/y-1.jpg', ebook: { format: 'EPUB', url: 'https://u/y' } }, []);
+  assert.equal(noPdf.pdfFile, undefined);
+  assert.equal(new Book({ ...withPdf, pdfFile: '../secret.pdf' }).validateSync().errors.pdfFile.kind, 'regexp');
+  assert.equal(new Book(withPdf).validateSync(), undefined);
+  assert.equal(toBookDocument({ ...base, isbn: ['978', '1', '938168', '14', '7'].join(String.fromCharCode(0xad)), cover: 'covers/x.svg', ebook: { format: 'PDF', url: 'https://u' } }, []).isbn, '9781938168147');
+});
+
+const pdfs = require('../services/pdf');
+const { download } = require('../controllers/order');
+
+function pdfOrder(fields = {}) {
+  return new Order({ orderNumber: 'ORD-pdf', user: user._id, idempotencyKey: 'pdf', requestHash: 'hash', paymentMethod: 'PAYOS', orderCode: 1700000000000999,
+    total: 100, items: [{ book: bookId, format: 'PDF', title: 'Book', unitPrice: 100, quantity: 1 }], ...fields });
+}
+
+function pdfBookMock(t, book) {
+  const select = { select: () => ({ session: async () => book }) };
+  t.mock.method(Book, 'findOne', () => select);
+  t.mock.method(User, 'updateOne', () => ({ session: async () => ({}) }));
+}
+
+test('PDF names cannot leave the PDF folder', () => {
+  for (const bad of ['../secret.pdf', 'a/b.pdf', 'a\\b.pdf', 'A.pdf', 'x.txt', '', null, { $ne: 1 }]) assert.equal(pdfs.pdfPath(bad), null);
+  assert.ok(pdfs.pdfPath('good-1.pdf').endsWith('good-1.pdf'));
+  assert.equal(pdfs.pdfExists('no-such-file.pdf'), false);
+});
+
+test('a book may be in an order as both formats but a PDF line is always one copy', () => {
+  const both = commerce.itemInput([{ book: String(bookId), quantity: 2 }, { book: String(bookId), format: 'PDF' }]);
+  assert.deepEqual(both.map(item => [item.format, item.quantity]), [['PDF', 1], ['PHYSICAL', 2]]);
+  assert.throws(() => commerce.itemInput([{ book: String(bookId), format: 'PDF', quantity: 2 }]), { status: 400 });
+  assert.throws(() => commerce.itemInput([{ book: String(bookId), format: 'EPUB', quantity: 1 }]), { status: 400 });
+});
+
+test('PDF lines reject cash on delivery before any write', async t => {
+  const state = stockMocks(t);
+  await assert.rejects(() => commerce.createOrder(user, { items: [{ book: String(bookId), format: 'PDF' }], paymentMethod: 'COD' }, 'cod-pdf'), { code: 'PAYMENT_REQUIRED' });
+  await assert.rejects(() => commerce.createOrder(user, { items: [{ book: String(bookId), format: 'PDF' }] }, 'default-pdf'), { code: 'PAYMENT_REQUIRED' });
+  assert.equal(state.calls.length, 0);
+});
+
+test('PDF-only order needs no address, pays no shipping, keeps stock and charges the PDF price', async t => {
+  const state = stockMocks(t);
+  const originalFee = process.env.SHIPPING_FEE_VND;
+  process.env.SHIPPING_FEE_VND = '15000';
+  t.after(() => { if (originalFee === undefined) delete process.env.SHIPPING_FEE_VND; else process.env.SHIPPING_FEE_VND = originalFee; });
+  t.mock.method(Order, 'findOne', () => query(null));
+  t.mock.method(Order, 'exists', () => ({ session: async () => null }));
+  pdfBookMock(t, { _id: bookId, title: 'Digital', pdfFile: 'x.pdf', pdfPrice: 40000, price: 999999 });
+  t.mock.method(fs, 'existsSync', () => true);
+  const order = await commerce.createOrder(user, { items: [{ book: String(bookId), format: 'PDF' }], paymentMethod: 'PAYOS' }, 'pdf-only', { orderCode: 1700000000000321 });
+  assert.equal(order.total, 40000);
+  assert.equal(order.shippingFee, 0);
+  assert.equal(order.shippingAddress, undefined);
+  assert.equal(state.calls.length, 0);
+});
+
+test('mixed order deducts stock for the physical line only and still requires an address', async t => {
+  const state = stockMocks(t);
+  t.mock.method(Order, 'findOne', () => query(null));
+  t.mock.method(Order, 'exists', () => ({ session: async () => null }));
+  pdfBookMock(t, { _id: bookId, title: 'Digital', pdfFile: 'x.pdf', pdfPrice: 40000 });
+  t.mock.method(fs, 'existsSync', () => true);
+  const items = [{ book: String(bookId), quantity: 2 }, { book: String(bookId), format: 'PDF' }];
+  await assert.rejects(() => commerce.createOrder(user, { items, paymentMethod: 'PAYOS' }, 'mixed-no-address'), { status: 400 });
+  const order = await commerce.createOrder(user, { items, paymentMethod: 'PAYOS', shippingAddress: address }, 'mixed', { orderCode: 1700000000000322 });
+  assert.equal(order.total, 40000 + 250000);
+  assert.equal(state.stock(), 8);
+  assert.equal(state.calls.length, 1);
+});
+
+test('owned, unavailable and missing PDFs are refused', async t => {
+  stockMocks(t);
+  t.mock.method(Order, 'findOne', () => query(null));
+  const exists = t.mock.method(Order, 'exists', () => ({ session: async () => ({ _id: 'owned' }) }));
+  pdfBookMock(t, null);
+  const input = { items: [{ book: String(bookId), format: 'PDF' }], paymentMethod: 'PAYOS' };
+  await assert.rejects(() => commerce.createOrder(user, input, 'owned'), { code: 'ALREADY_OWNED' });
+  assert.equal(exists.mock.calls[0].arguments[0].items.$elemMatch.format, 'PDF');
+  exists.mock.mockImplementation(() => ({ session: async () => null }));
+  await assert.rejects(() => commerce.createOrder(user, input, 'not-for-sale'), { code: 'PDF_UNAVAILABLE' });
+  Book.findOne.mock.mockImplementation(() => ({ select: () => ({ session: async () => ({ pdfFile: 'no-such-file.pdf', pdfPrice: 1 }) }) }));
+  await assert.rejects(() => commerce.createOrder(user, input, 'file-gone'), { code: 'PDF_UNAVAILABLE' });
+});
+
+test('paying a PDF-only order completes it, but never revives a cancelled one', async t => {
+  const order = pdfOrder();
+  const updates = paidUpdates(t, order);
+  t.mock.method(payment.gateway, 'verify', async () => ({ code: '00', orderCode: order.orderCode, amount: 100, reference: 'R' }));
+  await payment.handleWebhook({});
+  assert.equal(order.status, 'COMPLETED');
+  assert.ok(order.completedAt);
+  assert.equal(updates[0].$push.statusHistory.status, 'COMPLETED');
+  const cancelled = pdfOrder({ status: 'CANCELLED', cancellationReason: 'Expired' });
+  Order.findOne.mock.mockImplementation(() => query(cancelled));
+  Order.findOneAndUpdate.mock.mockImplementation(async (filter, update) => Object.assign(cancelled, update.$set));
+  await payment.handleWebhook({});
+  assert.equal(cancelled.status, 'CANCELLED');
+  assert.equal(cancelled.paymentStatus, 'PAID');
+});
+
+test('a mixed order stays with the store after payment', async t => {
+  const order = pdfOrder({ shippingAddress: address, items: [{ book: bookId, format: 'PDF', title: 'B', unitPrice: 100, quantity: 1 }, { book: bookId, title: 'B', unitPrice: 100, quantity: 1 }], total: 200 });
+  const updates = paidUpdates(t, order);
+  t.mock.method(payment.gateway, 'verify', async () => ({ code: '00', orderCode: order.orderCode, amount: 200, reference: 'R' }));
+  await payment.handleWebhook({});
+  assert.equal(order.status, 'PENDING');
+  assert.equal(order.paymentStatus, 'PAID');
+  assert.equal(updates[0].$push, undefined);
+});
+
+test('PDF-only orders cannot be shipped, and cancelling restores stock for physical lines only', async t => {
+  const state = stockMocks(t, 5);
+  const adminUser = { ...user, role: 'ADMIN' };
+  const only = pdfOrder({ paymentStatus: 'PAID', paidAt: new Date() });
+  t.mock.method(Order, 'findOne', () => query(only));
+  await assert.rejects(() => commerce.transitionOrder(adminUser, String(only._id), 'CONFIRMED'), { code: 'INVALID_TRANSITION' });
+  await assert.rejects(() => commerce.transitionOrder(adminUser, String(only._id), 'SHIPPING'), { code: 'INVALID_TRANSITION' });
+  const mixed = pdfOrder({ shippingAddress: address, items: [{ book: bookId, format: 'PDF', title: 'B', unitPrice: 100, quantity: 1 }, { book: bookId, title: 'B', unitPrice: 100, quantity: 2 }] });
+  Order.findOne.mock.mockImplementation(() => query(mixed));
+  await commerce.transitionOrder(adminUser, String(mixed._id), 'CANCELLED', 'Out of print');
+  assert.equal(state.stock(), 7);
+  assert.equal(state.calls.length, 1);
+});
+
+test('download is owner-scoped and needs a paid, active order with that PDF', async t => {
+  const res = { download() { throw new Error('must not send the file'); } };
+  const req = order => ({ params: { id: String(order._id), bookId: String(bookId) }, user, get: () => '' });
+  let filter;
+  const mock = order => { Order.findOne.mock.mockImplementation(value => { filter = value; return query(order); }); };
+  t.mock.method(Order, 'findOne', () => query(null));
+  const unpaid = pdfOrder();
+  mock(unpaid);
+  await assert.rejects(() => download(req(unpaid), res), { code: 'NOT_PAID' });
+  assert.equal(String(filter.user), String(user._id));
+  const cancelled = pdfOrder({ paymentStatus: 'PAID', paidAt: new Date(), status: 'CANCELLED', cancellationReason: 'x' });
+  mock(cancelled);
+  await assert.rejects(() => download(req(cancelled), res), { code: 'NOT_PAID' });
+  const refunded = pdfOrder({ paymentStatus: 'REFUNDED', paidAt: new Date(), status: 'CANCELLED', cancellationReason: 'x' });
+  mock(refunded);
+  await assert.rejects(() => download(req(refunded), res), { code: 'NOT_PAID' });
+  const physicalOnly = pdfOrder({ shippingAddress: address, paymentStatus: 'PAID', paidAt: new Date(), items: [{ book: bookId, title: 'B', unitPrice: 100, quantity: 1 }] });
+  mock(physicalOnly);
+  await assert.rejects(() => download(req(physicalOnly), res), { code: 'NOT_FOUND' });
+  const paid = pdfOrder({ paymentStatus: 'PAID', paidAt: new Date(), status: 'COMPLETED' });
+  mock(paid);
+  t.mock.method(Book, 'findById', () => ({ select: async () => ({ pdfFile: 'no-such-file.pdf', slug: 'b' }) }));
+  await assert.rejects(() => download(req(paid), res), { code: 'FILE_MISSING' });
+});
+
+test('public book JSON never includes pdfFile because the field is unselected by default', () => {
+  assert.equal(Book.schema.path('pdfFile').options.select, false);
 });

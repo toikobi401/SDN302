@@ -47,7 +47,7 @@ Quy tắc: ưu tiên biến CSS hiện có; không tạo mã màu riêng cho t�
 | Body Bootstrap | 0.9rem, weight 400, line-height 1.7 | Mốc nội dung mặc định |
 | Heading display | line-height 1.1 | Dùng cho tiêu đề lớn, tránh cắt chữ |
 
-Font được khai báo trong CSS chưa đảm bảo font đã được tải. Khi triển khai font web, nạp đủ font cần dùng và giữ fallback. Mỗi trang có một `h1`; section dùng `h2`, tên sản phẩm dùng `h3`.
+Prata và Raleway được nạp từ Google Fonts trong `public/index.html` và có đủ dấu tiếng Việt. Body dùng `lining-nums` để số 0 của Raleway không giống chữ o. Mỗi trang có một `h1`; section dùng `h2`, tên sản phẩm dùng `h3`.
 
 ### Layout và spacing
 
@@ -62,15 +62,15 @@ Font được khai báo trong CSS chưa đảm bảo font đã được tải. K
 
 | Khu vực template | Component / nguồn React | Quy tắc thiết kế |
 | --- | --- | --- |
-| `#header-wrap`, `#header` | `Header.js` | Logo trái, menu phải; utility bar cho account/cart/search; mobile có hamburger |
+| `#header-wrap`, `#header` | `Navbar.js` | Logo trái, menu phải; utility bar cho account/cart/search; mobile có hamburger |
 | `#billboard` | `Billboard.js` | Nội dung và ảnh bìa chia hai vùng; previous/next và dots đồng bộ slide |
 | `#client-holder` | `ClientHolder` trong `HomeSections.js` | Hàng logo đối tác, giữ tỉ lệ và khoảng thở |
 | `#featured-books` | `FeaturedBooks` | Eyebrow + heading giữa, lưới sách và link xem tất cả |
-| Sản phẩm trong các danh sách | `ProductItem.js` | Ảnh → tên sách → tác giả → giá; cùng cấu trúc ở mọi danh sách |
+| Sản phẩm trong các danh sách | `BookCard.js` | Ảnh → tên sách → tác giả → giá; cùng cấu trúc ở mọi danh sách |
 | `#best-selling` | `BestSelling` | Ảnh lớn cạnh thông tin và CTA; nền pattern nhẹ |
 | `#popular-books` | `PopularBooks` | Tabs thể loại nằm trên lưới; tab active phải dễ nhận biết |
 | `#quotation` | `Quotation` | Quote giữa trang và tên tác giả, chiều rộng đọc vừa phải |
-| `#special-offer` | `SpecialOffer` | Dùng ProductItem; giá cũ gạch ngang, giá mới nổi bật |
+| `#special-offer` | `SpecialOffer` | Dùng BookCard; giá cũ gạch ngang, giá mới nổi bật |
 | `#subscribe` | `Subscribe` | Tiêu đề và mô tả/form hai cột trên desktop |
 | `#latest-blog` | `LatestBlog` | Ảnh, ngày, tiêu đề, category; ba bài mỗi hàng desktop |
 | `#download-app` | `DownloadApp` | Ảnh thiết bị cạnh nội dung và badge cửa hàng ứng dụng |
@@ -81,7 +81,7 @@ Font được khai báo trong CSS chưa đảm bảo font đã được tải. K
 
 ### Product card
 
-- Dùng `ProductItem` chung thay vì viết lại card cho từng section.
+- Dùng `BookCard` chung thay vì viết lại card cho từng section.
 - Giữ ảnh đúng tỉ lệ, không kéo méo; khung ảnh nhất quán trong cùng danh sách.
 - Tên sách dài được xuống dòng; không che giá hoặc tác giả.
 - CTA Add to Cart phải dùng được bằng bàn phím và trên cảm ứng; không chỉ xuất hiện khi hover.
@@ -129,7 +129,7 @@ Font được khai báo trong CSS chưa đảm bảo font đã được tải. K
 ## 8. Checklist khi thêm màn hình
 
 - [ ] Dùng palette, typography, lưới và nhịp spacing thống nhất với Booksaw.
-- [ ] Tái sử dụng Header, Footer và ProductItem khi phù hợp.
+- [ ] Tái sử dụng Navbar, Footer và BookCard khi phù hợp.
 - [ ] Có hierarchy tiêu đề, CTA chính rõ và nội dung không bị cắt.
 - [ ] Responsive, thao tác bàn phím và focus hoạt động.
 - [ ] Không có ảnh lỗi, link chết hoặc nút im lặng gây hiểu nhầm.

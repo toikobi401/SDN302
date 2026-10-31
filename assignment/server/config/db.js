@@ -1,14 +1,18 @@
 const mongoose = require('mongoose');
-require('dotenv').config();
 
-const connectDB = async () => {
-    try {
-        await mongoose.connect(process.env.MONGO_URI);
-        console.log('MongoDB connected successfully');
-    } catch (error) {
-        console.error("MongoDB connection failed: ", error);
-        process.exit(1);
-    }
-};
+async function connectDB() {
+  const uri = process.env.MONGO_URI;
+  if (!uri) throw new Error('MONGO_URI is required');
+  // Index creation is an explicit administrative operation (npm run db:init).
+  return mongoose.connect(uri, {
+    autoIndex: false,
+    autoCreate: false,
+    serverSelectionTimeoutMS: 10000,
+  });
+}
 
-module.exports = connectDB;
+async function disconnectDB() {
+  await mongoose.disconnect();
+}
+
+module.exports = { connectDB, disconnectDB };

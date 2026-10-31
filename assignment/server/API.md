@@ -1,6 +1,6 @@
 # Bookstore REST API
 
-Base URL: `/api`. Body và response là JSON; trừ upload ảnh, body thông thường nên nhỏ. Request tối đa 8 MiB. Các ID là MongoDB ObjectId. Tiền tính bằng số nguyên VND.
+Base URL: `/api`. Body và response là JSON. Request tối đa 1 MiB; ảnh không đi qua API. Các ID là MongoDB ObjectId. Tiền tính bằng số nguyên VND.
 
 ## Cấu hình và khởi động
 
@@ -8,10 +8,10 @@ Base URL: `/api`. Body và response là JSON; trừ upload ảnh, body thông th
 2. Bổ sung các biến trong `.env.example` vào `.env` hiện tại; giữ nguyên thông tin MongoDB và Cloudinary đã điền.
 3. Đặt `JWT_SECRET` là chuỗi ngẫu nhiên ít nhất 32 ký tự, không dùng giá trị mẫu. Có thể sinh bằng `node -p "require('node:crypto').randomBytes(48).toString('hex')"`.
 4. MongoDB phải là replica set hoặc Atlas để hỗ trợ transaction. Chạy `npm run db:init` trước khi sử dụng để tạo collection và unique index.
-5. Tạo admin: điền `ADMIN_NAME`, `ADMIN_EMAIL`, `ADMIN_PASSWORD` trong `.env`, chạy `npm run admin:create`, rồi xóa `ADMIN_PASSWORD` khỏi `.env`. Không tự nâng quyền tài khoản đã tồn tại.
+5. Tạo admin và dữ liệu mẫu: điền `ADMIN_NAME`, `ADMIN_EMAIL`, `ADMIN_PASSWORD` trong `.env`, chạy `npm run db:seed`, rồi xóa `ADMIN_PASSWORD` khỏi `.env`. Không tự nâng quyền tài khoản đã tồn tại.
 6. Chạy `npm start`. Server chỉ lắng nghe sau khi kết nối MongoDB thành công.
 
-`SHIPPING_FEE_VND` là phí vận chuyển cố định, mặc định 0. Chưa có tính phí theo khu vực. Đơn PENDING giữ hàng đến khi được xử lý/hủy; chưa có tự hết hạn. Đây là lựa chọn tạm cho những điểm còn mở trong CONTEXT.md.
+`SHIPPING_FEE_VND` là phí vận chuyển cố định, mặc định 0. Chưa có tính phí theo khu vực. Đơn COD PENDING giữ hàng đến khi được xử lý/hủy; đơn payOS tự hủy khi link hết hạn sau 15 phút. Đây là lựa chọn tạm cho những điểm còn mở trong CONTEXT.md.
 
 ## Quy ước
 
@@ -65,7 +65,7 @@ Tìm kiếm dùng chuỗi regex được escape, không phân biệt hoa thườ
 
 - `GET /admin/books`: danh sách mọi sách, các query như công khai và thêm `status=ACTIVE|DISCONTINUED`.
 - `GET /admin/books/:id`.
-- `POST /admin/books`.
+- `POST /admin/books`: bắt buộc có `coverImageUrl` và `coverImagePublicId`.
 - `PATCH /admin/books/:id`.
 - `DELETE /admin/books/:id`: ngừng bán.
 
@@ -79,6 +79,8 @@ Ví dụ tạo sách:
   "publisher": "NXB ...",
   "description": "Giới thiệu sách",
   "categories": ["<categoryId>"],
+  "coverImageUrl": "https://res.cloudinary.com/<cloud>/image/upload/v1/bookstore/books/abc.jpg",
+  "coverImagePublicId": "bookstore/books/abc",
   "price": 150000,
   "lowStockThreshold": 5
 }
@@ -93,16 +95,31 @@ Danh mục và nhà cung cấp đều hỗ trợ `GET /admin/<resource>`, `GET /
 
 Có thể dùng PATCH để kích hoạt lại. Sách được giữ lại khi danh mục bị ngừng hoạt động; không cho gán mới danh mục đang ngừng hoạt động.
 
+## Bán PDF
+
+Mỗi sách có bản in; sách có `pdfForSale: true` bán thêm PDF theo `pdfPrice`.
+
+- `GET /books`, `GET /books/:id`: trả `pdfForSale`, `pdfPrice`, không bao giờ trả `pdfFile`.
+- `POST`, `PATCH /admin/books`: thêm `pdfFile` (chỉ tên file trong `data/books/pdfs`, dạng `my-book.pdf`), `pdfPrice`, `pdfForSale`. Bật bán khi thiếu giá hoặc thiếu file trả 400.
+- `PUT /cart/items/:bookId`: thêm `format: "PHYSICAL" | "PDF"`, mặc định `PHYSICAL`. Dòng PDF luôn có `quantity: 1`.
+- `DELETE /cart/items/:bookId?format=PDF`: xoá đúng dòng theo định dạng, mặc định `PHYSICAL`.
+- `POST /orders`: mỗi item thêm `format`. Đơn có PDF bắt buộc `paymentMethod: "PAYOS"` (400 `PAYMENT_REQUIRED`). Đơn chỉ có PDF không cần `shippingAddress` và không có phí ship. PDF ngừng bán hoặc thiếu file trả 409 `PDF_UNAVAILABLE`. Đã mua hoặc đang chờ trả tiền PDF đó trả 409 `ALREADY_OWNED`.
+- `GET /orders/:id/items/:bookId/download`: chủ đơn tải file khi đơn `PAID` và chưa `CANCELLED`; chưa trả tiền trả 403 `NOT_PAID`, file bị mất trả 404 `FILE_MISSING`. Đây là cách duy nhất để lấy file.
+
+Đơn chỉ có PDF chuyển thẳng sang `COMPLETED` khi trả tiền và không đi qua `CONFIRMED`, `SHIPPING`. Đơn có cả hai định dạng tải được PDF ngay, phần giao hàng vẫn do admin xử lý. Huỷ đơn chỉ hoàn kho các dòng bản in và khoá quyền tải.
+
+## Thanh toán payOS
+
+- `POST /orders` với `paymentMethod: "PAYOS"` tạo đơn, trừ kho và trả đơn kèm `checkoutUrl`, `orderCode`, `paymentExpiresAt`. Chưa cấu hình key thì trả 503; payOS lỗi thì đơn bị hủy, kho được hoàn và trả 502.
+- `POST /payments/payos/webhook`: payOS gọi, xác thực bằng chữ ký, sai chữ ký trả 400. Đơn không tồn tại vẫn trả 200 vì payOS gửi giao dịch mẫu khi xác nhận URL.
+
 ## Upload ảnh Cloudinary
 
-- `POST /admin/books/:id/images`: `{ "image": "data:image/png;base64,...", "kind": "cover" }`. `kind` là `cover` hoặc `gallery`.
-- `POST /admin/categories/:id/image`: `{ "image": "data:image/jpeg;base64,..." }`.
+- `POST /admin/uploads/signature`: trả `cloudName`, `apiKey`, `timestamp`, `folder`, `allowedFormats`, `signature`. Chữ ký có hiệu lực 1 giờ, giới hạn 30 lần/phút.
 
-Chấp nhận JPEG, PNG, WebP tối đa 5 MiB/file; tối đa 20 ảnh gallery. Backend kiểm tra MIME/signature, upload Cloudinary rồi lưu secure URL và public ID vào document tương ứng. Frontend gửi data URI, không gửi đường dẫn file máy cá nhân.
+Trình duyệt gửi `file`, `api_key`, `timestamp`, `folder`, `allowed_formats`, `signature` tới `https://api.cloudinary.com/v1_1/<cloudName>/image/upload` rồi đưa `secure_url`, `public_id` vào `coverImageUrl`, `coverImagePublicId` hoặc `imageUrls`, `imagePublicIds` khi tạo/sửa sách. Backend kiểm tra URL thuộc tài khoản của cửa hàng và public ID nằm trong thư mục sách. Tối đa 5 ảnh phụ; hai mảng phải cùng độ dài.
 
-Ảnh sách: `coverImageUrl`, `coverImagePublicId`, `imageUrls`, `imagePublicIds`; ảnh danh mục: `imageUrl`, `imagePublicId`. Các public ID gallery theo dõi tài sản do endpoint upload tạo; ảnh URL bên ngoài có thể không có public ID tương ứng.
-
-Ảnh cũ được giữ trên Cloudinary khi thay bìa để URL trong đơn cũ tiếp tục hoạt động. Nếu lưu database thất bại sau upload, backend cố xóa ảnh vừa upload và log nếu dọn dẹp thất bại. MongoDB và Cloudinary không có transaction chung; cần quy trình dọn tài sản mồ côi khi vận hành. Chưa cung cấp API xóa ảnh vĩnh viễn.
+Khi sửa sách, ảnh không còn dùng được xóa trên Cloudinary sau khi lưu DB; lỗi xóa chỉ ghi log. Backend chỉ xóa public ID đọc từ DB. Ẩn sách không xóa ảnh.
 
 ## Giỏ hàng — cần đăng nhập
 
@@ -118,7 +135,8 @@ Giỏ không giữ hàng và không chốt giá, tối đa 100 sách khác nhau.
 - `POST /orders`, có `Idempotency-Key`.
 - `GET /orders`: chỉ đơn của mình, lọc `status`, `from`, `to`, phân trang.
 - `GET /orders/:id`: chỉ đơn của mình.
-- `POST /orders/:id/cancel`: `{ "reason": "Đặt nhầm sách" }`, chỉ khi PENDING.
+- `POST /orders/:id/cancel`: `{ "reason": "Đặt nhầm sách" }`, chỉ khi PENDING và chưa thanh toán.
+- `POST /orders/:id/payment/sync`: hỏi payOS và cập nhật trạng thái thanh toán của đơn của mình.
 
 Ví dụ đặt hàng:
 
@@ -131,7 +149,7 @@ Ví dụ đặt hàng:
     "addressLine": "123 Nguyen Trai",
     "province": "TP. Hồ Chí Minh"
   },
-  "paymentMethod": "COD",
+  "paymentMethod": "COD hoặc PAYOS",
   "note": "Giao giờ hành chính"
 }
 ```
@@ -142,9 +160,12 @@ Backend lấy giá/thông tin sách từ DB, tự tính subtotal/shippingFee/tot
 
 - `GET /admin/orders`, `GET /admin/orders/:id`.
 - `PATCH /admin/orders/:id/status`: `{ "status": "CONFIRMED" }`.
-- `POST /admin/orders/:id/payment`: xác nhận đã thu tiền COD, chỉ khi SHIPPING hoặc COMPLETED. Gửi lại không thu/ghi nhận thêm.
+- `GET /admin/orders` lọc thêm theo `paymentStatus=UNPAID|PAID|REFUNDED`.
+- `POST /admin/orders/:id/payment`: xác nhận đã thu tiền COD, chỉ khi SHIPPING hoặc COMPLETED. Gửi lại không thu/ghi nhận thêm. Không áp dụng cho đơn PAYOS.
+- `POST /admin/orders/:id/payment/sync`: hỏi payOS và cập nhật đơn.
+- `POST /admin/orders/:id/refund`: chuyển đơn CANCELLED + PAID sang REFUNDED sau khi đã hoàn tiền ngoài hệ thống.
 
-Luồng: PENDING → CONFIRMED → SHIPPING → COMPLETED. Admin hủy PENDING/CONFIRMED bằng `{ "status": "CANCELLED", "reason": "..." }`. Không cho hủy đơn đã thu tiền vì chưa có nghiệp vụ hoàn tiền. Trạng thái thanh toán độc lập, COMPLETED có thể UNPAID cho đến khi admin xác nhận thu tiền. Mỗi thay đổi lưu người thực hiện và thời gian.
+Luồng: PENDING → CONFIRMED → SHIPPING → COMPLETED. Admin hủy PENDING/CONFIRMED bằng `{ "status": "CANCELLED", "reason": "..." }`. Đơn PAYOS phải PAID mới được CONFIRMED. Admin hủy đơn đã thu tiền thì đơn ở CANCELLED + PAID cho đến khi được đánh dấu hoàn tiền. Trạng thái thanh toán độc lập, COMPLETED có thể UNPAID cho đến khi admin xác nhận thu tiền. Mỗi thay đổi lưu người thực hiện và thời gian.
 
 ## Nhập hàng
 

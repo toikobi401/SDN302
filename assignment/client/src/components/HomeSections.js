@@ -1,4 +1,5 @@
-import { useStore } from '../Store';
+import { useCart } from '../context/CartContext';
+import { useCatalog } from '../context/CatalogContext';
 import {
   money,
   placeholderArticles,
@@ -6,7 +7,8 @@ import {
   placeholderClients,
   placeholderQuote,
 } from "../data/placeholders";
-import ProductItem from "./ProductItem";
+import BookCard, { BookSkeletons } from "./BookCard";
+import { Pager } from "./ui";
 
 export function ClientHolder() {
   return (
@@ -31,7 +33,7 @@ export function ClientHolder() {
 }
 
 export function FeaturedBooks() {
-  const { books, loading, error } = useStore();
+  const { books, loading, error } = useCatalog();
   return (
     <section id="featured-books" className="py-5 my-5">
       <div className="container">
@@ -45,8 +47,9 @@ export function FeaturedBooks() {
             </div>
             <div className="product-list">
               <div className="row">
+                {loading && <BookSkeletons count={4} />}
                 {!loading && !error && books.slice(0, 4).map((book) => (
-                  <ProductItem key={book.id} book={book} />
+                  <BookCard key={book.id} book={book} />
                 ))}
               </div>
             </div>
@@ -67,7 +70,8 @@ export function FeaturedBooks() {
 }
 
 export function BestSelling() {
-  const { books, loading, error, addToCart, busy } = useStore();
+  const { books, loading, error } = useCatalog();
+  const { addToCart, busy } = useCart();
   const book = books[0];
   if (!book || loading || error) return null;
   return (
@@ -107,7 +111,7 @@ export function BestSelling() {
 }
 
 export function PopularBooks() {
-  const { books, categories, category, selectCategory, loading, error, reload, page, pagination, setPage } = useStore();
+  const { books, categories, category, selectCategory, sort, selectSort, loading, error, reload, page, pagination, setPage } = useCatalog();
   const genres = [{ _id: "", name: "All Genre" }, ...categories];
 
   return (
@@ -131,17 +135,27 @@ export function PopularBooks() {
                 </li>
               ))}
             </ul>
-            {loading && <p role="status">Loading books...</p>}
-            {error && <p role="alert">{error} <button onClick={reload}>Try again</button></p>}
-            {!loading && !error && !books.length && <p>No books found.</p>}
-            {!loading && !error && pagination.pages > 1 && <div><button disabled={page <= 1} onClick={() => setPage(page - 1)}>Previous</button> Page {page} / {pagination.pages} <button disabled={page >= pagination.pages} onClick={() => setPage(page + 1)}>Next</button></div>}
+            <div className="toolbar">
+              <label>Sort by
+                <select value={sort} onChange={(event) => selectSort(event.target.value)}>
+                  <option value="newest">Newest</option>
+                  <option value="price_asc">Price: low to high</option>
+                  <option value="price_desc">Price: high to low</option>
+                  <option value="title">Title</option>
+                </select>
+              </label>
+            </div>
+            {error && <p className="message error" role="alert">{error} <button type="button" className="action outline" onClick={reload}>Try again</button></p>}
+            {!loading && !error && !books.length && <p>No books match your search. Try another title, author or category.</p>}
             <div className="tab-content">
               <div data-tab-content="" className="active">
                 <div className="row">
+                  {loading && <BookSkeletons count={8} />}
                   {!loading && !error && books.map((book) => (
-                    <ProductItem key={book.id} book={book} />
+                    <BookCard key={book.id} book={book} />
                   ))}
                 </div>
+                {!loading && !error && <Pager page={page} pages={pagination.pages} onChange={setPage} />}
               </div>
             </div>
           </div>
