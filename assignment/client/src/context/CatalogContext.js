@@ -36,7 +36,7 @@ export function CatalogProvider({ children }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return <CatalogContext.Provider value={{ books, categories, category, sort, page, pagination, loading, error, setPage,
+  return <CatalogContext.Provider value={{ books, categories, query, category, sort, page, pagination, loading, error, setPage,
     search: value => { setQuery(value.trim()); setPage(1); },
     selectCategory: value => { setCategory(value); setPage(1); },
     selectSort: value => { setSort(value); setPage(1); },

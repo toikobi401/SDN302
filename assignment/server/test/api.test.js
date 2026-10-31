@@ -452,6 +452,16 @@ test('download is owner-scoped and needs a paid, active order with that PDF', as
   await assert.rejects(() => download(req(paid), res), { code: 'FILE_MISSING' });
 });
 
+test('an aborted download is not an error, but a failed one still is', async t => {
+  const order = pdfOrder({ paymentStatus: 'PAID', paidAt: new Date(), status: 'COMPLETED' });
+  t.mock.method(Order, 'findOne', () => query(order));
+  t.mock.method(Book, 'findById', () => ({ select: async () => ({ pdfFile: 'exists.pdf', slug: 'b' }) }));
+  t.mock.method(require('node:fs'), 'existsSync', () => true);
+  const req = { params: { id: String(order._id), bookId: String(bookId) }, user, get: () => '' };
+  await download(req, { download: (file, name, done) => done(Object.assign(new Error('aborted'), { code: 'ECONNABORTED' })) });
+  await assert.rejects(() => download(req, { download: (file, name, done) => done(Object.assign(new Error('broken'), { code: 'EIO' })) }), { code: 'EIO' });
+});
+
 test('public book JSON never includes pdfFile because the field is unselected by default', () => {
   assert.equal(Book.schema.path('pdfFile').options.select, false);
 });

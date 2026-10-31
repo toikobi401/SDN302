@@ -111,7 +111,7 @@ export function BestSelling() {
 }
 
 export function PopularBooks() {
-  const { books, categories, category, selectCategory, sort, selectSort, loading, error, reload, page, pagination, setPage } = useCatalog();
+  const { books, categories, query, search, category, selectCategory, sort, selectSort, loading, error, reload, page, pagination, setPage } = useCatalog();
   const genres = [{ _id: "", name: "All Genre" }, ...categories];
 
   return (
@@ -136,12 +136,17 @@ export function PopularBooks() {
               ))}
             </ul>
             <div className="toolbar">
+              <form role="search" onSubmit={(event) => { event.preventDefault(); search(new FormData(event.currentTarget).get("q")); }}>
+                {/* key resets the box when the Navbar search changes the query */}
+                <label>Search by title, author or ISBN<input key={query} name="q" type="search" defaultValue={query} /></label>
+              </form>
               <label>Sort by
                 <select value={sort} onChange={(event) => selectSort(event.target.value)}>
                   <option value="newest">Newest</option>
                   <option value="price_asc">Price: low to high</option>
                   <option value="price_desc">Price: high to low</option>
                   <option value="title">Title</option>
+                  <option value="pdf_first">PDF available first</option>
                 </select>
               </label>
             </div>

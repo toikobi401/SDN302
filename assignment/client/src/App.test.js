@@ -1,4 +1,5 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import App from './App';
 import { cloudImage, slugify } from './components/ui';
 
@@ -13,6 +14,16 @@ test('storefront renders the catalog section and shows a fetched book', async ()
   render(<App />);
   expect(screen.getByRole('heading', { name: 'Browse Books' })).toBeInTheDocument();
   expect((await screen.findAllByRole('link', { name: 'A Test Book' }))[0]).toHaveAttribute('href', '/books/b1');
+});
+
+test('Browse Books search sends the query to the catalog API', async () => {
+  global.fetch = jest.fn(async url => ({
+    ok: true, status: 200,
+    json: async () => (String(url).includes('/books') ? { data: [], pagination: { pages: 0 } } : { data: [] }),
+  }));
+  render(<App />);
+  userEvent.type(screen.getByLabelText('Search by title, author or ISBN'), 'Dune{enter}');
+  await waitFor(() => expect(global.fetch).toHaveBeenCalledWith(expect.stringContaining('q=Dune'), expect.anything()));
 });
 
 test('cloudImage only rewrites Cloudinary URLs', () => {

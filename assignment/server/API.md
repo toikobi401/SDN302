@@ -54,7 +54,7 @@ PATCH addresses thay thế toàn bộ danh sách, tối đa 20 địa chỉ. JWT
 
 ## Sách và danh mục công khai
 
-- `GET /books`: chỉ sách ACTIVE. Query: `q` (tên/tác giả/ISBN), `category`, `minPrice`, `maxPrice`, `inStock=true|false`, `sort=newest|price_asc|price_desc|title`, `page`, `limit`.
+- `GET /books`: chỉ sách ACTIVE. Query: `q` (tên/tác giả/ISBN), `category`, `minPrice`, `maxPrice`, `inStock=true|false`, `sort=newest|price_asc|price_desc|title|pdf_first`, `page`, `limit`.
 - `GET /books/:id`: chi tiết sách đang bán.
 - `GET /categories`: danh mục đang hoạt động.
 - `GET /categories/:id`: chi tiết danh mục đang hoạt động.

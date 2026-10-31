@@ -34,6 +34,7 @@ export function OrderDetail() {
   const { data: order, loading, error, reload, setData } = useApi(`/orders/${id}`);
   const [busy, setBusy] = useState(false);
   const [actionError, setActionError] = useState('');
+  const [downloading, setDownloading] = useState(null);
   const checked = useRef(false);
 
   async function checkPayment() {
@@ -52,9 +53,10 @@ export function OrderDetail() {
   });
 
   async function download(item) {
-    setActionError('');
+    setDownloading(item.book); setActionError('');
     try { await downloadFile(`/orders/${id}/items/${item.book}/download`); }
     catch (err) { setActionError(err.message); }
+    finally { setDownloading(null); }
   }
 
   async function cancel(event) {
@@ -86,7 +88,7 @@ export function OrderDetail() {
           <dt>Payment</dt><dd>{methodLabels[order.paymentMethod]}, {paymentLabels[order.paymentStatus].toLowerCase()}</dd>
           {order.shippingAddress && <><dt>Deliver to</dt><dd><Address value={order.shippingAddress} /></dd></>}
         </dl>
-        <div className="table-responsive"><OrderItems order={order} action={item => item.format === 'PDF' && canDownload(order) && <div><button type="button" className="action outline" onClick={() => download(item)}>Download PDF</button></div>} /></div>
+        <div className="table-responsive"><OrderItems order={order} action={item => item.format === 'PDF' && canDownload(order) && <div><button type="button" className="action outline" disabled={downloading === item.book} onClick={() => download(item)}>{downloading === item.book ? 'Downloading...' : 'Download PDF'}</button></div>} /></div>
         {order.status === 'PENDING' && order.paymentStatus === 'UNPAID' && <form className="inline-form" onSubmit={cancel}>
           <label>Reason for cancelling<input name="reason" required maxLength={1000} /></label>
           <button className="action outline" disabled={busy} type="submit">Cancel order</button>

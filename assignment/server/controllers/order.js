@@ -44,7 +44,8 @@ async function download(req, res) {
     assert(false, 404, 'FILE_MISSING', 'The PDF file is unavailable; contact the store');
   }
   await new Promise((resolve, reject) => {
-    res.download(pdfPath(book.pdfFile), `${book.slug}.pdf`, error => (error ? reject(error) : resolve()));
+    // A customer closing the tab mid-download is not a server error.
+    res.download(pdfPath(book.pdfFile), `${book.slug}.pdf`, error => (error && error.code !== 'ECONNABORTED' ? reject(error) : resolve()));
   });
 }
 

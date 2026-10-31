@@ -78,7 +78,7 @@ function bookFilter(query, management = false) {
 }
 
 async function books(req, res, management) {
-  const sorts = { newest: { createdAt: -1, _id: 1 }, price_asc: { price: 1, _id: 1 }, price_desc: { price: -1, _id: 1 }, title: { title: 1, _id: 1 } };
+  const sorts = { newest: { createdAt: -1, _id: 1 }, price_asc: { price: 1, _id: 1 }, price_desc: { price: -1, _id: 1 }, title: { title: 1, _id: 1 }, pdf_first: { pdfForSale: -1, createdAt: -1, _id: 1 } };
   const sort = req.query.sort || 'newest';
   assert(Object.hasOwn(sorts, sort), 400, 'INVALID_QUERY', 'Invalid sort');
   res.json(await paginate(Book, bookFilter(req.query, management), req.query, { sort: sorts[sort], populate: { path: 'categories', match: { isActive: true } }, select: management ? ADMIN_FIELDS : undefined }));

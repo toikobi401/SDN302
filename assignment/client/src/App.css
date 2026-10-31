@@ -44,7 +44,7 @@ button {
 .stack { display: flex; flex-direction: column; gap: 16px; }
 .stack.col-md-7 { padding-right: 32px; }
 .page label, .toolbar label { display: block; margin-bottom: 0; }
-.page input:not([type="radio"]):not([type="checkbox"]), .page select, .page textarea, .toolbar select { display: block; width: 100%; margin: 4px 0 0; padding: 8px 12px; min-height: 44px; border: 1px solid #757575; border-radius: 0; background: #fff; }
+.page input:not([type="radio"]):not([type="checkbox"]), .page select, .page textarea, .toolbar select, .toolbar input[type="search"] { display: block; width: 100%; margin: 4px 0 0; padding: 8px 12px; min-height: 44px; border: 1px solid #757575; border-radius: 0; background: #fff; }
 .page input[type="file"] { padding: 8px; }
 .page fieldset { border: 0; padding: 0; margin: 0; }
 .page legend { font-size: inherit; font-weight: 600; margin-bottom: 8px; }

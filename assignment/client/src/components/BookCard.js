@@ -22,6 +22,7 @@ function BookCard({ book, layout = "column" }) {
             )}
             {money(book.price)}
           </div>
+          {book.pdfForSale && <small>PDF: {money(book.pdfPrice)}</small>}
         </figcaption>
       </div>
     </div>
