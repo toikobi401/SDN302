@@ -8,6 +8,8 @@ const awaitingPayment = order => order.paymentMethod === 'PAYOS' && order.status
 
 const canDownload = order => order.paymentStatus === 'PAID' && order.status !== 'CANCELLED';
 
+const downloadsLeft = item => item.quantity - (item.downloadCount || 0);
+
 export function OrderList() {
   const [page, setPage] = useState(1);
   const { data, pagination, loading, error, reload } = useApi(`/orders?page=${page}&limit=10`);
@@ -56,7 +58,7 @@ export function OrderDetail() {
     setDownloading(item.book); setActionError('');
     try { await downloadFile(`/orders/${id}/items/${item.book}/download`); }
     catch (err) { setActionError(err.message); }
-    finally { setDownloading(null); }
+    finally { setDownloading(null); reload(); }
   }
 
   async function cancel(event) {
@@ -81,14 +83,14 @@ export function OrderDetail() {
         {order.status === 'CANCELLED' && order.paymentStatus === 'PAID' && <p className="message error">This order was cancelled after your payment arrived. The store will refund {money(order.total)} to you.</p>}
         {order.paymentStatus === 'REFUNDED' && <p className="message success">The store refunded this order on {dateTime(order.refundedAt)}.</p>}
         {order.paymentMethod === 'PAYOS' && order.status === 'PENDING' && order.paymentStatus === 'PAID' && <p className="message success">Payment received. The store will confirm your order soon.</p>}
-        {canDownload(order) && order.items.some(item => item.format === 'PDF') && <p className="message success">Payment received. Your PDF is ready to download.</p>}
+        {canDownload(order) && order.items.some(item => item.format === 'PDF' && downloadsLeft(item) > 0) && <p className="message success">Payment received. Your PDF is ready to download.</p>}
         <dl className="book-facts">
           <dt>Placed</dt><dd>{dateTime(order.createdAt)}</dd>
           <dt>Status</dt><dd>{statusLabels[order.status]}{order.cancellationReason && ` (${order.cancellationReason})`}</dd>
           <dt>Payment</dt><dd>{methodLabels[order.paymentMethod]}, {paymentLabels[order.paymentStatus].toLowerCase()}</dd>
           {order.shippingAddress && <><dt>Deliver to</dt><dd><Address value={order.shippingAddress} /></dd></>}
         </dl>
-        <div className="table-responsive"><OrderItems order={order} action={item => item.format === 'PDF' && canDownload(order) && <div><button type="button" className="action outline" disabled={downloading === item.book} onClick={() => download(item)}>{downloading === item.book ? 'Downloading...' : 'Download PDF'}</button></div>} /></div>
+        <div className="table-responsive"><OrderItems order={order} action={item => item.format === 'PDF' && canDownload(order) && <div><button type="button" className="action outline" disabled={downloading === item.book || downloadsLeft(item) < 1} onClick={() => download(item)}>{downloading === item.book ? 'Downloading...' : 'Download PDF'}</button> {downloadsLeft(item)} of {item.quantity} downloads left</div>} /></div>
         {order.status === 'PENDING' && order.paymentStatus === 'UNPAID' && <form className="inline-form" onSubmit={cancel}>
           <label>Reason for cancelling<input name="reason" required maxLength={1000} /></label>
           <button className="action outline" disabled={busy} type="submit">Cancel order</button>

@@ -10,6 +10,8 @@ const itemSchema = new Schema({
   unitPrice: integer(),
   quantity: integer(1),
   lineTotal: integer(),
+  // Only PDF lines use this; quantity is how many downloads were bought.
+  downloadCount: integer(0, 0),
 }, { _id: false });
 
 const historySchema = new Schema({
@@ -59,7 +61,6 @@ schema.pre('validate', function () {
   this.subtotal = this.items.reduce((sum, item) => sum + item.lineTotal, 0);
   if (this.discount > this.subtotal) this.invalidate('discount', 'Discount cannot exceed the subtotal');
   this.total = this.subtotal + this.shippingFee - this.discount;
-  for (const item of this.items) if (item.format === 'PDF' && item.quantity !== 1) this.invalidate('items', 'A PDF line always has quantity 1');
   if (this.paymentStatus === 'PAID' && !this.paidAt) this.invalidate('paidAt', 'paidAt is required for paid orders');
 });
 

@@ -34,6 +34,7 @@ router.delete('/admin/books/:id', admin, book.hide);
 router.post('/admin/books/:id/stock-adjustments', admin, book.adjustStock);
 router.get('/admin/inventory-movements', admin, book.inventoryMovements);
 router.post('/admin/uploads/signature', admin, uploadLimit, upload.signature);
+router.post('/admin/uploads/pdf', admin, uploadLimit, upload.pdf);
 
 router.get('/categories', category.list);
 router.get('/categories/:id', category.get);

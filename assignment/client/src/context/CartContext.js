@@ -39,8 +39,7 @@ export function CartProvider({ children }) {
     try {
       const current = (await api('/cart')).data;
       const inCart = current.items.find(item => item.book?._id === book.id && item.format === format)?.quantity || 0;
-      const quantity = format === 'PDF' ? 1 : inCart + 1;
-      await api(`/cart/items/${book.id}`, { method: 'PUT', body: JSON.stringify({ quantity, format }) });
+      await api(`/cart/items/${book.id}`, { method: 'PUT', body: JSON.stringify({ quantity: inCart + 1, format }) });
       await refreshCart();
       setNotice(format === 'PDF' ? 'PDF added to cart.' : 'Book added to cart.');
     } catch (err) { setNotice(err.message); }

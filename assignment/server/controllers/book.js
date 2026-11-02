@@ -45,7 +45,7 @@ async function bookInput(input) {
 function assertPdfSellable(book) {
   if (!book.pdfForSale) return;
   assert(book.pdfPrice, 400, 'INVALID_INPUT', 'Set a PDF price before selling the PDF');
-  assert(pdfExists(book.pdfFile), 400, 'PDF_MISSING', 'The PDF file is not in data/books/pdfs');
+  assert(pdfExists(book.pdfFile), 400, 'PDF_MISSING', 'Upload a PDF file before selling the PDF');
 }
 
 function bookFilter(query, management = false) {

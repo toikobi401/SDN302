@@ -323,16 +323,48 @@ function pdfBookMock(t, book) {
   t.mock.method(User, 'updateOne', () => ({ session: async () => ({}) }));
 }
 
+test('an uploaded PDF gets a generated name, and a rejected one leaves no file behind', async t => {
+  const { Readable } = require('node:stream');
+  const send = chunks => Readable.from(chunks.map(chunk => Buffer.from(chunk)));
+  const dir = require('node:path').dirname(pdfs.pdfPath('x.pdf'));
+  const name = await pdfs.savePdf(send(['%P', 'DF-1.7 body']));
+  t.after(() => fs.rmSync(pdfs.pdfPath(name), { force: true }));
+  assert.match(name, /^upload-[a-f0-9-]+\.pdf$/);
+  assert.ok(pdfs.isPdfName(name));
+  assert.equal(fs.readFileSync(pdfs.pdfPath(name), 'utf8'), '%PDF-1.7 body');
+  const before = fs.readdirSync(dir).length;
+  await assert.rejects(() => pdfs.savePdf(send(['<html>not a pdf'])), { code: 'INVALID_PDF', status: 400 });
+  await assert.rejects(() => pdfs.savePdf(send(['%PD'])), { code: 'INVALID_PDF', status: 400 });
+  await assert.rejects(() => pdfs.savePdf(send(['%PDF-', 'too long']), 6), { code: 'PDF_TOO_LARGE', status: 413 });
+  assert.equal(fs.readdirSync(dir).length, before);
+});
+
+test('a refused PDF upload reads the whole body before answering', async () => {
+  const { Readable } = require('node:stream');
+  const { pdf } = require('../controllers/upload');
+  const res = { status() { throw new Error('must not answer with success'); } };
+  const notPdf = Object.assign(Readable.from([Buffer.from('<html>'), Buffer.from('rest')]), { is: () => 'application/pdf', get: () => undefined });
+  await assert.rejects(() => pdf(notPdf, res), { code: 'INVALID_PDF' });
+  assert.equal(notPdf.readableEnded, true);
+  const wrongType = Object.assign(Readable.from([Buffer.from('%PDF-')]), { is: () => false, get: () => undefined });
+  await assert.rejects(() => pdf(wrongType, res), { status: 415 });
+  assert.equal(wrongType.readableEnded, true);
+  const declaredTooBig = Object.assign(Readable.from([Buffer.from('%PDF-')]), { is: () => 'application/pdf', get: () => String(201 * 1024 * 1024) });
+  await assert.rejects(() => pdf(declaredTooBig, res), { status: 413 });
+});
+
 test('PDF names cannot leave the PDF folder', () => {
   for (const bad of ['../secret.pdf', 'a/b.pdf', 'a\\b.pdf', 'A.pdf', 'x.txt', '', null, { $ne: 1 }]) assert.equal(pdfs.pdfPath(bad), null);
   assert.ok(pdfs.pdfPath('good-1.pdf').endsWith('good-1.pdf'));
   assert.equal(pdfs.pdfExists('no-such-file.pdf'), false);
 });
 
-test('a book may be in an order as both formats but a PDF line is always one copy', () => {
+test('a book may be in an order as both formats and a PDF line defaults to one download', async () => {
   const both = commerce.itemInput([{ book: String(bookId), quantity: 2 }, { book: String(bookId), format: 'PDF' }]);
   assert.deepEqual(both.map(item => [item.format, item.quantity]), [['PDF', 1], ['PHYSICAL', 2]]);
-  assert.throws(() => commerce.itemInput([{ book: String(bookId), format: 'PDF', quantity: 2 }]), { status: 400 });
+  assert.equal(commerce.itemInput([{ book: String(bookId), format: 'PDF', quantity: 3 }])[0].quantity, 3);
+  assert.throws(() => commerce.itemInput([{ book: String(bookId), format: 'PDF', quantity: 0 }]), { status: 400 });
+  await pdfOrder({ items: [{ book: bookId, format: 'PDF', title: 'B', unitPrice: 100, quantity: 3 }] }).validate();
   assert.throws(() => commerce.itemInput([{ book: String(bookId), format: 'EPUB', quantity: 1 }]), { status: 400 });
 });
 
@@ -373,14 +405,17 @@ test('mixed order deducts stock for the physical line only and still requires an
   assert.equal(state.calls.length, 1);
 });
 
-test('owned, unavailable and missing PDFs are refused', async t => {
+test('PDFs with an unpaid order, unavailable and missing PDFs are refused', async t => {
   stockMocks(t);
   t.mock.method(Order, 'findOne', () => query(null));
-  const exists = t.mock.method(Order, 'exists', () => ({ session: async () => ({ _id: 'owned' }) }));
+  const exists = t.mock.method(Order, 'exists', () => ({ session: async () => ({ _id: 'pending' }) }));
   pdfBookMock(t, null);
   const input = { items: [{ book: String(bookId), format: 'PDF' }], paymentMethod: 'PAYOS' };
-  await assert.rejects(() => commerce.createOrder(user, input, 'owned'), { code: 'ALREADY_OWNED' });
-  assert.equal(exists.mock.calls[0].arguments[0].items.$elemMatch.format, 'PDF');
+  await assert.rejects(() => commerce.createOrder(user, input, 'pending'), { code: 'PDF_PAYMENT_PENDING' });
+  const pendingFilter = exists.mock.calls[0].arguments[0];
+  assert.equal(pendingFilter.items.$elemMatch.format, 'PDF');
+  // Paid orders must not match, so a customer who used up their downloads can buy more.
+  assert.deepEqual([pendingFilter.paymentStatus, pendingFilter.status], ['UNPAID', 'PENDING']);
   exists.mock.mockImplementation(() => ({ session: async () => null }));
   await assert.rejects(() => commerce.createOrder(user, input, 'not-for-sale'), { code: 'PDF_UNAVAILABLE' });
   Book.findOne.mock.mockImplementation(() => ({ select: () => ({ session: async () => ({ pdfFile: 'no-such-file.pdf', pdfPrice: 1 }) }) }));
@@ -452,14 +487,34 @@ test('download is owner-scoped and needs a paid, active order with that PDF', as
   await assert.rejects(() => download(req(paid), res), { code: 'FILE_MISSING' });
 });
 
-test('an aborted download is not an error, but a failed one still is', async t => {
+test('each download uses one purchased download and is refused past the limit', async t => {
+  const order = pdfOrder({ paymentStatus: 'PAID', paidAt: new Date(), status: 'COMPLETED', items: [{ book: bookId, format: 'PDF', title: 'B', unitPrice: 100, quantity: 2 }] });
+  t.mock.method(Order, 'findOne', () => query(order));
+  t.mock.method(Book, 'findById', () => ({ select: async () => ({ pdfFile: 'exists.pdf', slug: 'b' }) }));
+  t.mock.method(require('node:fs'), 'existsSync', () => true);
+  const update = t.mock.method(Order, 'updateOne', async () => ({ matchedCount: 1 }));
+  const req = { params: { id: String(order._id), bookId: String(bookId) }, user, get: () => '' };
+  await download(req, { download: (file, name, done) => done() });
+  assert.equal(update.mock.callCount(), 1);
+  const [where, change] = update.mock.calls[0].arguments;
+  assert.equal(change.$inc['items.$.downloadCount'], 1);
+  assert.deepEqual(where.items.$elemMatch.downloadCount, { $not: { $gte: 2 } });
+  // matchedCount, because timestamps make modifiedCount 1 even when no line qualifies.
+  update.mock.mockImplementation(async () => ({ matchedCount: 0, modifiedCount: 1 }));
+  await assert.rejects(() => download(req, { download() { throw new Error('must not send the file'); } }), { code: 'DOWNLOAD_LIMIT', status: 403 });
+});
+
+test('an aborted download is not an error and gives the download back, but a failed one still is an error', async t => {
   const order = pdfOrder({ paymentStatus: 'PAID', paidAt: new Date(), status: 'COMPLETED' });
   t.mock.method(Order, 'findOne', () => query(order));
+  const update = t.mock.method(Order, 'updateOne', async () => ({ matchedCount: 1 }));
   t.mock.method(Book, 'findById', () => ({ select: async () => ({ pdfFile: 'exists.pdf', slug: 'b' }) }));
   t.mock.method(require('node:fs'), 'existsSync', () => true);
   const req = { params: { id: String(order._id), bookId: String(bookId) }, user, get: () => '' };
   await download(req, { download: (file, name, done) => done(Object.assign(new Error('aborted'), { code: 'ECONNABORTED' })) });
+  assert.equal(update.mock.calls[1].arguments[1].$inc['items.$.downloadCount'], -1);
   await assert.rejects(() => download(req, { download: (file, name, done) => done(Object.assign(new Error('broken'), { code: 'EIO' })) }), { code: 'EIO' });
+  assert.equal(update.mock.calls[3].arguments[1].$inc['items.$.downloadCount'], -1);
 });
 
 test('public book JSON never includes pdfFile because the field is unselected by default', () => {

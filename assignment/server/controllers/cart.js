@@ -12,7 +12,7 @@ function formatInput(value) {
 
 function cartLine(item) {
   if (!item.book) return { available: false, lineTotal: 0 };
-  if (item.format === 'PDF') return { available: item.book.status === 'ACTIVE' && item.book.pdfForSale, lineTotal: item.book.pdfPrice || 0 };
+  if (item.format === 'PDF') return { available: item.book.status === 'ACTIVE' && item.book.pdfForSale, lineTotal: (item.book.pdfPrice || 0) * item.quantity };
   return { available: item.book.status === 'ACTIVE' && item.book.stock >= item.quantity, lineTotal: item.book.price * item.quantity };
 }
 
@@ -46,7 +46,6 @@ async function setItem(req, res) {
   const book = id(req.params.bookId, 'book');
   const format = formatInput(req.body?.format);
   const quantity = number(req.body?.quantity, 'quantity', 1);
-  assert(format !== 'PDF' || quantity === 1, 400, 'INVALID_INPUT', 'A PDF line always has quantity 1');
   let cart;
   try {
     cart = await mongoose.connection.transaction(async session => {

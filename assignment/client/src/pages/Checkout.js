@@ -87,7 +87,7 @@ export default function Checkout() {
       <aside className="col-md-5">
         <h2>Your order</h2>
         {items.map(item => <p key={`${item.book._id}:${item.format}`}>
-          {item.book.title} {item.format === 'PDF' ? '(PDF)' : `x ${item.quantity}`}: {money(item.lineTotal)}
+          {item.book.title} {item.format === 'PDF' && '(PDF) '}x {item.quantity}: {money(item.lineTotal)}
         </p>)}
         <p>Subtotal: <strong>{money(cart.subtotal)}</strong></p>
         {coupon && <p>Discount: <strong>-{money(coupon.discount)}</strong></p>}

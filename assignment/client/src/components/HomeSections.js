@@ -13,7 +13,7 @@ import { Pager } from "./ui";
 export function ClientHolder() {
   return (
     <section id="client-holder">
-      <div className="container">
+      {/* <div className="container">
         <div className="row">
           <div className="inner-content">
             <div className="logo-wrap">
@@ -27,7 +27,7 @@ export function ClientHolder() {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
     </section>
   );
 }
@@ -189,137 +189,140 @@ export function SpecialOffer() { return null; }
 
 export function Subscribe() {
   return (
-    <section id="subscribe">
-      <div className="container">
-        <div className="row justify-content-center">
-          <div className="col-md-8">
-            <div className="row">
-              <div className="col-md-6">
-                <div className="title-element">
-                  <h2 className="section-title divider">Subscribe to our newsletter</h2>
-                </div>
-              </div>
-              <div className="col-md-6">
-                <div className="subscribe-content">
-                  <p>
-                    Sed eu feugiat amet, libero ipsum enim pharetra hac dolor sit amet, consectetur.
-                    Elit adipiscing enim pharetra hac.
-                  </p>
-                  <form id="form" onSubmit={(e) => e.preventDefault()}>
-                    <input type="text" name="email" placeholder="Enter your email addresss here" />
-                    <button type="submit" className="btn-subscribe">
-                      <span>send</span>
-                      <i className="icon icon-send" />
-                    </button>
-                  </form>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+    // <section id="subscribe">
+    //   <div className="container">
+    //     <div className="row justify-content-center">
+    //       <div className="col-md-8">
+    //         <div className="row">
+    //           <div className="col-md-6">
+    //             <div className="title-element">
+    //               <h2 className="section-title divider">Subscribe to our newsletter</h2>
+    //             </div>
+    //           </div>
+    //           <div className="col-md-6">
+    //             <div className="subscribe-content">
+    //               <p>
+    //                 Sed eu feugiat amet, libero ipsum enim pharetra hac dolor sit amet, consectetur.
+    //                 Elit adipiscing enim pharetra hac.
+    //               </p>
+    //               <form id="form" onSubmit={(e) => e.preventDefault()}>
+    //                 <input type="text" name="email" placeholder="Enter your email addresss here" />
+    //                 <button type="submit" className="btn-subscribe">
+    //                   <span>send</span>
+    //                   <i className="icon icon-send" />
+    //                 </button>
+    //               </form>
+    //             </div>
+    //           </div>
+    //         </div>
+    //       </div>
+    //     </div>
+    //   </div>
+    // </section>
+    <></>
   );
 }
 
 export function LatestBlog() {
   return (
-    <section id="latest-blog" className="py-5 my-5">
-      <div className="container">
-        <div className="row">
-          <div className="col-md-12">
-            <div className="section-header align-center">
-              <div className="title">
-                <span>Read our articles</span>
-              </div>
-              <h2 className="section-title">Latest Articles</h2>
-            </div>
-            <div className="row">
-              {placeholderArticles.map((article) => (
-                <div className="col-md-4" key={article.id}>
-                  <article className="column">
-                    <figure>
-                      <a href="#article" className="image-hvr-effect">
-                        <img src={article.image} alt={article.title} className="post-image" />
-                      </a>
-                    </figure>
-                    <div className="post-item">
-                      <div className="meta-date">{article.date}</div>
-                      <h3>
-                        <a href="#article">{article.title}</a>
-                      </h3>
-                      <div className="links-element">
-                        <div className="categories">{article.category}</div>
-                        <div className="social-links">
-                          <ul>
-                            <li>
-                              <a href="#facebook">
-                                <i className="icon icon-facebook" />
-                              </a>
-                            </li>
-                            <li>
-                              <a href="#twitter">
-                                <i className="icon icon-twitter" />
-                              </a>
-                            </li>
-                            <li>
-                              <a href="#behance">
-                                <i className="icon icon-behance-square" />
-                              </a>
-                            </li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                  </article>
-                </div>
-              ))}
-            </div>
-            <div className="row">
-              <div className="btn-wrap align-center">
-                <a href="#latest-blog" className="btn btn-outline-accent btn-accent-arrow">
-                  Read All Articles
-                  <i className="icon icon-ns-arrow-right" />
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+    // <section id="latest-blog" className="py-5 my-5">
+    //   <div className="container">
+    //     <div className="row">
+    //       <div className="col-md-12">
+    //         <div className="section-header align-center">
+    //           <div className="title">
+    //             <span>Read our articles</span>
+    //           </div>
+    //           <h2 className="section-title">Latest Articles</h2>
+    //         </div>
+    //         <div className="row">
+    //           {placeholderArticles.map((article) => (
+    //             <div className="col-md-4" key={article.id}>
+    //               <article className="column">
+    //                 <figure>
+    //                   <a href="#article" className="image-hvr-effect">
+    //                     <img src={article.image} alt={article.title} className="post-image" />
+    //                   </a>
+    //                 </figure>
+    //                 <div className="post-item">
+    //                   <div className="meta-date">{article.date}</div>
+    //                   <h3>
+    //                     <a href="#article">{article.title}</a>
+    //                   </h3>
+    //                   <div className="links-element">
+    //                     <div className="categories">{article.category}</div>
+    //                     <div className="social-links">
+    //                       <ul>
+    //                         <li>
+    //                           <a href="#facebook">
+    //                             <i className="icon icon-facebook" />
+    //                           </a>
+    //                         </li>
+    //                         <li>
+    //                           <a href="#twitter">
+    //                             <i className="icon icon-twitter" />
+    //                           </a>
+    //                         </li>
+    //                         <li>
+    //                           <a href="#behance">
+    //                             <i className="icon icon-behance-square" />
+    //                           </a>
+    //                         </li>
+    //                       </ul>
+    //                     </div>
+    //                   </div>
+    //                 </div>
+    //               </article>
+    //             </div>
+    //           ))}
+    //         </div>
+    //         <div className="row">
+    //           <div className="btn-wrap align-center">
+    //             <a href="#latest-blog" className="btn btn-outline-accent btn-accent-arrow">
+    //               Read All Articles
+    //               <i className="icon icon-ns-arrow-right" />
+    //             </a>
+    //           </div>
+    //         </div>
+    //       </div>
+    //     </div>
+    //   </div>
+    // </section>
+    <></>
   );
 }
 
 export function DownloadApp() {
   return (
-    <section id="download-app" className="leaf-pattern-overlay">
-      <div className="corner-pattern-overlay" />
-      <div className="container">
-        <div className="row justify-content-center">
-          <div className="col-md-8">
-            <div className="row">
-              <div className="col-md-5">
-                <figure>
-                  <img src={placeholderAssets.device} alt="phone" className="single-image" />
-                </figure>
-              </div>
-              <div className="col-md-7">
-                <div className="app-info">
-                  <h2 className="section-title divider">Download our app now !</h2>
-                  <p>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sagittis sed ptibus
-                    liberolectus nonet psryroin. Amet sed lorem posuere sit iaculis amet, ac urna.
-                  </p>
-                  <div className="google-app">
-                    <img src={placeholderAssets.googlePlay} alt="google play" />
-                    <img src={placeholderAssets.appStore} alt="app store" />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+    // <section id="download-app" className="leaf-pattern-overlay">
+    //   <div className="corner-pattern-overlay" />
+    //   <div className="container">
+    //     <div className="row justify-content-center">
+    //       <div className="col-md-8">
+    //         <div className="row">
+    //           <div className="col-md-5">
+    //             <figure>
+    //               <img src={placeholderAssets.device} alt="phone" className="single-image" />
+    //             </figure>
+    //           </div>
+    //           <div className="col-md-7">
+    //             <div className="app-info">
+    //               <h2 className="section-title divider">Download our app now !</h2>
+    //               <p>
+    //                 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sagittis sed ptibus
+    //                 liberolectus nonet psryroin. Amet sed lorem posuere sit iaculis amet, ac urna.
+    //               </p>
+    //               <div className="google-app">
+    //                 <img src={placeholderAssets.googlePlay} alt="google play" />
+    //                 <img src={placeholderAssets.appStore} alt="app store" />
+    //               </div>
+    //             </div>
+    //           </div>
+    //         </div>
+    //       </div>
+    //     </div>
+    //   </div>
+    // </section>
+    <></>
   );
 }

@@ -22,7 +22,7 @@ Khởi tạo DB không xóa dữ liệu. Nếu dữ liệu cũ vi phạm unique 
 - Tra cứu sách, phân trang, lọc/sắp xếp, quản trị sách/danh mục/nhà cung cấp.
 - Giỏ hàng theo tài khoản, giá tạm tính và trạng thái đáp ứng tồn kho.
 - Tạo và áp dụng mã giảm giá, giới hạn lượt dùng và thời gian.
-- Bán bản in và PDF trong cùng đơn, tải PDF có kiểm tra quyền sau khi thanh toán.
+- Bán bản in và PDF trong cùng đơn, tải PDF có kiểm tra quyền sau khi thanh toán, số lượt tải bằng số lượng đã mua.
 - Đặt đơn COD hoặc payOS, snapshot giá, xác nhận/giao/hoàn thành/hủy đơn, ghi nhận thu tiền COD, webhook và sync payOS, tự hủy đơn quá hạn thanh toán, ghi nhận hoàn tiền.
 - Phiếu nhập nháp, chỉnh sửa, xác nhận nhận hàng hoặc hủy.
 - Điều chỉnh tồn kho có lý do, nhật ký nhập/bán/hoàn kho.
@@ -59,7 +59,7 @@ Chi tiết endpoint, request body, trạng thái và giả định nghiệp vụ
 - Đơn payOS tự hủy sau 15 phút nếu chưa trả tiền; đơn COD PENDING chưa tự hết hạn. Chưa có đổi trả hoặc tích hợp vận chuyển.
 - Giỏ hàng không tự xóa sau đặt đơn; frontend có thể xóa sau khi nhận kết quả thành công.
 - Rate limit lưu trong bộ nhớ từng tiến trình; cần kho dùng chung khi chạy nhiều instance.
-- Ảnh bị thay hoặc bỏ khỏi sách được xóa trên Cloudinary. Ảnh đã tải nhưng lưu sách thất bại vẫn nằm lại, cần dọn thủ công. Giới hạn 5 MB chỉ kiểm tra ở client.
+- Ảnh bị thay hoặc bỏ khỏi sách được xóa trên Cloudinary. Ảnh đã tải nhưng lưu sách thất bại vẫn nằm lại, cần dọn thủ công. Giới hạn 5 MB chỉ kiểm tra ở client. PDF do admin tải lên nằm trong `data/books/pdfs`, không được xóa khi thay file hoặc khi lưu sách thất bại, cần dọn thủ công.
 - Validation ở Mongoose/API; không có MongoDB JSON Schema validator cho ghi trực tiếp. Không cung cấp quyền ghi DB trực tiếp cho client.
 - Index unique là bắt buộc cho chống trùng; cần chạy db:init trước khi dùng API.
 - Order/PurchaseReceipt cũ chưa có requestHash cần được backfill trước khi sửa trạng thái qua API mới.

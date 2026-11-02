@@ -14,8 +14,7 @@ function itemInput(items, purchase = false) {
     const format = item?.format ?? 'PHYSICAL';
     assert(bookFormats.includes(format), 400, 'INVALID_INPUT', 'format must be PHYSICAL or PDF');
     if (format === 'PHYSICAL') return { book, format, quantity: number(item?.quantity, 'quantity', 1) };
-    assert(item?.quantity === undefined || item.quantity === 1, 400, 'INVALID_INPUT', 'A PDF line always has quantity 1');
-    return { book, format, quantity: 1 };
+    return { book, format, quantity: number(item?.quantity ?? 1, 'quantity', 1) };
   }).sort((a, b) => a.book.localeCompare(b.book) || (a.format || '').localeCompare(b.format || ''));
   assert(new Set(result.map(item => `${item.book}:${item.format}`)).size === result.length, 400, 'INVALID_INPUT', 'Duplicate book items');
   return result;
@@ -67,11 +66,12 @@ async function moveStock({ book, delta, type, actor, operationKey, order, purcha
   return previous;
 }
 
-async function assertPdfsNotOwned(user, items, session) {
-  const owned = await Order.exists({ user: user._id,
+// Buying a paid PDF again is allowed because it adds downloads; only a second payment in flight is refused.
+async function assertNoPdfPaymentPending(user, items, session) {
+  const pending = await Order.exists({ user: user._id,
     items: { $elemMatch: { format: 'PDF', book: { $in: items.filter(item => item.format === 'PDF').map(item => item.book) } } },
-    $or: [{ paymentStatus: 'PAID', status: { $ne: 'CANCELLED' } }, { paymentStatus: 'UNPAID', status: 'PENDING' }] }).session(session);
-  assert(!owned, 409, 'ALREADY_OWNED', 'You already own or are paying for this PDF');
+    paymentStatus: 'UNPAID', status: 'PENDING' }).session(session);
+  assert(!pending, 409, 'PDF_PAYMENT_PENDING', 'You have an unpaid order for this PDF; pay or cancel it first');
 }
 
 async function pdfLine(item, session) {
@@ -96,7 +96,7 @@ async function createOrder(user, input, key, paymentFields = {}) {
   return idempotent(Order, { user: user._id, idempotencyKey }, hash, async session => {
     // Writing the user document makes one customer's concurrent orders conflict, so the once-only checks cannot race.
     if (hasPdf || couponCode) await User.updateOne({ _id: user._id }, { $currentDate: { updatedAt: true } }).session(session);
-    if (hasPdf) await assertPdfsNotOwned(user, items, session);
+    if (hasPdf) await assertNoPdfPaymentPending(user, items, session);
     const order = new Order({ user: user._id, idempotencyKey, requestHash: hash,
       orderNumber: `ORD-${randomUUID()}`, shippingAddress, note, paymentMethod, ...paymentFields,
       shippingFee: hasPhysical ? number(Number(process.env.SHIPPING_FEE_VND || 0), 'SHIPPING_FEE_VND') : 0,

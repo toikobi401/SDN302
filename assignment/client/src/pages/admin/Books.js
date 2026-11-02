@@ -6,11 +6,16 @@ import { cloudImage, LoadState, Pager, slugify } from '../../components/ui';
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 const MAX_GALLERY_IMAGES = 5;
 const IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+const MAX_PDF_BYTES = 200 * 1024 * 1024;
 const send = (path, method, body, headers) => api(path, { method, body: JSON.stringify(body), headers });
 
 function imageProblem(files) {
   const bad = files.find(file => !IMAGE_TYPES.includes(file.type) || file.size > MAX_IMAGE_BYTES);
   return bad && `${bad.name} must be a JPG, PNG or WebP image of at most 5 MB.`;
+}
+
+function pdfProblem(file) {
+  if (!file.size || file.size > MAX_PDF_BYTES || !/\.pdf$/i.test(file.name)) return `${file.name} must be a PDF file of at most 200 MB.`;
 }
 
 function BookForm({ book, categories, onSaved, onClose }) {
@@ -32,6 +37,12 @@ function BookForm({ book, categories, onSaved, onClose }) {
     const problem = imageProblem([...(cover?.size ? [cover] : []), ...gallery]);
     if (problem) { setError(problem); return; }
     if (existingGallery + gallery.length > MAX_GALLERY_IMAGES) { setError(`A book can have at most ${MAX_GALLERY_IMAGES} extra images.`); return; }
+    const pdf = form.get('pdf');
+    const selling = form.get('pdfForSale') === 'on';
+    // Checked here because an upload followed by a refused save would leave an unused file on the server.
+    const sellProblem = selling && (!form.get('pdfPrice') ? 'Set a PDF price before selling the PDF.' : !pdf.name && !current?.pdfFile && 'Choose a PDF file before selling the PDF.');
+    const fileProblem = sellProblem || (pdf.name && pdfProblem(pdf));
+    if (fileProblem) { setError(fileProblem); return; }
     const body = {
       title: form.get('title'),
       authors: form.get('authors').split(',').map(value => value.trim()).filter(Boolean),
@@ -42,12 +53,15 @@ function BookForm({ book, categories, onSaved, onClose }) {
       status: form.get('status'),
       ...(form.get('publisher').trim() ? { publisher: form.get('publisher') } : {}),
       ...(form.get('isbn').trim() ? { isbn: form.get('isbn') } : {}),
-      ...(form.get('pdfFile').trim() ? { pdfFile: form.get('pdfFile').trim() } : {}),
       ...(form.get('pdfPrice') ? { pdfPrice: Number(form.get('pdfPrice')) } : {}),
-      pdfForSale: form.get('pdfForSale') === 'on',
+      pdfForSale: selling,
     };
     run(async () => {
-      // Images upload only on save, so an abandoned form leaves no files behind.
+      // Files upload only on save, so an abandoned form leaves no files behind.
+      if (pdf.name) {
+        const { data } = await api('/admin/uploads/pdf', { method: 'POST', body: pdf, headers: { 'Content-Type': 'application/pdf' } });
+        body.pdfFile = data.pdfFile;
+      }
       if (cover?.size) {
         const image = await uploadImage(cover);
         body.coverImageUrl = image.url;
@@ -121,7 +135,8 @@ function BookForm({ book, categories, onSaved, onClose }) {
       <fieldset>
         <legend>PDF edition</legend>
         {current?.license && <p>License: {current.license}{/NonCommercial/i.test(current.license) && '. This license does not allow selling the book.'}</p>}
-        <label>File name in data/books/pdfs<input name="pdfFile" maxLength={200} pattern="[a-z0-9\-]+\.pdf" title="Lowercase letters, numbers and hyphens, ending in .pdf" defaultValue={current?.pdfFile} /></label>
+        {current?.pdfFile && <p>Current file: {current.pdfFile}</p>}
+        <label>{current?.pdfFile ? 'Replace PDF file' : 'PDF file'} (at most 200 MB)<input name="pdf" type="file" accept=".pdf,application/pdf" /></label>
         <label>PDF price in VND<input name="pdfPrice" type="number" min="1" step="1" defaultValue={current?.pdfPrice} /></label>
         <label className="choice"><input name="pdfForSale" type="checkbox" defaultChecked={current?.pdfForSale} /> Sell the PDF</label>
       </fieldset>

@@ -111,11 +111,11 @@ Mã lỗi: 400 `COUPON_INVALID` (không tồn tại, đã tắt, ngoài thời g
 Mỗi sách có bản in; sách có `pdfForSale: true` bán thêm PDF theo `pdfPrice`.
 
 - `GET /books`, `GET /books/:id`: trả `pdfForSale`, `pdfPrice`, không bao giờ trả `pdfFile`.
-- `POST`, `PATCH /admin/books`: thêm `pdfFile` (chỉ tên file trong `data/books/pdfs`, dạng `my-book.pdf`), `pdfPrice`, `pdfForSale`. Bật bán khi thiếu giá hoặc thiếu file trả 400.
-- `PUT /cart/items/:bookId`: thêm `format: "PHYSICAL" | "PDF"`, mặc định `PHYSICAL`. Dòng PDF luôn có `quantity: 1`.
+- `POST`, `PATCH /admin/books`: thêm `pdfFile` (tên file do `POST /admin/uploads/pdf` trả về), `pdfPrice`, `pdfForSale`. Bật bán khi thiếu giá hoặc thiếu file trả 400.
+- `PUT /cart/items/:bookId`: thêm `format: "PHYSICAL" | "PDF"`, mặc định `PHYSICAL`. Dòng PDF có `quantity` là số lượt tải mua, giá `pdfPrice × quantity`.
 - `DELETE /cart/items/:bookId?format=PDF`: xoá đúng dòng theo định dạng, mặc định `PHYSICAL`.
-- `POST /orders`: mỗi item thêm `format`. Đơn có PDF bắt buộc `paymentMethod: "PAYOS"` (400 `PAYMENT_REQUIRED`). Đơn chỉ có PDF không cần `shippingAddress` và không có phí ship. PDF ngừng bán hoặc thiếu file trả 409 `PDF_UNAVAILABLE`. Đã mua hoặc đang chờ trả tiền PDF đó trả 409 `ALREADY_OWNED`.
-- `GET /orders/:id/items/:bookId/download`: chủ đơn tải file khi đơn `PAID` và chưa `CANCELLED`; chưa trả tiền trả 403 `NOT_PAID`, file bị mất trả 404 `FILE_MISSING`. Đây là cách duy nhất để lấy file.
+- `POST /orders`: mỗi item thêm `format`; dòng PDF không gửi `quantity` thì tính là 1. Đơn có PDF bắt buộc `paymentMethod: "PAYOS"` (400 `PAYMENT_REQUIRED`). Đơn chỉ có PDF không cần `shippingAddress` và không có phí ship. PDF ngừng bán hoặc thiếu file trả 409 `PDF_UNAVAILABLE`. Đang có đơn chưa trả tiền chứa PDF đó trả 409 `PDF_PAYMENT_PENDING`. Đã trả tiền thì vẫn mua thêm được.
+- `GET /orders/:id/items/:bookId/download`: chủ đơn tải file khi đơn `PAID` và chưa `CANCELLED`; chưa trả tiền trả 403 `NOT_PAID`, hết lượt trả 403 `DOWNLOAD_LIMIT`, file bị mất trả 404 `FILE_MISSING`. Mỗi lần tải tăng `items[].downloadCount`, tối đa bằng `quantity` của dòng; gửi file lỗi hoặc đứt giữa chừng thì trả lại lượt. Đây là cách duy nhất để lấy file.
 
 Đơn chỉ có PDF chuyển thẳng sang `COMPLETED` khi trả tiền và không đi qua `CONFIRMED`, `SHIPPING`. Đơn có cả hai định dạng tải được PDF ngay, phần giao hàng vẫn do admin xử lý. Huỷ đơn chỉ hoàn kho các dòng bản in và khoá quyền tải.
 
@@ -126,6 +126,7 @@ Mỗi sách có bản in; sách có `pdfForSale: true` bán thêm PDF theo `pdfP
 
 ## Upload ảnh Cloudinary
 
+- `POST /admin/uploads/pdf`: body là chính file PDF, `Content-Type: application/pdf`, tối đa 200 MB. Lưu vào `data/books/pdfs` với tên do server sinh và trả 201 `{ "data": { "pdfFile": "upload-<uuid>.pdf" } }`. Sai `Content-Type` trả 415, nội dung không bắt đầu bằng `%PDF-` trả 400 `INVALID_PDF`, quá cỡ trả 413 `PDF_TOO_LARGE`. Giới hạn 30 lần/phút.
 - `POST /admin/uploads/signature`: trả `cloudName`, `apiKey`, `timestamp`, `folder`, `allowedFormats`, `signature`. Chữ ký có hiệu lực 1 giờ, giới hạn 30 lần/phút.
 
 Trình duyệt gửi `file`, `api_key`, `timestamp`, `folder`, `allowed_formats`, `signature` tới `https://api.cloudinary.com/v1_1/<cloudName>/image/upload` rồi đưa `secure_url`, `public_id` vào `coverImageUrl`, `coverImagePublicId` hoặc `imageUrls`, `imagePublicIds` khi tạo/sửa sách. Backend kiểm tra URL thuộc tài khoản của cửa hàng và public ID nằm trong thư mục sách. Tối đa 5 ảnh phụ; hai mảng phải cùng độ dài.

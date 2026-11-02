@@ -43,9 +43,19 @@ async function download(req, res) {
     console.error(JSON.stringify({ event: 'pdf_file_missing', book: bookId, order: String(order._id), requestId: req.requestId }));
     assert(false, 404, 'FILE_MISSING', 'The PDF file is unavailable; contact the store');
   }
+  const pdfLineWhere = downloadCount => ({ _id: order._id, items: { $elemMatch: { book: line.book, format: 'PDF', downloadCount } } });
+  // The filter stops concurrent requests going over the limit. $not also matches lines saved before counting existed.
+  const claimed = await Order.updateOne(pdfLineWhere({ $not: { $gte: line.quantity } }), { $inc: { 'items.$.downloadCount': 1 } });
+  assert(claimed.matchedCount === 1, 403, 'DOWNLOAD_LIMIT', 'You have used all downloads for this PDF');
   await new Promise((resolve, reject) => {
-    // A customer closing the tab mid-download is not a server error.
-    res.download(pdfPath(book.pdfFile), `${book.slug}.pdf`, error => (error && error.code !== 'ECONNABORTED' ? reject(error) : resolve()));
+    res.download(pdfPath(book.pdfFile), `${book.slug}.pdf`, async error => {
+      if (!error) return resolve();
+      // shortcut: a client that aborts near the end keeps its download, upgrade to signed one-time links if that matters.
+      await Order.updateOne(pdfLineWhere({ $gt: 0 }), { $inc: { 'items.$.downloadCount': -1 } })
+        .catch(refund => console.error(JSON.stringify({ event: 'download_refund_failed', order: String(order._id), name: refund.name })));
+      // A customer closing the tab mid-download is not a server error.
+      return error.code === 'ECONNABORTED' ? resolve() : reject(error);
+    });
   });
 }
 

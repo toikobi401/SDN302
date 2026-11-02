@@ -29,16 +29,16 @@ export default function Cart() {
       {item.book?.coverImageUrl && <img src={cloudImage(item.book.coverImageUrl, 120)} alt="" />}
       <div className="cart-title">
         {item.book ? <Link to={`/books/${item.book._id}`}>{item.book.title}</Link> : 'Book no longer available'}
-        <div>{item.format === 'PDF' ? 'PDF' : 'Printed book'}</div>
+        <div>{item.format === 'PDF' ? 'PDF: each copy is one download' : 'Printed book'}</div>
         {!item.available && <div className="message error">{item.format === 'PDF' ? 'This PDF is no longer for sale. Remove it to check out.' : 'Not available in this quantity. Lower the quantity or remove it to check out.'}</div>}
       </div>
       <span>{money(item.lineTotal)}</span>
       {item.book && <>
-        {item.format !== 'PDF' && <label>Quantity<input type="number" min="1" step="1" value={item.quantity} disabled={busy} onChange={event => {
+        <label>Quantity<input type="number" min="1" step="1" value={item.quantity} disabled={busy} onChange={event => {
           const quantity = Number(event.target.value);
           if (!Number.isSafeInteger(quantity) || quantity < 1) return;
           run(() => api(`/cart/items/${item.book._id}`, { method: 'PUT', body: JSON.stringify({ quantity, format: item.format }) }));
-        }} /></label>}
+        }} /></label>
         <button type="button" className="action outline" disabled={busy} onClick={() => run(() => api(`/cart/items/${item.book._id}?format=${item.format}`, { method: 'DELETE' }))}>Remove</button>
       </>}
     </div>)}
