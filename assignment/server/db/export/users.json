@@ -1,0 +1,40 @@
+[
+  {
+    "_id": {
+      "$oid": "6ae611a7c5f7e430053aafe9"
+    },
+    "name": "Bookstore Admin",
+    "email": "admin@example.com",
+    "passwordHash": "$2b$12$yPEvyMCmXCJXpecs7VYWrOYlY3075D52GZalR6VNh.442y2ic97/e",
+    "tokenVersion": 0,
+    "role": "ADMIN",
+    "isActive": true,
+    "addresses": [],
+    "createdAt": {
+      "$date": "2026-10-31T16:04:55.448Z"
+    },
+    "updatedAt": {
+      "$date": "2026-10-31T16:04:55.448Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ae61319d1a4a6829e5f3639"
+    },
+    "name": "test01",
+    "email": "test01@example.com",
+    "passwordHash": "$2b$12$g2cBCEq7TNG6aa4H30cUHuAiaBLEmLAq207oIJG/h8rNIOJDQnyR.",
+    "tokenVersion": 0,
+    "role": "CUSTOMER",
+    "isActive": true,
+    "addresses": [],
+    "createdAt": {
+      "$date": "2026-10-31T16:11:05.753Z"
+    },
+    "updatedAt": {
+      "$date": "2026-10-31T16:11:05.753Z"
+    },
+    "__v": 0
+  }
+]

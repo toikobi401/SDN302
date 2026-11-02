@@ -1,0 +1,194 @@
+[
+  {
+    "_id": {
+      "$oid": "6ae612a3d6f4c75e68bdfd5a"
+    },
+    "book": {
+      "$oid": "6ae612a3d6f4c75e68bdfd59"
+    },
+    "type": "ADJUSTMENT",
+    "quantityChange": 20,
+    "stockBefore": 0,
+    "stockAfter": 20,
+    "operationKey": "adjust:6ae611a7c5f7e430053aafe9:seed-simple-way-of-piece-life",
+    "performedBy": {
+      "$oid": "6ae611a7c5f7e430053aafe9"
+    },
+    "reason": "Sample opening stock",
+    "createdAt": {
+      "$date": "2026-10-31T16:09:07.529Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ae612a4d6f4c75e68bdfd5c"
+    },
+    "book": {
+      "$oid": "6ae612a4d6f4c75e68bdfd5b"
+    },
+    "type": "ADJUSTMENT",
+    "quantityChange": 20,
+    "stockBefore": 0,
+    "stockAfter": 20,
+    "operationKey": "adjust:6ae611a7c5f7e430053aafe9:seed-great-travel-at-desert",
+    "performedBy": {
+      "$oid": "6ae611a7c5f7e430053aafe9"
+    },
+    "reason": "Sample opening stock",
+    "createdAt": {
+      "$date": "2026-10-31T16:09:08.517Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ae612a5d6f4c75e68bdfd5e"
+    },
+    "book": {
+      "$oid": "6ae612a5d6f4c75e68bdfd5d"
+    },
+    "type": "ADJUSTMENT",
+    "quantityChange": 20,
+    "stockBefore": 0,
+    "stockAfter": 20,
+    "operationKey": "adjust:6ae611a7c5f7e430053aafe9:seed-the-lady-beauty-scarlett",
+    "performedBy": {
+      "$oid": "6ae611a7c5f7e430053aafe9"
+    },
+    "reason": "Sample opening stock",
+    "createdAt": {
+      "$date": "2026-10-31T16:09:09.171Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ae612a5d6f4c75e68bdfd60"
+    },
+    "book": {
+      "$oid": "6ae612a5d6f4c75e68bdfd5f"
+    },
+    "type": "ADJUSTMENT",
+    "quantityChange": 20,
+    "stockBefore": 0,
+    "stockAfter": 20,
+    "operationKey": "adjust:6ae611a7c5f7e430053aafe9:seed-once-upon-a-time",
+    "performedBy": {
+      "$oid": "6ae611a7c5f7e430053aafe9"
+    },
+    "reason": "Sample opening stock",
+    "createdAt": {
+      "$date": "2026-10-31T16:09:09.952Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ae612a6d6f4c75e68bdfd62"
+    },
+    "book": {
+      "$oid": "6ae612a6d6f4c75e68bdfd61"
+    },
+    "type": "ADJUSTMENT",
+    "quantityChange": 20,
+    "stockBefore": 0,
+    "stockAfter": 20,
+    "operationKey": "adjust:6ae611a7c5f7e430053aafe9:seed-portrait-photography",
+    "performedBy": {
+      "$oid": "6ae611a7c5f7e430053aafe9"
+    },
+    "reason": "Sample opening stock",
+    "createdAt": {
+      "$date": "2026-10-31T16:09:10.559Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ae612a7d6f4c75e68bdfd64"
+    },
+    "book": {
+      "$oid": "6ae612a7d6f4c75e68bdfd63"
+    },
+    "type": "ADJUSTMENT",
+    "quantityChange": 20,
+    "stockBefore": 0,
+    "stockAfter": 20,
+    "operationKey": "adjust:6ae611a7c5f7e430053aafe9:seed-tips-of-simple-lifestyle",
+    "performedBy": {
+      "$oid": "6ae611a7c5f7e430053aafe9"
+    },
+    "reason": "Sample opening stock",
+    "createdAt": {
+      "$date": "2026-10-31T16:09:11.218Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ae612a7d6f4c75e68bdfd66"
+    },
+    "book": {
+      "$oid": "6ae612a7d6f4c75e68bdfd65"
+    },
+    "type": "ADJUSTMENT",
+    "quantityChange": 20,
+    "stockBefore": 0,
+    "stockAfter": 20,
+    "operationKey": "adjust:6ae611a7c5f7e430053aafe9:seed-just-felt-from-outside",
+    "performedBy": {
+      "$oid": "6ae611a7c5f7e430053aafe9"
+    },
+    "reason": "Sample opening stock",
+    "createdAt": {
+      "$date": "2026-10-31T16:09:11.867Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ae612a8d6f4c75e68bdfd68"
+    },
+    "book": {
+      "$oid": "6ae612a8d6f4c75e68bdfd67"
+    },
+    "type": "ADJUSTMENT",
+    "quantityChange": 20,
+    "stockBefore": 0,
+    "stockAfter": 20,
+    "operationKey": "adjust:6ae611a7c5f7e430053aafe9:seed-peaceful-enlightment",
+    "performedBy": {
+      "$oid": "6ae611a7c5f7e430053aafe9"
+    },
+    "reason": "Sample opening stock",
+    "createdAt": {
+      "$date": "2026-10-31T16:09:12.493Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ae61345d1a4a6829e5f363c"
+    },
+    "book": {
+      "$oid": "6ae605291b6f43b5d8ca72a8"
+    },
+    "type": "SALE",
+    "quantityChange": -1,
+    "stockBefore": 20,
+    "stockAfter": 19,
+    "order": {
+      "$oid": "6ae61345d1a4a6829e5f363b"
+    },
+    "operationKey": "order:6ae61345d1a4a6829e5f363b:reserve",
+    "performedBy": {
+      "$oid": "6ae61319d1a4a6829e5f3639"
+    },
+    "reason": "Order placed",
+    "createdAt": {
+      "$date": "2026-10-31T16:11:49.194Z"
+    },
+    "__v": 0
+  }
+]

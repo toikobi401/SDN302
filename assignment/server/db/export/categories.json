@@ -1,0 +1,317 @@
+[
+  {
+    "_id": {
+      "$oid": "6ae605058feb2b76f8327eb7"
+    },
+    "name": "Literature",
+    "slug": "literature",
+    "isActive": true,
+    "createdAt": {
+      "$date": "2026-10-31T15:11:01.647Z"
+    },
+    "updatedAt": {
+      "$date": "2026-10-31T15:11:01.647Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ae605058feb2b76f8327eb8"
+    },
+    "name": "Textbooks",
+    "slug": "textbooks",
+    "isActive": true,
+    "createdAt": {
+      "$date": "2026-10-31T15:11:01.650Z"
+    },
+    "updatedAt": {
+      "$date": "2026-10-31T15:11:01.650Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ae605058feb2b76f8327eb9"
+    },
+    "name": "Romance",
+    "slug": "romance",
+    "isActive": true,
+    "createdAt": {
+      "$date": "2026-10-31T15:11:01.652Z"
+    },
+    "updatedAt": {
+      "$date": "2026-10-31T15:11:01.652Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ae605058feb2b76f8327eba"
+    },
+    "name": "Horror & Gothic",
+    "slug": "horror-gothic",
+    "isActive": true,
+    "createdAt": {
+      "$date": "2026-10-31T15:11:01.653Z"
+    },
+    "updatedAt": {
+      "$date": "2026-10-31T15:11:01.653Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ae605058feb2b76f8327ebb"
+    },
+    "name": "Adventure",
+    "slug": "adventure",
+    "isActive": true,
+    "createdAt": {
+      "$date": "2026-10-31T15:11:01.654Z"
+    },
+    "updatedAt": {
+      "$date": "2026-10-31T15:11:01.654Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ae605058feb2b76f8327ebc"
+    },
+    "name": "Children",
+    "slug": "children",
+    "isActive": true,
+    "createdAt": {
+      "$date": "2026-10-31T15:11:01.655Z"
+    },
+    "updatedAt": {
+      "$date": "2026-10-31T15:11:01.655Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ae605058feb2b76f8327ebd"
+    },
+    "name": "Mystery & Crime",
+    "slug": "mystery-crime",
+    "isActive": true,
+    "createdAt": {
+      "$date": "2026-10-31T15:11:01.656Z"
+    },
+    "updatedAt": {
+      "$date": "2026-10-31T15:11:01.656Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ae605058feb2b76f8327ebe"
+    },
+    "name": "Drama & Poetry",
+    "slug": "drama-poetry",
+    "isActive": true,
+    "createdAt": {
+      "$date": "2026-10-31T15:11:01.657Z"
+    },
+    "updatedAt": {
+      "$date": "2026-10-31T15:11:01.657Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ae605058feb2b76f8327ebf"
+    },
+    "name": "Classics",
+    "slug": "classics",
+    "isActive": true,
+    "createdAt": {
+      "$date": "2026-10-31T15:11:01.658Z"
+    },
+    "updatedAt": {
+      "$date": "2026-10-31T15:11:01.658Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ae605058feb2b76f8327ec0"
+    },
+    "name": "Fantasy & Sci-Fi",
+    "slug": "fantasy-scifi",
+    "isActive": true,
+    "createdAt": {
+      "$date": "2026-10-31T15:11:01.659Z"
+    },
+    "updatedAt": {
+      "$date": "2026-10-31T15:11:01.659Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ae605058feb2b76f8327ec1"
+    },
+    "name": "Science",
+    "slug": "science",
+    "isActive": true,
+    "createdAt": {
+      "$date": "2026-10-31T15:11:01.660Z"
+    },
+    "updatedAt": {
+      "$date": "2026-10-31T15:11:01.660Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ae605058feb2b76f8327ec2"
+    },
+    "name": "Math",
+    "slug": "math",
+    "isActive": true,
+    "createdAt": {
+      "$date": "2026-10-31T15:11:01.661Z"
+    },
+    "updatedAt": {
+      "$date": "2026-10-31T15:11:01.661Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ae605058feb2b76f8327ec3"
+    },
+    "name": "Social Sciences",
+    "slug": "social-sciences",
+    "isActive": true,
+    "createdAt": {
+      "$date": "2026-10-31T15:11:01.662Z"
+    },
+    "updatedAt": {
+      "$date": "2026-10-31T15:11:01.662Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ae605058feb2b76f8327ec4"
+    },
+    "name": "Business",
+    "slug": "business",
+    "isActive": true,
+    "createdAt": {
+      "$date": "2026-10-31T15:11:01.663Z"
+    },
+    "updatedAt": {
+      "$date": "2026-10-31T15:11:01.663Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ae605058feb2b76f8327ec5"
+    },
+    "name": "Nursing",
+    "slug": "nursing",
+    "isActive": true,
+    "createdAt": {
+      "$date": "2026-10-31T15:11:01.663Z"
+    },
+    "updatedAt": {
+      "$date": "2026-10-31T15:11:01.663Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ae605058feb2b76f8327ec6"
+    },
+    "name": "College Success",
+    "slug": "college-success",
+    "isActive": true,
+    "createdAt": {
+      "$date": "2026-10-31T15:11:01.664Z"
+    },
+    "updatedAt": {
+      "$date": "2026-10-31T15:11:01.664Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ae605058feb2b76f8327ec7"
+    },
+    "name": "Computer Science",
+    "slug": "computer-science",
+    "isActive": true,
+    "createdAt": {
+      "$date": "2026-10-31T15:11:01.666Z"
+    },
+    "updatedAt": {
+      "$date": "2026-10-31T15:11:01.666Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ae605058feb2b76f8327ec8"
+    },
+    "name": "Humanities",
+    "slug": "humanities",
+    "isActive": true,
+    "createdAt": {
+      "$date": "2026-10-31T15:11:01.668Z"
+    },
+    "updatedAt": {
+      "$date": "2026-10-31T15:11:01.668Z"
+    },
+    "__v": 0
+  },
+  {
+    "_id": {
+      "$oid": "6ae611a78eadc4d98b43caf5"
+    },
+    "slug": "fiction",
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-10-31T16:04:55.457Z"
+    },
+    "isActive": true,
+    "name": "Fiction",
+    "updatedAt": {
+      "$date": "2026-10-31T16:09:05.766Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6ae611a78eadc4d98b43caf6"
+    },
+    "slug": "lifestyle",
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-10-31T16:04:55.477Z"
+    },
+    "isActive": true,
+    "name": "Lifestyle",
+    "updatedAt": {
+      "$date": "2026-10-31T16:09:05.772Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6ae611a78eadc4d98b43caf7"
+    },
+    "slug": "travel",
+    "__v": 0,
+    "createdAt": {
+      "$date": "2026-10-31T16:04:55.481Z"
+    },
+    "isActive": true,
+    "name": "Travel",
+    "updatedAt": {
+      "$date": "2026-10-31T16:09:05.776Z"
+    }
+  }
+]

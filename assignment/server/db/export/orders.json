@@ -1,0 +1,101 @@
+[
+  {
+    "_id": {
+      "$oid": "6ae61345d1a4a6829e5f363b"
+    },
+    "orderNumber": "ORD-a2f59f9d-35b9-44d3-b189-70e9aac15ae1",
+    "user": {
+      "$oid": "6ae61319d1a4a6829e5f3639"
+    },
+    "idempotencyKey": "11a6561d-bd28-4ced-b76f-5259e3dd08a2",
+    "requestHash": "e19b6785ec1c7cda8f24b3e02f56a750087bced5476b325f1cb2bd9b9f8625ff",
+    "shippingAddress": {
+      "recipientName": "Test Customer",
+      "phone": "0900000000",
+      "addressLine": "1 Example Street",
+      "province": "Ha Noi"
+    },
+    "items": [
+      {
+        "book": {
+          "$oid": "6ae605291b6f43b5d8ca72a8"
+        },
+        "format": "PHYSICAL",
+        "title": "Principles of Macroeconomics 3e",
+        "isbn": "9781711471471",
+        "coverImageUrl": "/api/covers/textbook/social-sciences/principles-of-macroeconomics-3e.svg",
+        "unitPrice": 165000,
+        "quantity": 1,
+        "lineTotal": 165000
+      }
+    ],
+    "shippingFee": 0,
+    "currency": "VND",
+    "paymentMethod": "COD",
+    "paymentStatus": "PAID",
+    "status": "COMPLETED",
+    "statusHistory": [
+      {
+        "status": "PENDING",
+        "changedBy": {
+          "$oid": "6ae61319d1a4a6829e5f3639"
+        },
+        "changedAt": {
+          "$date": "2026-10-31T16:11:49.190Z"
+        }
+      },
+      {
+        "status": "CONFIRMED",
+        "changedBy": {
+          "$oid": "6ae611a7c5f7e430053aafe9"
+        },
+        "changedAt": {
+          "$date": "2026-10-31T16:12:05.837Z"
+        }
+      },
+      {
+        "status": "SHIPPING",
+        "changedBy": {
+          "$oid": "6ae611a7c5f7e430053aafe9"
+        },
+        "changedAt": {
+          "$date": "2026-10-31T16:12:09.520Z"
+        }
+      },
+      {
+        "status": "SHIPPING",
+        "changedBy": {
+          "$oid": "6ae611a7c5f7e430053aafe9"
+        },
+        "note": "COD payment collected",
+        "changedAt": {
+          "$date": "2026-10-31T16:12:19.882Z"
+        }
+      },
+      {
+        "status": "COMPLETED",
+        "changedBy": {
+          "$oid": "6ae611a7c5f7e430053aafe9"
+        },
+        "changedAt": {
+          "$date": "2026-10-31T16:12:23.452Z"
+        }
+      }
+    ],
+    "subtotal": 165000,
+    "total": 165000,
+    "createdAt": {
+      "$date": "2026-10-31T16:11:49.198Z"
+    },
+    "updatedAt": {
+      "$date": "2026-10-31T16:12:23.454Z"
+    },
+    "__v": 4,
+    "paidAt": {
+      "$date": "2026-10-31T16:12:19.882Z"
+    },
+    "completedAt": {
+      "$date": "2026-10-31T16:12:23.452Z"
+    }
+  }
+]
