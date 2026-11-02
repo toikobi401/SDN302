@@ -465,3 +465,119 @@ test('an aborted download is not an error, but a failed one still is', async t =
 test('public book JSON never includes pdfFile because the field is unselected by default', () => {
   assert.equal(Book.schema.path('pdfFile').options.select, false);
 });
+
+const { Coupon } = require('../models');
+const coupons = require('../services/coupon');
+
+function couponMocks(t, fields = {}, { usedBefore = null } = {}) {
+  const coupon = new Coupon({ code: 'SALE10', type: 'PERCENT', value: 10, ...fields });
+  t.mock.method(Coupon, 'findOne', () => query(coupon));
+  t.mock.method(Order, 'exists', () => ({ session: async () => usedBefore }));
+  t.mock.method(User, 'updateOne', () => ({ session: async () => ({}) }));
+  t.mock.method(Coupon, 'findOneAndUpdate', async () => { coupon.usedCount += 1; return coupon; });
+  t.mock.method(Coupon, 'updateOne', async () => { coupon.usedCount -= 1; });
+  return coupon;
+}
+
+test('discounts respect percentage, cap, fixed amount and subtotal', () => {
+  assert.equal(coupons.couponDiscount({ type: 'PERCENT', value: 10, maxDiscount: null }, 125000), 12500);
+  assert.equal(coupons.couponDiscount({ type: 'PERCENT', value: 33, maxDiscount: null }, 1001), 330);
+  assert.equal(coupons.couponDiscount({ type: 'PERCENT', value: 50, maxDiscount: 20000 }, 100000), 20000);
+  assert.equal(coupons.couponDiscount({ type: 'FIXED', value: 30000, maxDiscount: null }, 100000), 30000);
+  assert.equal(coupons.couponDiscount({ type: 'FIXED', value: 30000, maxDiscount: null }, 20000), 20000);
+});
+
+test('codes are normalized and malformed codes are refused', () => {
+  assert.equal(coupons.normalizeCode(' sale-10 '), 'SALE-10');
+  for (const bad of ['', 'ab', 'a b c', { $ne: 1 }, null, 'x'.repeat(31)]) assert.throws(() => coupons.normalizeCode(bad), { code: 'COUPON_INVALID' });
+});
+
+test('unusable coupons are refused with a shared message for unknown, off and out-of-date codes', async t => {
+  const coupon = couponMocks(t);
+  const later = new Date(Date.now() + 60000);
+  const earlier = new Date(Date.now() - 60000);
+  coupon.isActive = false;
+  await assert.rejects(() => coupons.usableCoupon(user, 'SALE10', 1000), { code: 'COUPON_INVALID' });
+  coupon.isActive = true;
+  coupon.startsAt = later;
+  await assert.rejects(() => coupons.usableCoupon(user, 'SALE10', 1000), { code: 'COUPON_INVALID' });
+  coupon.startsAt = null;
+  coupon.expiresAt = earlier;
+  await assert.rejects(() => coupons.usableCoupon(user, 'SALE10', 1000), { code: 'COUPON_INVALID' });
+  coupon.expiresAt = null;
+  coupon.minSubtotal = 5000;
+  await assert.rejects(() => coupons.usableCoupon(user, 'SALE10', 4999), { code: 'COUPON_MINIMUM' });
+  assert.equal((await coupons.usableCoupon(user, 'SALE10', 5000)).code, 'SALE10');
+  coupon.usageLimit = 1;
+  coupon.usedCount = 1;
+  await assert.rejects(() => coupons.usableCoupon(user, 'SALE10', 5000), { code: 'COUPON_EXHAUSTED' });
+  Coupon.findOne.mock.mockImplementation(() => query(null));
+  await assert.rejects(() => coupons.usableCoupon(user, 'NOPE1', 5000), { code: 'COUPON_INVALID' });
+});
+
+test('a customer cannot reuse a code', async t => {
+  couponMocks(t, {}, { usedBefore: { _id: 'order' } });
+  await assert.rejects(() => coupons.usableCoupon(user, 'SALE10', 1000), { code: 'COUPON_USED' });
+  assert.deepEqual(Order.exists.mock.calls[0].arguments[0].status, { $ne: 'CANCELLED' });
+});
+
+test('losing the race for the last use fails the order', async t => {
+  couponMocks(t);
+  Coupon.findOneAndUpdate.mock.mockImplementation(async () => null);
+  await assert.rejects(() => coupons.redeemCoupon(user, 'SALE10', 1000), { code: 'COUPON_EXHAUSTED' });
+});
+
+test('an order takes the discount off the books, keeps shipping, and cancelling returns the use', async t => {
+  const state = stockMocks(t, 10);
+  const originalFee = process.env.SHIPPING_FEE_VND;
+  process.env.SHIPPING_FEE_VND = '15000';
+  t.after(() => { if (originalFee === undefined) delete process.env.SHIPPING_FEE_VND; else process.env.SHIPPING_FEE_VND = originalFee; });
+  const coupon = couponMocks(t);
+  t.mock.method(Order, 'findOne', () => query(null));
+  const order = await commerce.createOrder(user, { items: [{ book: String(bookId), quantity: 2 }], shippingAddress: address, couponCode: 'sale10', discount: 999999 }, 'coupon-order');
+  assert.equal(order.subtotal, 250000);
+  assert.equal(order.discount, 25000);
+  assert.equal(order.total, 240000);
+  assert.equal(order.couponCode, 'SALE10');
+  assert.equal(coupon.usedCount, 1);
+  Order.findOne.mock.mockImplementation(() => query(order));
+  await commerce.transitionOrder(user, String(order._id), 'CANCELLED', 'Changed mind');
+  assert.equal(coupon.usedCount, 0);
+  assert.equal(state.stock(), 10);
+  await commerce.transitionOrder(user, String(order._id), 'CANCELLED', 'Changed mind');
+  assert.equal(coupon.usedCount, 0);
+});
+
+test('a full discount is allowed for cash but not for an online payment', async t => {
+  stockMocks(t, 10);
+  couponMocks(t, { value: 100 });
+  t.mock.method(Order, 'findOne', () => query(null));
+  const input = { items: [{ book: String(bookId), quantity: 1 }], shippingAddress: address };
+  await assert.rejects(() => commerce.createOrder(user, { ...input, couponCode: 'SALE10', paymentMethod: 'PAYOS' }, 'free-online', { orderCode: 1700000000000777 }), { code: 'COUPON_TOTAL' });
+  const free = await commerce.createOrder(user, { ...input, couponCode: 'SALE10' }, 'free-cash');
+  assert.equal(free.total, 0);
+});
+
+test('order schema refuses a discount above the subtotal', async () => {
+  const order = new Order({ orderNumber: 'ORD-d', user: user._id, idempotencyKey: 'd', requestHash: 'h', shippingAddress: address, discount: 300,
+    items: [{ book: bookId, title: 'B', unitPrice: 100, quantity: 2 }] });
+  await assert.rejects(() => order.validate(), { name: 'ValidationError' });
+});
+
+test('coupon admin input is validated and the code cannot be renamed', async t => {
+  const { create, update } = require('../controllers/coupon');
+  const res = { status() { return this; }, json() { return this; } };
+  const post = body => create({ body }, res);
+  await assert.rejects(() => post({ code: 'SALE10', type: 'PERCENT', value: 101 }), { status: 400 });
+  await assert.rejects(() => post({ code: 'x', type: 'PERCENT', value: 10 }), { status: 400 });
+  await assert.rejects(() => post({ code: 'SALE10', type: 'OTHER', value: 10 }), { status: 400 });
+  await assert.rejects(() => post({ code: 'SALE10', type: 'FIXED', value: 0 }), { status: 400 });
+  await assert.rejects(() => post({ code: 'SALE10', type: 'FIXED', value: 10, startsAt: '2027-01-02T00:00:00Z', expiresAt: '2027-01-01T00:00:00Z' }), { status: 400 });
+  const created = t.mock.method(Coupon, 'create', async fields => fields);
+  await post({ code: 'sale10', type: 'FIXED', value: 10, usedCount: 500 });
+  assert.equal(created.mock.calls[0].arguments[0].code, 'SALE10');
+  assert.equal(created.mock.calls[0].arguments[0].usedCount, undefined);
+  const coupon = new Coupon({ code: 'SALE10', type: 'FIXED', value: 10 });
+  t.mock.method(Coupon, 'findOne', () => query(coupon));
+  await assert.rejects(() => update({ params: { id: String(coupon._id) }, body: { code: 'OTHER' } }, res), { status: 400 });
+});

@@ -57,9 +57,10 @@ assignment/
 | Mua hàng | Có màn hình | Giỏ hàng lưu trên server, đặt hàng, COD hoặc payOS, lịch sử đơn, huỷ đơn, thanh toán tiếp |
 | Quản trị | Có màn hình | Thêm, sửa, ẩn sách; tải ảnh; điều chỉnh tồn kho; danh mục; xử lý đơn; ghi nhận thu COD và hoàn tiền; thống kê |
 | Nhập hàng | Chỉ có API | Nhà cung cấp, phiếu nhập, nhật ký kho (xem câu hỏi 1 ở phần 10) |
+| Mã giảm giá | Có màn hình | Admin tạo, sửa, bật tắt mã; khách nhập mã khi thanh toán (xem "Mã giảm giá" ở phần 6) |
 | Bản mềm PDF | Có màn hình | Chọn mua bản vật lí hoặc PDF, tải PDF sau khi thanh toán (xem "Bán sách theo định dạng" ở phần 6) |
 
-**Không làm:** cổng thanh toán khác, hoàn tiền tự động, refresh token, đánh giá sách, mã giảm giá, quên mật khẩu, gửi email, nhiều chi nhánh.
+**Không làm:** cổng thanh toán khác, hoàn tiền tự động, refresh token, đánh giá sách, quên mật khẩu, gửi email, nhiều chi nhánh.
 
 Nội dung trang chủ như banner, bài viết, logo đối tác vẫn là dữ liệu mẫu của template. Giao diện đang bằng tiếng Anh theo `UI_DESIGN_GUIDELINES.md`.
 
@@ -68,6 +69,7 @@ Nội dung trang chủ như banner, bài viết, logo đối tác vẫn là dữ
 ```mermaid
 erDiagram
     USER ||--o{ ORDER : "đặt"
+    COUPON |o--o{ ORDER : "giảm giá (theo code)"
     USER ||--o| CART : "có"
     BOOK }o--o{ CATEGORY : "thuộc"
     ORDER ||--|{ ORDER_ITEM : "gồm (nhúng)"
@@ -129,7 +131,9 @@ erDiagram
         object shippingAddress
         number subtotal "server tự tính"
         number shippingFee
-        number total "server tự tính"
+        string couponCode "mã đã dùng"
+        number discount "tiền giảm, server tự tính"
+        number total "subtotal + shippingFee - discount"
         string status "PENDING | CONFIRMED | SHIPPING | COMPLETED | CANCELLED"
         array statusHistory
         string paymentMethod "COD | PAYOS"
@@ -140,6 +144,19 @@ erDiagram
         string paymentReference
         date paidAt
         date refundedAt
+    }
+    COUPON {
+        ObjectId _id PK
+        string code UK
+        string type "PERCENT | FIXED"
+        number value
+        number minSubtotal
+        number maxDiscount
+        number usageLimit
+        number usedCount
+        date startsAt
+        date expiresAt
+        boolean isActive
     }
     ORDER_ITEM {
         ObjectId book FK
@@ -238,6 +255,18 @@ Tạm thời lưu ngay trong dự án, không dùng Cloudinary (xem câu hỏi 5
 - Thay file bằng cách ghi đè cùng tên: người đã mua tải được bản mới.
 - File đã tải về không được bảo vệ thêm. Chưa làm DRM hay đóng dấu theo người mua.
 - Lưu trên ổ đĩa nên chỉ chạy được một instance, và file sẽ mất nếu hosting không có ổ đĩa lâu dài.
+
+### Mã giảm giá
+
+- Admin tạo mã ở `/admin/coupons`: giảm theo % (có thể đặt mức giảm tối đa) hoặc giảm số tiền cố định, cùng giá trị đơn tối thiểu, tổng lượt dùng và thời gian hiệu lực.
+- Mã không phân biệt hoa thường và không đổi tên được, vì đơn cũ tham chiếu theo mã. Xoá mã chỉ là tắt mã.
+- Mỗi đơn dùng một mã. Mã chỉ giảm tiền sách (`subtotal`), không giảm phí ship, và không giảm quá `subtotal`.
+- Mỗi khách dùng mỗi mã một lần. Huỷ đơn thì trả lại lượt, kể cả đơn hết hạn thanh toán.
+- Client chỉ gửi `couponCode`. Server tự kiểm tra và tính lại trong cùng transaction tạo đơn, rồi lưu `couponCode`, `discount` vào đơn. Sửa mã sau đó không đổi đơn cũ.
+- `usedCount` tăng bằng update có điều kiện, nên đặt đơn đồng thời không vượt tổng lượt dùng.
+- Đơn thanh toán payOS phải còn số tiền lớn hơn 0, nên mã giảm 100% chỉ dùng được với đơn COD.
+- `POST /api/cart/coupon` chỉ để xem trước trên trang thanh toán và không trừ lượt.
+- Mã không tồn tại, đã tắt hoặc ngoài thời gian hiệu lực đều nhận chung một thông báo, và route xem trước bị giới hạn 20 lần mỗi phút, để khó dò mã.
 
 ### Trạng thái đơn hàng
 
@@ -340,6 +369,15 @@ Xem đầy đủ ở [server/API.md](server/API.md). Phần mới cho thanh toá
 | POST | `/api/admin/orders/:id/payment/sync` | Admin | Như trên, cho mọi đơn |
 | POST | `/api/admin/orders/:id/refund` | Admin | Chuyển `CANCELLED` + `PAID` sang `REFUNDED` |
 | POST | `/api/admin/uploads/signature` | Admin | Cấp chữ ký tải ảnh lên Cloudinary |
+
+API cho mã giảm giá:
+
+| Method | Route | Quyền | Mô tả |
+|---|---|---|---|
+| POST | `/api/cart/coupon` | Auth | Xem trước tiền giảm theo giỏ hiện tại, không trừ lượt |
+| POST | `/api/orders` | Auth | Thêm `couponCode` (tuỳ chọn) |
+| GET, POST | `/api/admin/coupons` | Admin | Danh sách, tạo mã |
+| GET, PATCH, DELETE | `/api/admin/coupons/:id` | Admin | Xem, sửa, tắt mã |
 
 API cho bản mềm PDF:
 

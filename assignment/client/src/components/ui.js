@@ -35,6 +35,7 @@ export function OrderItems({ order, action }) {
     </tr>)}</tbody>
     <tfoot>
       <tr><td colSpan="3">Shipping</td><td>{money(order.shippingFee)}</td></tr>
+      {order.discount > 0 && <tr><td colSpan="3">Discount ({order.couponCode})</td><td>-{money(order.discount)}</td></tr>}
       <tr><th colSpan="3" scope="row">Total</th><th>{money(order.total)}</th></tr>
     </tfoot>
   </table>;

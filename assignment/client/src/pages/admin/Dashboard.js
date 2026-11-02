@@ -10,6 +10,7 @@ export function AdminLayout() {
       <NavLink to="/admin/books">Books</NavLink>
       <NavLink to="/admin/categories">Categories</NavLink>
       <NavLink to="/admin/orders">Orders</NavLink>
+      <NavLink to="/admin/coupons">Discount codes</NavLink>
     </nav>
     <Outlet />
   </div>;

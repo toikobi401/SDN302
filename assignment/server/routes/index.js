@@ -10,11 +10,13 @@ const payment = require('../controllers/payment');
 const upload = require('../controllers/upload');
 const receipt = require('../controllers/receipt');
 const report = require('../controllers/report');
+const coupon = require('../controllers/coupon');
 
 const router = Router();
 const admin = [requireAuth, requireAdmin];
 const loginLimit = rateLimit({ limit: 15, windowMs: 15 * 60 * 1000 });
 const uploadLimit = rateLimit({ limit: 30, windowMs: 60 * 1000 });
+const couponLimit = rateLimit({ limit: 20, windowMs: 60 * 1000 });
 
 router.post('/auth/register', loginLimit, auth.register);
 router.post('/auth/login', loginLimit, auth.login);
@@ -41,6 +43,12 @@ router.post('/admin/categories', admin, category.create);
 router.patch('/admin/categories/:id', admin, category.update);
 router.delete('/admin/categories/:id', admin, category.remove);
 
+router.get('/admin/coupons', admin, coupon.adminList);
+router.get('/admin/coupons/:id', admin, coupon.adminGet);
+router.post('/admin/coupons', admin, coupon.create);
+router.patch('/admin/coupons/:id', admin, coupon.update);
+router.delete('/admin/coupons/:id', admin, coupon.remove);
+
 router.get('/admin/suppliers', admin, supplier.adminList);
 router.get('/admin/suppliers/:id', admin, supplier.adminGet);
 router.post('/admin/suppliers', admin, supplier.create);
@@ -48,6 +56,7 @@ router.patch('/admin/suppliers/:id', admin, supplier.update);
 router.delete('/admin/suppliers/:id', admin, supplier.remove);
 
 router.get('/cart', requireAuth, cart.get);
+router.post('/cart/coupon', requireAuth, couponLimit, cart.previewCoupon);
 router.put('/cart/items/:bookId', requireAuth, cart.setItem);
 router.delete('/cart/items/:bookId', requireAuth, cart.removeItem);
 router.delete('/cart', requireAuth, cart.clear);

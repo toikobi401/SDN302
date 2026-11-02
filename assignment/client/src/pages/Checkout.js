@@ -9,11 +9,21 @@ export default function Checkout() {
   const navigate = useNavigate();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [couponInput, setCouponInput] = useState('');
+  const [coupon, setCoupon] = useState(null);
+  const [couponError, setCouponError] = useState('');
   // The same key survives a lost connection, so retrying cannot place a second order.
   const orderKey = useRef(crypto.randomUUID());
   const items = cart.items.filter(item => item.book);
   const hasPdf = items.some(item => item.format === 'PDF');
   const hasPhysical = items.some(item => item.format !== 'PDF');
+
+  async function applyCoupon() {
+    setCouponError(''); setCoupon(null);
+    if (!couponInput.trim()) return;
+    try { setCoupon((await api('/cart/coupon', { method: 'POST', body: JSON.stringify({ code: couponInput }) })).data); }
+    catch (err) { setCouponError(err.message); }
+  }
 
   async function submit(event) {
     event.preventDefault();
@@ -23,6 +33,7 @@ export default function Checkout() {
       paymentMethod: hasPdf ? 'PAYOS' : paymentMethod,
       ...(hasPhysical ? { shippingAddress: { ...required, ...(ward.trim() ? { ward } : {}) } } : {}),
       ...(note.trim() ? { note } : {}),
+      ...(coupon ? { couponCode: coupon.code } : {}),
     };
     setBusy(true); setError('');
     try {
@@ -55,6 +66,13 @@ export default function Checkout() {
           <label>Province or city<input name="province" required maxLength={500} /></label>
         </>}
         <label>Note for the store (optional)<textarea name="note" rows="2" maxLength={2000} /></label>
+        <div className="inline-form coupon-form">
+          <label>Discount code (optional)<input value={couponInput} maxLength={30} onChange={event => { setCouponInput(event.target.value); setCoupon(null); setCouponError(''); }}
+            onKeyDown={event => { if (event.key === 'Enter') { event.preventDefault(); applyCoupon(); } }} /></label>
+          <button type="button" className="action outline" onClick={applyCoupon}>Apply code</button>
+        </div>
+        {couponError && <p className="message error" role="alert">{couponError}</p>}
+        {coupon && <p className="message success" role="status">Code {coupon.code} applied: {money(coupon.discount)} off.</p>}
         <fieldset>
           <legend>Payment</legend>
           {hasPdf
@@ -72,6 +90,8 @@ export default function Checkout() {
           {item.book.title} {item.format === 'PDF' ? '(PDF)' : `x ${item.quantity}`}: {money(item.lineTotal)}
         </p>)}
         <p>Subtotal: <strong>{money(cart.subtotal)}</strong></p>
+        {coupon && <p>Discount: <strong>-{money(coupon.discount)}</strong></p>}
+        {coupon && <p>After discount: <strong>{money(coupon.total)}</strong></p>}
         <p>{hasPhysical ? 'The store confirms the final total, including any shipping fee, when you place the order.' : 'PDF orders have no shipping fee.'}</p>
       </aside>
     </div>

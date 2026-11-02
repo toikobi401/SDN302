@@ -4,6 +4,7 @@ const { Book, Order, PurchaseReceipt, Supplier, InventoryMovement, User } = requ
 const { assert, id, text, number, found, pick } = require('../lib/http');
 const { bookFormats } = require('../models/shared');
 const { pdfExists } = require('./pdf');
+const { normalizeCode, redeemCoupon, releaseCoupon } = require('./coupon');
 
 function itemInput(items, purchase = false) {
   assert(Array.isArray(items) && items.length > 0 && items.length <= 100, 400, 'INVALID_INPUT', 'Provide 1–100 items');
@@ -67,8 +68,6 @@ async function moveStock({ book, delta, type, actor, operationKey, order, purcha
 }
 
 async function assertPdfsNotOwned(user, items, session) {
-  // Writing the user document makes concurrent orders by one customer conflict, so the check below cannot race.
-  await User.updateOne({ _id: user._id }, { $currentDate: { updatedAt: true } }).session(session);
   const owned = await Order.exists({ user: user._id,
     items: { $elemMatch: { format: 'PDF', book: { $in: items.filter(item => item.format === 'PDF').map(item => item.book) } } },
     $or: [{ paymentStatus: 'PAID', status: { $ne: 'CANCELLED' } }, { paymentStatus: 'UNPAID', status: 'PENDING' }] }).session(session);
@@ -91,9 +90,12 @@ async function createOrder(user, input, key, paymentFields = {}) {
   const paymentMethod = input.paymentMethod ?? 'COD';
   assert(['COD', 'PAYOS'].includes(paymentMethod), 400, 'INVALID_INPUT', 'paymentMethod must be COD or PAYOS');
   assert(!hasPdf || paymentMethod === 'PAYOS', 400, 'PAYMENT_REQUIRED', 'PDF books must be paid online');
-  const hash = fingerprint({ items, shippingAddress, note, paymentMethod });
+  const couponCode = input.couponCode === undefined ? undefined : normalizeCode(input.couponCode);
+  const hash = fingerprint({ items, shippingAddress, note, paymentMethod, couponCode });
   const idempotencyKey = text(key, 'Idempotency-Key', { max: 128 });
   return idempotent(Order, { user: user._id, idempotencyKey }, hash, async session => {
+    // Writing the user document makes one customer's concurrent orders conflict, so the once-only checks cannot race.
+    if (hasPdf || couponCode) await User.updateOne({ _id: user._id }, { $currentDate: { updatedAt: true } }).session(session);
     if (hasPdf) await assertPdfsNotOwned(user, items, session);
     const order = new Order({ user: user._id, idempotencyKey, requestHash: hash,
       orderNumber: `ORD-${randomUUID()}`, shippingAddress, note, paymentMethod, ...paymentFields,
@@ -107,6 +109,13 @@ async function createOrder(user, input, key, paymentFields = {}) {
       const book = await moveStock({ book: item.book, delta: -item.quantity, type: 'SALE', actor: user._id,
         operationKey: `order:${order._id}:reserve`, order: order._id, reason: 'Order placed', active: true }, session);
       order.items.push({ ...item, title: book.title, isbn: book.isbn, coverImageUrl: book.coverImageUrl, unitPrice: book.price });
+    }
+    if (couponCode) {
+      const subtotal = order.items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
+      order.couponCode = couponCode;
+      order.discount = await redeemCoupon(user, couponCode, subtotal, session);
+      // payOS cannot take a zero amount, and a PDF cannot fall back to cash.
+      assert(paymentMethod === 'COD' || subtotal + order.shippingFee - order.discount > 0, 400, 'COUPON_TOTAL', 'This code leaves nothing to pay online; choose cash on delivery or use another code');
     }
     await order.save({ session });
     return order;
@@ -135,6 +144,7 @@ async function transitionOrder(user, value, status, reason) {
         await moveStock({ book: item.book, delta: item.quantity, type: 'CANCELLATION', actor: user._id,
           operationKey: `order:${order._id}:cancel`, order: order._id, reason: order.cancellationReason }, session);
       }
+      if (order.couponCode) await releaseCoupon(order.couponCode, session);
       order.cancelledAt = new Date();
       order.stockReleasedAt = new Date();
     }

@@ -32,7 +32,8 @@ const gateway = {
     amount: order.total,
     // payOS allows 9 characters when the bank account is not linked through payOS.
     description: `BS${String(order.orderCode).slice(-7)}`,
-    items: [
+    // A discount has no line of its own, so a discounted order is sent as one line matching the amount.
+    items: order.discount ? [{ name: `Order ${order.orderCode}`, quantity: 1, price: order.total }] : [
       ...order.items.map(item => ({ name: `${item.title.slice(0, 90)}${item.format === 'PDF' ? ' (PDF)' : ''}`, quantity: item.quantity, price: item.unitPrice })),
       ...(order.shippingFee ? [{ name: 'Shipping', quantity: 1, price: order.shippingFee }] : []),
     ],

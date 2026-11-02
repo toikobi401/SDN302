@@ -31,6 +31,9 @@ const schema = new Schema({
   },
   subtotal: integer(),
   shippingFee: integer(0, 0),
+  // Kept on the order so later edits to the coupon cannot change what was charged.
+  couponCode: { type: String, trim: true, uppercase: true },
+  discount: integer(0, 0),
   total: integer(),
   currency: { type: String, enum: ['VND'], default: 'VND', required: true },
   paymentMethod: { type: String, enum: ['COD', 'PAYOS'], default: 'COD', required: true },
@@ -54,7 +57,8 @@ const schema = new Schema({
 schema.pre('validate', function () {
   for (const item of this.items) item.lineTotal = item.unitPrice * item.quantity;
   this.subtotal = this.items.reduce((sum, item) => sum + item.lineTotal, 0);
-  this.total = this.subtotal + this.shippingFee;
+  if (this.discount > this.subtotal) this.invalidate('discount', 'Discount cannot exceed the subtotal');
+  this.total = this.subtotal + this.shippingFee - this.discount;
   for (const item of this.items) if (item.format === 'PDF' && item.quantity !== 1) this.invalidate('items', 'A PDF line always has quantity 1');
   if (this.paymentStatus === 'PAID' && !this.paidAt) this.invalidate('paidAt', 'paidAt is required for paid orders');
 });
@@ -62,6 +66,7 @@ schema.pre('validate', function () {
 schema.index({ orderNumber: 1 }, { unique: true });
 schema.index({ user: 1, idempotencyKey: 1 }, { unique: true });
 schema.index({ user: 1, createdAt: -1 });
+schema.index({ user: 1, couponCode: 1 });
 schema.index({ status: 1, createdAt: -1 });
 schema.index({ status: 1, paymentStatus: 1, completedAt: -1 });
 schema.index({ orderCode: 1 }, { unique: true, partialFilterExpression: { orderCode: { $type: 'number' } } });

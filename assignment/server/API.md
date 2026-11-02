@@ -95,6 +95,17 @@ Danh mục và nhà cung cấp đều hỗ trợ `GET /admin/<resource>`, `GET /
 
 Có thể dùng PATCH để kích hoạt lại. Sách được giữ lại khi danh mục bị ngừng hoạt động; không cho gán mới danh mục đang ngừng hoạt động.
 
+## Mã giảm giá
+
+- `POST /admin/coupons`: `{ "code": "SALE10", "type": "PERCENT", "value": 10, "minSubtotal": 100000, "maxDiscount": 50000, "usageLimit": 100, "startsAt": null, "expiresAt": "2027-01-01T00:00:00.000Z" }`. `type` là `PERCENT` (1–100) hoặc `FIXED` (VND). Chỉ `code`, `type`, `value` là bắt buộc. Code gồm 3–30 chữ, số, `-`, `_` và được chuyển thành chữ hoa.
+- `GET /admin/coupons`, `GET /admin/coupons/:id`.
+- `PATCH /admin/coupons/:id`: sửa mọi trường trừ `code`. Gửi `null` để bỏ `maxDiscount`, `usageLimit`, `startsAt`, `expiresAt`.
+- `DELETE /admin/coupons/:id`: tắt mã, không xoá.
+- `POST /cart/coupon`: `{ "code": "SALE10" }`, trả `subtotal`, `discount`, `total` theo giỏ hiện tại. Không trừ lượt, giới hạn 20 lần/phút/IP.
+- `POST /orders`: thêm `couponCode`. Đơn trả về có `couponCode`, `discount`; `total = subtotal + shippingFee - discount`.
+
+Mã lỗi: 400 `COUPON_INVALID` (không tồn tại, đã tắt, ngoài thời gian), 400 `COUPON_MINIMUM`, 400 `COUPON_TOTAL` (đơn payOS không còn tiền phải trả), 409 `COUPON_USED`, 409 `COUPON_EXHAUSTED`. Mỗi khách dùng mỗi mã một lần; huỷ đơn trả lại lượt. Thống kê `summary` trả thêm `revenue.discounts`; `bookRevenue` là tiền sách trước giảm giá.
+
 ## Bán PDF
 
 Mỗi sách có bản in; sách có `pdfForSale: true` bán thêm PDF theo `pdfPrice`.

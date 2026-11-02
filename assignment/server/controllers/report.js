@@ -7,9 +7,9 @@ async function summary(req, res) {
   const [ordersByStatus, revenue] = await Promise.all([
     Order.aggregate([{ $match: createdFilter }, { $group: { _id: '$status', count: { $sum: 1 } } }, { $sort: { _id: 1 } }]),
     Order.aggregate([{ $match: { ...completedFilter, status: 'COMPLETED', paymentStatus: 'PAID' } },
-      { $group: { _id: null, orders: { $sum: 1 }, bookRevenue: { $sum: '$subtotal' }, shippingRevenue: { $sum: '$shippingFee' }, totalCollected: { $sum: '$total' } } }]),
+      { $group: { _id: null, orders: { $sum: 1 }, bookRevenue: { $sum: '$subtotal' }, discounts: { $sum: { $ifNull: ['$discount', 0] } }, shippingRevenue: { $sum: '$shippingFee' }, totalCollected: { $sum: '$total' } } }]),
   ]);
-  res.json({ data: { ordersByStatus, revenue: revenue[0] ? { ...revenue[0], _id: undefined } : { orders: 0, bookRevenue: 0, shippingRevenue: 0, totalCollected: 0 }, currency: 'VND' } });
+  res.json({ data: { ordersByStatus, revenue: revenue[0] ? { ...revenue[0], _id: undefined } : { orders: 0, bookRevenue: 0, discounts: 0, shippingRevenue: 0, totalCollected: 0 }, currency: 'VND' } });
 }
 
 async function bestSellers(req, res) {

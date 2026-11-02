@@ -3,6 +3,7 @@ exports.Category = require('./category.js').Category;
 exports.Book = require('./book.js').Book;
 exports.Cart = require('./cart.js').Cart;
 exports.Order = require('./order.js').Order;
+exports.Coupon = require('./coupon.js').Coupon;
 exports.Supplier = require('./supplier.js').Supplier;
 exports.PurchaseReceipt = require('./purchase-receipt.js').PurchaseReceipt;
 exports.InventoryMovement = require('./inventory-movement.js').InventoryMovement;

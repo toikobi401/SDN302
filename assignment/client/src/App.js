@@ -17,6 +17,7 @@ import { AdminLayout, Dashboard } from './pages/admin/Dashboard';
 import AdminBooks from './pages/admin/Books';
 import AdminCategories from './pages/admin/Categories';
 import AdminOrders from './pages/admin/Orders';
+import AdminCoupons from './pages/admin/Coupons';
 
 function ScrollManager() {
   const { pathname, hash } = useLocation();
@@ -49,6 +50,7 @@ function Storefront() {
             <Route path="books" element={<AdminBooks />} />
             <Route path="categories" element={<AdminCategories />} />
             <Route path="orders" element={<AdminOrders />} />
+            <Route path="coupons" element={<AdminCoupons />} />
           </Route>
           <Route path="*" element={<div className="container page"><h1>Page not found</h1><Link to="/">Back to the store</Link></div>} />
         </Routes>

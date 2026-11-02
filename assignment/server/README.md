@@ -21,6 +21,7 @@ Khởi tạo DB không xóa dữ liệu. Nếu dữ liệu cũ vi phạm unique 
 - Đăng ký/đăng nhập JWT, phân quyền, thu hồi token khi logout, cập nhật profile và địa chỉ.
 - Tra cứu sách, phân trang, lọc/sắp xếp, quản trị sách/danh mục/nhà cung cấp.
 - Giỏ hàng theo tài khoản, giá tạm tính và trạng thái đáp ứng tồn kho.
+- Tạo và áp dụng mã giảm giá, giới hạn lượt dùng và thời gian.
 - Bán bản in và PDF trong cùng đơn, tải PDF có kiểm tra quyền sau khi thanh toán.
 - Đặt đơn COD hoặc payOS, snapshot giá, xác nhận/giao/hoàn thành/hủy đơn, ghi nhận thu tiền COD, webhook và sync payOS, tự hủy đơn quá hạn thanh toán, ghi nhận hoàn tiền.
 - Phiếu nhập nháp, chỉnh sửa, xác nhận nhận hàng hoặc hủy.
@@ -36,7 +37,7 @@ Chi tiết endpoint, request body, trạng thái và giả định nghiệp vụ
 - `index.js`: đọc cấu hình, kết nối DB, khởi động server và quét đơn hết hạn.
 - `app.js`: cấu hình Express.
 - `config/db.js`: kết nối MongoDB.
-- `models/`: 8 collection và schema dùng chung.
+- `models/`: 9 collection và schema dùng chung.
 - `middleware/`: `auth.js` (JWT, phân quyền, rate limit), `error.js` (xử lý lỗi).
 - `lib/http.js`: validation và phân trang.
 - `routes/index.js`: toàn bộ route và quyền truy cập.
@@ -55,7 +56,7 @@ Chi tiết endpoint, request body, trạng thái và giả định nghiệp vụ
 ## Các lựa chọn và giới hạn hiện tại
 
 - COD và payOS; hoàn tiền thực hiện thủ công ngoài hệ thống; phí vận chuyển cố định theo SHIPPING_FEE_VND (mặc định 0).
-- Đơn payOS tự hủy sau 15 phút nếu chưa trả tiền; đơn COD PENDING chưa tự hết hạn. Chưa có đổi trả, giảm giá hoặc tích hợp vận chuyển.
+- Đơn payOS tự hủy sau 15 phút nếu chưa trả tiền; đơn COD PENDING chưa tự hết hạn. Chưa có đổi trả hoặc tích hợp vận chuyển.
 - Giỏ hàng không tự xóa sau đặt đơn; frontend có thể xóa sau khi nhận kết quả thành công.
 - Rate limit lưu trong bộ nhớ từng tiến trình; cần kho dùng chung khi chạy nhiều instance.
 - Ảnh bị thay hoặc bỏ khỏi sách được xóa trên Cloudinary. Ảnh đã tải nhưng lưu sách thất bại vẫn nằm lại, cần dọn thủ công. Giới hạn 5 MB chỉ kiểm tra ở client.

@@ -109,3 +109,9 @@ td.button-row .action { margin: 0 8px 8px 0; font-size: .8rem; padding: 8px 12px
 .toolbar label input, .toolbar label select { margin-bottom: 0; }
 body { font-variant-numeric: lining-nums; }
 .page :not(.admin-nav) > a:not(.action) { color: var(--dark-color); text-decoration: underline; }
+.coupon-form { margin: 0; }
+.action:focus { background: var(--dark-color); color: var(--light-color); }
+.action.outline:focus { background: transparent; color: var(--dark-color); }
+.action:hover:focus:not(:disabled) { background: transparent; color: var(--dark-color); }
+.action.outline:hover:focus:not(:disabled) { background: var(--dark-color); color: var(--light-color); }
+.action:focus-visible { outline: 2px solid var(--dark-color); outline-offset: 2px; }

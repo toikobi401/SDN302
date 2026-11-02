@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const { Cart, Book } = require('../models');
+const { normalizeCode, couponDiscount, usableCoupon } = require('../services/coupon');
 const { assert, id, number } = require('../lib/http');
 const { bookFormats } = require('../models/shared');
 
@@ -15,8 +16,8 @@ function cartLine(item) {
   return { available: item.book.status === 'ACTIVE' && item.book.stock >= item.quantity, lineTotal: item.book.price * item.quantity };
 }
 
-async function get(req, res) {
-  const cart = await Cart.findOne({ user: req.user._id }).populate('items.book');
+async function cartSummary(user) {
+  const cart = await Cart.findOne({ user: user._id }).populate('items.book');
   let subtotal = 0;
   const items = (cart?.items || []).map(item => {
     const { available, lineTotal } = cartLine(item);
@@ -24,7 +25,20 @@ async function get(req, res) {
     return { book: item.book, format: item.format, quantity: item.quantity, available: Boolean(available), lineTotal };
   });
   assert(Number.isSafeInteger(subtotal), 409, 'TOTAL_TOO_LARGE', 'Cart total exceeds supported range');
-  res.json({ data: { items, subtotal, currency: 'VND', reservesStock: false } });
+  return { items, subtotal, currency: 'VND', reservesStock: false };
+}
+
+async function get(req, res) {
+  res.json({ data: await cartSummary(req.user) });
+}
+
+// Only a preview for the checkout page; placing the order checks the code again and uses it up.
+async function previewCoupon(req, res) {
+  const code = normalizeCode(req.body?.code);
+  const { subtotal } = await cartSummary(req.user);
+  const coupon = await usableCoupon(req.user, code, subtotal);
+  const discount = couponDiscount(coupon, subtotal);
+  res.json({ data: { code, subtotal, discount, total: subtotal - discount } });
 }
 
 // PUT sets the exact quantity, so repeating the same request does not add duplicates.
@@ -69,4 +83,4 @@ async function clear(req, res) {
   res.status(204).end();
 }
 
-module.exports = { get, setItem, removeItem, clear };
+module.exports = { get, previewCoupon, setItem, removeItem, clear };

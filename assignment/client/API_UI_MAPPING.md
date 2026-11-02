@@ -13,6 +13,8 @@
 | Đơn của tôi `/orders`, `/orders/:id` | `GET /api/orders`, `GET /api/orders/:id`, `POST /api/orders/:id/payment/sync`, `POST /api/orders/:id/cancel` | Trang chi tiết kiêm trang kết quả thanh toán |
 | Tổng quan `/admin` | `GET /api/admin/reports/summary`, `GET /api/admin/reports/low-stock` | Doanh thu, đơn theo trạng thái, sách sắp hết |
 | Sách `/admin/books` | `/api/admin/books`, `/api/admin/books/:id/stock-adjustments`, `/api/admin/uploads/signature` | Ảnh gửi thẳng lên Cloudinary rồi mới lưu sách |
+| Mã giảm giá `/admin/coupons` | `/api/admin/coupons` | Tạo, sửa, bật tắt mã |
+| Nhập mã ở `/checkout` | `POST /api/cart/coupon`, `POST /api/orders` | Xem trước tiền giảm; server tính lại khi đặt đơn |
 | Danh mục `/admin/categories` | `/api/admin/categories` | Ẩn thay vì xóa |
 | Đơn hàng `/admin/orders` | `/api/admin/orders`, `.../status`, `.../payment`, `.../payment/sync`, `.../refund` | Lọc theo trạng thái đơn và thanh toán |
 
