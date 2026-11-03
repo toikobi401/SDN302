@@ -5,7 +5,8 @@ import { cloudImage, slugify } from './components/ui';
 
 beforeEach(() => { window.scrollTo = jest.fn(); });
 
-test('storefront renders the catalog section and shows a fetched book', async () => {
+test('Browse Books is its own page and shows a fetched book', async () => {
+  window.history.pushState({}, '', '/books');
   const book = { _id: 'b1', title: 'A Test Book', authors: ['An Author'], price: 1000, stock: 2, imageUrls: [] };
   global.fetch = jest.fn(async url => ({
     ok: true, status: 200,
@@ -16,7 +17,20 @@ test('storefront renders the catalog section and shows a fetched book', async ()
   expect((await screen.findAllByRole('link', { name: 'A Test Book' }))[0]).toHaveAttribute('href', '/books/b1');
 });
 
+test('home page has no Browse section and fetches its own latest books', async () => {
+  window.history.pushState({}, '', '/');
+  global.fetch = jest.fn(async url => ({
+    ok: true, status: 200,
+    json: async () => (String(url).includes('/books') ? { data: [], pagination: { pages: 0 } } : { data: [] }),
+  }));
+  render(<App />);
+  expect(screen.queryByRole('heading', { name: 'Browse Books' })).not.toBeInTheDocument();
+  expect(screen.getByRole('link', { name: 'Browse Books' })).toHaveAttribute('href', '/books');
+  await waitFor(() => expect(global.fetch).toHaveBeenCalledWith(expect.stringContaining('limit=4&sort=newest'), expect.anything()));
+});
+
 test('Browse Books search sends the query to the catalog API', async () => {
+  window.history.pushState({}, '', '/books');
   global.fetch = jest.fn(async url => ({
     ok: true, status: 200,
     json: async () => (String(url).includes('/books') ? { data: [], pagination: { pages: 0 } } : { data: [] }),

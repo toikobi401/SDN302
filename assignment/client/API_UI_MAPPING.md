@@ -2,8 +2,8 @@
 
 | UI | Endpoint | Mapping |
 | --- | --- | --- |
-| New Arrivals / Discover a Book | `GET /api/books?sort=newest` | Sách mới nhất; không phải xếp hạng bán chạy |
-| Browse Books | `GET /api/books?q=&category=&page=&limit=8` | Tìm theo tên/tác giả/ISBN, thể loại, phân trang |
+| New Arrivals / Discover a Book | `GET /api/books?limit=4&sort=newest` | Sách mới nhất; không phải xếp hạng bán chạy |
+| Browse Books `/books` | `GET /api/books?q=&category=&page=&limit=8` | Tìm theo tên/tác giả/ISBN, thể loại, phân trang |
 | Tabs thể loại | `GET /api/categories?limit=100` | `_id` làm filter, `name` làm nhãn |
 | BookCard | Book document | `_id → id`, `authors → author`, `coverImageUrl → image`, `price` là VND, `stock` điều khiển nút mua |
 | Account | `POST /api/auth/register`, `POST /api/auth/login`, `GET /api/auth/me`, `POST /api/auth/logout` | Đăng ký/đăng nhập, phục hồi phiên; Bearer token trong sessionStorage |

@@ -81,7 +81,7 @@ function Navbar() {
                     <form
                       role="search"
                       className="search-box"
-                      onSubmit={(e) => { e.preventDefault(); search(new FormData(e.currentTarget).get("q")); navigate("/#popular-books"); }}
+                      onSubmit={(e) => { e.preventDefault(); search(new FormData(e.currentTarget).get("q")); navigate("/books"); }}
                     >
                       <input
                         className="search-field text search-input"
@@ -118,7 +118,7 @@ function Navbar() {
                       <Link to="/#featured-books" className="nav-link" onClick={closeMenu}>New Arrivals</Link>
                     </li>
                     <li className="menu-item">
-                      <Link to="/#popular-books" className="nav-link" onClick={closeMenu}>Browse Books</Link>
+                      <Link to="/books" className="nav-link" onClick={closeMenu}>Browse Books</Link>
                     </li>
                     {user && (
                       <li className="menu-item">

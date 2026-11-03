@@ -50,7 +50,7 @@ export default function Checkout() {
     }
   }
 
-  if (!items.length) return <div className="container page"><h1>Check out</h1><p>Your cart is empty. <Link to="/#popular-books">Browse books</Link></p></div>;
+  if (!items.length) return <div className="container page"><h1>Check out</h1><p>Your cart is empty. <Link to="/books">Browse books</Link></p></div>;
 
   return <div className="container page">
     <h1>Check out</h1>

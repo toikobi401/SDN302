@@ -24,7 +24,7 @@ export default function Cart() {
   return <div className="container page">
     <h1>Shopping cart</h1>
     {error && <p className="message error" role="alert">{error}</p>}
-    {!cart.items.length && <p>Your cart is empty. <Link to="/#popular-books">Browse books</Link></p>}
+    {!cart.items.length && <p>Your cart is empty. <Link to="/books">Browse books</Link></p>}
     {cart.items.map((item, index) => <div className="cart-row" key={item.book ? `${item.book._id}:${item.format}` : index}>
       {item.book?.coverImageUrl && <img src={cloudImage(item.book.coverImageUrl, 120)} alt="" />}
       <div className="cart-title">

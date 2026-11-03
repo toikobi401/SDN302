@@ -68,7 +68,7 @@ Prata và Raleway được nạp từ Google Fonts trong `public/index.html` và
 | `#featured-books` | `FeaturedBooks` | Eyebrow + heading giữa, lưới sách và link xem tất cả |
 | Sản phẩm trong các danh sách | `BookCard.js` | Ảnh → tên sách → tác giả → giá; cùng cấu trúc ở mọi danh sách |
 | `#best-selling` | `BestSelling` | Ảnh lớn cạnh thông tin và CTA; nền pattern nhẹ |
-| `#popular-books` | `PopularBooks` | Tabs thể loại nằm trên lưới; tab active phải dễ nhận biết |
+| `#popular-books` | Trang `/books` (`pages/Browse.js`) | Tabs thể loại nằm trên lưới; tab active phải dễ nhận biết |
 | `#quotation` | `Quotation` | Quote giữa trang và tên tác giả, chiều rộng đọc vừa phải |
 | `#special-offer` | `SpecialOffer` | Dùng BookCard; giá cũ gạch ngang, giá mới nổi bật |
 | `#subscribe` | `Subscribe` | Tiêu đề và mô tả/form hai cột trên desktop |

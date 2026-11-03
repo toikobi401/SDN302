@@ -8,6 +8,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ProtectedRoute from './components/ProtectedRoute';
 import Home from './pages/Home';
+import Browse from './pages/Browse';
 import BookDetail from './pages/BookDetail';
 import Auth from './pages/Auth';
 import Cart from './pages/Cart';
@@ -38,6 +39,7 @@ function Storefront() {
       <main>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/books" element={<Browse />} />
           <Route path="/books/:id" element={<BookDetail />} />
           <Route path="/login" element={<Auth />} />
           <Route path="/register" element={<Auth register />} />

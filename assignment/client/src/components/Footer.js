@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { placeholderAssets } from "../data/placeholders";
 
 function Footer() {
@@ -47,13 +48,13 @@ function Footer() {
                     <a href="#home">Home</a>
                   </li>
                   <li className="menu-item">
-                    <a href="#popular-books">Books</a>
+                    <Link to="/books">Books</Link>
                   </li>
                   <li className="menu-item">
                     <a href="#featured-books">Authors</a>
                   </li>
                   <li className="menu-item">
-                    <a href="#popular-books">Subjects</a>
+                    <Link to="/books">Subjects</Link>
                   </li>
                   <li className="menu-item">
                     <a href="#search">Advanced Search</a>

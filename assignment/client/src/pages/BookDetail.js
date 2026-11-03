@@ -44,7 +44,7 @@ export default function BookDetail() {
             {book.isbn && <><dt>ISBN</dt><dd>{book.isbn}</dd></>}
             {book.license && <><dt>License</dt><dd>{book.licenseUrl ? <a href={book.licenseUrl} target="_blank" rel="noreferrer">{book.license}</a> : book.license}</dd></>}
           </dl>
-          <Link to="/#popular-books">Back to all books</Link>
+          <Link to="/books">Back to all books</Link>
         </div>
       </div>}
     </LoadState>
