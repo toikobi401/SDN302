@@ -1,4 +1,14 @@
-# Getting Started with Create React App
+# Booksaw client
+
+The client runs on http://localhost:3001 in development; the API runs on port 3000.
+
+- Storefront: `/`, `/books`, `/cart`, `/orders`; customer sign in at `/login`.
+- Administration: `/admin`, with its own sidebar and header; administrator sign in at `/admin/login`.
+- Admin pages (`/admin/books`, `/admin/categories`, `/admin/orders`, `/admin/coupons`) require an `ADMIN` account. Create that account using the server's `npm run db:seed` setup.
+- Admin sign in returns to the requested admin page. Signing out returns to `/admin/login`.
+- Both areas use the same API and session. The storefront cart and catalog providers run only inside the storefront layout.
+
+## Create React App scripts
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
@@ -9,7 +19,7 @@ In the project directory, you can run:
 ### `npm start`
 
 Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Open [http://localhost:3001](http://localhost:3001) to view it in your browser.
 
 The page will reload when you make changes.\
 You may also see any lint errors in the console.

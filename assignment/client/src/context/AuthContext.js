@@ -22,12 +22,12 @@ export function AuthProvider({ children }) {
     setUser(account);
   }
 
-  async function signOut() {
+  async function signOut(redirectTo = '/') {
     try { await api('/auth/logout', { method: 'POST' }); }
     finally {
       sessionStorage.removeItem(TOKEN);
       setUser(null);
-      navigate('/');
+      navigate(redirectTo);
     }
   }
 

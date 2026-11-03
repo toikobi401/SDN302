@@ -1,0 +1,139 @@
+.admin-app {
+  min-height: 100vh;
+  background: var(--light-color);
+  color: var(--dark-color);
+}
+
+.admin-layout {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+.admin-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  padding: 32px 24px;
+  border-right: 1px solid var(--accent-color);
+}
+
+.admin-brand {
+  color: var(--dark-color);
+  font-family: var(--heading-font);
+  font-size: 2rem;
+  text-decoration: none;
+}
+
+.admin-brand span {
+  display: block;
+  margin-top: 12px;
+  font-family: var(--body-font);
+  font-size: .8rem;
+}
+
+.admin-app .admin-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.admin-app .admin-nav a {
+  min-height: 44px;
+  padding: 12px 16px;
+  border-left: 3px solid transparent;
+  color: var(--dark-color);
+  text-decoration: none;
+}
+
+.admin-app .admin-nav a:hover,
+.admin-app .admin-nav a.active {
+  background: var(--dark-color);
+  color: var(--light-color);
+  border-left-color: var(--accent-color);
+  text-decoration: none;
+}
+
+.admin-app .admin-nav a.active { font-weight: 700; }
+
+.admin-store-link {
+  margin-top: auto;
+  padding: 12px 0;
+  color: var(--dark-color);
+  text-decoration: underline;
+}
+
+.admin-workspace { min-width: 0; }
+
+.admin-book-cover {
+  display: block;
+  width: 64px;
+  height: 88px;
+  max-width: none;
+  object-fit: contain;
+  background: var(--light-color);
+  border: 1px solid var(--accent-color);
+}
+
+.admin-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 24px 32px;
+  border-bottom: 1px solid var(--accent-color);
+}
+
+.admin-account {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  overflow-wrap: anywhere;
+}
+
+.admin-content {
+  padding: 32px;
+  overflow-wrap: anywhere;
+}
+
+.admin-login {
+  display: grid;
+  align-items: center;
+  min-height: 100vh;
+  padding: 24px;
+}
+
+.admin-login > .page {
+  width: 100%;
+  padding: 32px;
+  border: 1px solid var(--accent-color);
+}
+
+.admin-login-brand {
+  margin-bottom: 24px;
+  font-weight: 600;
+}
+
+.admin-app a:focus-visible {
+  outline: 2px solid var(--dark-color);
+  outline-offset: 2px;
+}
+
+@media (max-width: 991px) {
+  .admin-layout { grid-template-columns: minmax(0, 1fr); }
+  .admin-sidebar { gap: 16px; padding: 24px; border-right: 0; border-bottom: 1px solid var(--accent-color); }
+  .admin-app .admin-nav { flex-direction: row; flex-wrap: wrap; }
+  .admin-store-link { margin-top: 0; }
+  .admin-header, .admin-content { padding: 24px; }
+}
+
+@media (max-width: 575px) {
+  .admin-sidebar, .admin-header, .admin-content, .admin-login { padding: 16px; }
+  .admin-login > .page { padding: 24px 16px; }
+  .admin-app .admin-nav a { padding: 12px; }
+}

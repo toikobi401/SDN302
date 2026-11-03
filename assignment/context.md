@@ -64,6 +64,8 @@ assignment/
 
 Nội dung trang chủ như banner, bài viết, logo đối tác vẫn là dữ liệu mẫu của template. Giao diện đang bằng tiếng Anh theo `UI_DESIGN_GUIDELINES.md`.
 
+Khu quản trị `/admin` dùng layout riêng (sidebar, header, đăng xuất), không dùng header/footer và các provider giỏ hàng, danh mục của cửa hàng. Trang đăng nhập admin là `/admin/login`; chỉ tài khoản `ADMIN` được truy cập. Đăng nhập admin mặc định chuyển đến `/admin`, hoặc quay lại trang quản trị đang yêu cầu; đăng xuất từ quản trị quay về `/admin/login`. Trang khách hàng vẫn dùng `/login`, `/register` và layout cửa hàng. Hai khu vực dùng chung API và phiên đăng nhập.
+
 ## 5. ERD
 
 ```mermaid

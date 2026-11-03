@@ -81,9 +81,6 @@ button {
 .cart-title { flex: 1 1 240px; }
 .cart-summary { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 24px; margin-top: 24px; }
 .cart-summary p { margin: 0; }
-.admin-nav { display: flex; flex-wrap: wrap; gap: 8px 24px; margin-bottom: 32px; padding-bottom: 8px; border-bottom: 1px solid var(--accent-color); }
-.admin-nav a { padding: 8px 0; color: var(--dark-color); text-decoration: none; }
-.admin-nav a.active { font-weight: 700; text-decoration: underline; }
 .book-skeleton { aspect-ratio: 3 / 4; margin-bottom: 32px; background: #e8e6de; animation: book-skeleton 1.4s ease-in-out infinite; }
 @keyframes book-skeleton { 50% { opacity: .5; } }
 .product-style a img { transition: transform .3s ease-out; }

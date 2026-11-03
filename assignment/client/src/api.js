@@ -10,7 +10,7 @@ export async function api(path, options = {}) {
   });
   if (response.status === 401 && token) {
     sessionStorage.removeItem(TOKEN);
-    window.location.assign('/login');
+    window.location.assign(/^\/admin(?:\/|$)/.test(window.location.pathname) ? '/admin/login' : '/login');
   }
   if (response.status === 204) return {};
   const body = await response.json();

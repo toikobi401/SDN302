@@ -1,20 +1,7 @@
-import { Link, NavLink, Outlet } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useApi } from '../../api';
 import { money } from '../../data/placeholders';
 import { LoadState, statusLabels } from '../../components/ui';
-
-export function AdminLayout() {
-  return <div className="container page">
-    <nav className="admin-nav" aria-label="Store management">
-      <NavLink end to="/admin">Overview</NavLink>
-      <NavLink to="/admin/books">Books</NavLink>
-      <NavLink to="/admin/categories">Categories</NavLink>
-      <NavLink to="/admin/orders">Orders</NavLink>
-      <NavLink to="/admin/coupons">Discount codes</NavLink>
-    </nav>
-    <Outlet />
-  </div>;
-}
 
 export function Dashboard() {
   const summary = useApi('/admin/reports/summary');

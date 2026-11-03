@@ -7,6 +7,7 @@ const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 const MAX_GALLERY_IMAGES = 5;
 const IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const MAX_PDF_BYTES = 200 * 1024 * 1024;
+const DEFAULT_COVER = `${process.env.PUBLIC_URL}/images/default.png`;
 const send = (path, method, body, headers) => api(path, { method, body: JSON.stringify(body), headers });
 
 function imageProblem(files) {
@@ -199,8 +200,11 @@ export default function AdminBooks() {
       categories={(categories.data || []).filter(category => category.isActive)} onSaved={reload} onClose={() => setEditing(null)} />}
     <LoadState loading={loading} error={error} reload={reload} empty={data && !data.length && 'No books match. Add one to get started.'}>
       <div className="table-responsive"><table className="table align-middle">
-        <thead><tr><th scope="col">Book</th><th scope="col">Price</th><th scope="col">Stock</th><th scope="col">Availability</th><th scope="col">Actions</th></tr></thead>
+        <thead><tr><th scope="col">Cover</th><th scope="col">Book</th><th scope="col">Price</th><th scope="col">Stock</th><th scope="col">Availability</th><th scope="col">Actions</th></tr></thead>
         <tbody>{data?.map(book => <tr key={book._id}>
+          <td><img className="admin-book-cover" src={book.coverImageUrl ? cloudImage(book.coverImageUrl, 128) : DEFAULT_COVER}
+            alt={`Cover of ${book.title}`} width="64" height="88" loading="lazy" decoding="async"
+            onError={event => { if (event.currentTarget.getAttribute('src') !== DEFAULT_COVER) event.currentTarget.src = DEFAULT_COVER; }} /></td>
           <td>{book.title}<br /><small>{book.authors.join(', ')}</small></td>
           <td>{money(book.price)}</td>
           <td>{book.stock}</td>

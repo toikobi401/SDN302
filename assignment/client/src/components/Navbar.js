@@ -61,7 +61,7 @@ function Navbar() {
                   <i className="icon icon-user" />
                   <span>{user?.name || "Sign in"}</span>
                 </Link>
-                {user && <button type="button" className="link-button" onClick={signOut}>Sign out</button>}
+                {user && <button type="button" className="link-button" onClick={() => signOut().catch(() => {})}>Sign out</button>}
                 <Link to="/cart" className="cart for-buy">
                   <i className="icon icon-clipboard" />
                   <span>Cart:({money(user ? cart.subtotal : 0)})</span>

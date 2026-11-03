@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { BrowserRouter, Link, Route, Routes, useLocation } from 'react-router-dom';
+import { BrowserRouter, Link, Outlet, Route, Routes, useLocation } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider, useCart } from './context/CartContext';
 import { CatalogProvider } from './context/CatalogContext';
@@ -14,7 +14,8 @@ import Auth from './pages/Auth';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import { OrderDetail, OrderList } from './pages/Orders';
-import { AdminLayout, Dashboard } from './pages/admin/Dashboard';
+import { Dashboard } from './pages/admin/Dashboard';
+import AdminLayout, { AdminShell } from './pages/admin/AdminLayout';
 import AdminBooks from './pages/admin/Books';
 import AdminCategories from './pages/admin/Categories';
 import AdminOrders from './pages/admin/Orders';
@@ -29,48 +30,58 @@ function ScrollManager() {
   return null;
 }
 
-function Storefront() {
+function StoreLayout() {
   const { notice } = useCart();
   return (
     <div className="App">
-      <ScrollManager />
       <Navbar />
       {notice && <p className="store-notice" role="status">{notice}</p>}
       <main>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/books" element={<Browse />} />
-          <Route path="/books/:id" element={<BookDetail />} />
-          <Route path="/login" element={<Auth />} />
-          <Route path="/register" element={<Auth register />} />
-          <Route path="/cart" element={<Cart />} />
-          <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
-          <Route path="/orders" element={<ProtectedRoute><OrderList /></ProtectedRoute>} />
-          <Route path="/orders/:id" element={<ProtectedRoute><OrderDetail /></ProtectedRoute>} />
-          <Route path="/admin" element={<ProtectedRoute admin><AdminLayout /></ProtectedRoute>}>
-            <Route index element={<Dashboard />} />
-            <Route path="books" element={<AdminBooks />} />
-            <Route path="categories" element={<AdminCategories />} />
-            <Route path="orders" element={<AdminOrders />} />
-            <Route path="coupons" element={<AdminCoupons />} />
-          </Route>
-          <Route path="*" element={<div className="container page"><h1>Page not found</h1><Link to="/">Back to the store</Link></div>} />
-        </Routes>
+        <Outlet />
       </main>
       <Footer />
     </div>
   );
 }
 
+function Storefront() {
+  return <CartProvider><CatalogProvider><StoreLayout /></CatalogProvider></CartProvider>;
+}
+
+function NotFound({ admin = false }) {
+  return <div className="container page"><h1>Page not found</h1><Link to={admin ? '/admin' : '/'}>{admin ? 'Back to overview' : 'Back to the store'}</Link></div>;
+}
+
 export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <CartProvider>
-          <CatalogProvider>
-            <Storefront />
-          </CatalogProvider>
-        </CartProvider>
+        <ScrollManager />
+        <Routes>
+          <Route path="/admin" element={<AdminShell />}>
+            <Route path="login" element={<main className="admin-login"><Auth admin /></main>} />
+            <Route element={<ProtectedRoute admin><AdminLayout /></ProtectedRoute>}>
+              <Route index element={<Dashboard />} />
+              <Route path="books" element={<AdminBooks />} />
+              <Route path="categories" element={<AdminCategories />} />
+              <Route path="orders" element={<AdminOrders />} />
+              <Route path="coupons" element={<AdminCoupons />} />
+              <Route path="*" element={<NotFound admin />} />
+            </Route>
+          </Route>
+          <Route element={<Storefront />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/books" element={<Browse />} />
+            <Route path="/books/:id" element={<BookDetail />} />
+            <Route path="/login" element={<Auth />} />
+            <Route path="/register" element={<Auth register />} />
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
+            <Route path="/orders" element={<ProtectedRoute><OrderList /></ProtectedRoute>} />
+            <Route path="/orders/:id" element={<ProtectedRoute><OrderDetail /></ProtectedRoute>} />
+            <Route path="*" element={<NotFound />} />
+          </Route>
+        </Routes>
       </AuthProvider>
     </BrowserRouter>
   );
