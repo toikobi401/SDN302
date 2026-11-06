@@ -299,6 +299,109 @@ return res.status(201).json({
 
 ---
 
+## 8. Chống trùng lịch / trùng khung giờ
+
+Rất hợp với dữ liệu rạp chiếu phim, phòng họp, lịch làm việc — **dạng đề dễ ra nhất chưa từng ra**.
+
+**Công thức:** hai khoảng `[s1, e1)` và `[s2, e2)` **giao nhau** khi `s1 < e2 && s2 < e1`.
+
+```js
+// Tìm suất nào trong CÙNG phòng bị chồng giờ
+const clash = await Showtime.findOne({
+    roomId,
+    startTime: { $lt: endTime },     // suất cũ bắt đầu trước khi suất mới kết thúc
+    endTime:   { $gt: startTime }    // VÀ kết thúc sau khi suất mới bắt đầu
+});
+if (clash) {
+    return res.status(409).json({
+        error: `Room is already booked from ${clash.startTime} to ${clash.endTime}`
+    });
+}
+```
+
+> ⚠️ **Phải dùng `$lt` / `$gt`, không phải `$lte` / `$gte`.**
+> Với `$lte`/`$gte`, suất 18:00–21:00 và suất 21:00–23:00 bị coi là trùng,
+> dù chúng chỉ chạm nhau tại một điểm.
+
+Nhớ kiểm tra khoảng thời gian hợp lệ trước:
+
+```js
+if (startTime >= endTime) {
+    return res.status(400).json({ error: 'startTime must be before endTime' });
+}
+```
+
+| # | Case (phòng đã có suất 18:00–21:00) | Kết quả | Đã test |
+|---|---|---|---|
+| 1 | Đặt 18:00–21:00 (trùng hoàn toàn) | 409 | ✅ |
+| 2 | Đặt 20:00–22:00 (chồng một phần) | 409 | ✅ |
+| 3 | Đặt 19:00–20:00 (nằm gọn bên trong) | 409 | |
+| 4 | Đặt 17:00–23:00 (bao trùm) | 409 | |
+| 5 | Đặt 21:00–23:00 (**chạm mép**) | **201** | ✅ |
+| 6 | Đặt 15:00–18:00 (chạm mép phía trước) | **201** | |
+| 7 | Đặt cùng giờ nhưng **phòng khác** | 201 | |
+| 8 | `startTime >= endTime` | 400 | ✅ |
+
+> Case 5 là chỗ dễ sai nhất — đã verify trả đúng 201.
+
+---
+
+## 9. Kiểm tra sức chứa
+
+```js
+const sold = await Ticket.countDocuments({ showTimeId, status: { $ne: 'canceled' } });
+
+// ⚠️ Nhớ CỘNG số đang đặt, không chỉ so sánh số đã bán
+if (sold + seats.length > room.capacity) {
+    return res.status(409).json({ error: `Only ${room.capacity - sold} seats left` });
+}
+```
+
+| Case | `capacity` | Đã bán | Đang đặt | Kết quả |
+|---|---|---|---|---|
+| Còn dư | 5 | 2 | 2 | 201 |
+| Vừa khít | 5 | 3 | 2 | 201 |
+| Vượt 1 | 5 | 4 | 2 | 409 `Only 1 seats left` |
+| Hết sạch | 5 | 5 | 1 | 409 `Only 0 seats left` |
+| Chỉ so `sold > capacity` (sai) | 5 | 4 | 2 | lọt qua → bán quá chỗ |
+
+---
+
+## 10. Trùng dữ liệu unique
+
+```js
+// Cách 1 — kiểm tra trước (message dễ kiểm soát hơn)
+if (await User.findOne({ email })) {
+    return res.status(409).json({ error: 'Email already registered' });
+}
+
+// Cách 2 — để MongoDB bắt, rồi map lỗi (cần unique index trên field đó)
+// error.code === 11000  ->  409   (xem MODELS.md mục 5)
+```
+
+| Case | Kết quả |
+|---|---|
+| Email mới | 201 |
+| Email đã tồn tại | 409 |
+| Hai request gửi cùng lúc | Chỉ cách 2 chặn được tuyệt đối (nhờ unique index) |
+
+---
+
+## 11. Sinh mã tự động
+
+Khi đề yêu cầu mã dạng `PRJ001`, `TK0005`:
+
+```js
+// Đếm bản ghi hiện có rồi cộng 1. Đủ dùng cho bài thi.
+const count = await Project.countDocuments();
+const code = `PRJ${String(count + 1).padStart(3, '0')}`;   // PRJ001, PRJ002...
+```
+
+> ⚠️ Cách này sai nếu đã có bản ghi bị xoá (sẽ sinh trùng mã). Chắc chắn hơn:
+> lấy bản ghi mới nhất rồi tăng — `await Project.findOne().sort('-code')`.
+
+---
+
 ## Hình dạng response 201
 
 Đề vẽ sao thì trả đúng vậy, kể cả khi thấy "thừa":

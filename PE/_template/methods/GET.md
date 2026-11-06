@@ -403,6 +403,190 @@ app.get('/api/children-search', async (req, res) => {
 
 ---
 
+## 9. Lọc nâng cao — các dạng đề có thể ra
+
+Nguyên tắc: **chỉ thêm điều kiện vào `filter` khi param có mặt**. Một route lo được mọi tổ hợp.
+
+```js
+const filter = {};
+```
+
+### 9a. Khoảng thời gian
+
+```js
+// ?from=2026-03-01&to=2026-03-31
+if (from || to) {
+    filter.startTime = {};
+    if (from) filter.startTime.$gte = from;
+    if (to)   filter.startTime.$lte = to;
+}
+```
+
+> `startTime` lưu dạng **String ISO** (`"2026-03-10T18:30:00.000Z"`) thì so sánh chuỗi
+> **vẫn đúng thứ tự**, không cần đổi kiểu. Nếu field khai là `Date` thì phải bọc `new Date(from)`.
+
+| Case | Request | Kết quả |
+|---|---|---|
+| Cả hai mốc | `?from=2026-03-01&to=2026-03-31` | Trong khoảng |
+| Chỉ `from` | `?from=2026-03-01` | Từ mốc đó trở đi |
+| Chỉ `to` | `?to=2026-03-31` | Đến mốc đó |
+| Không có | — | Không lọc theo ngày |
+| `from > to` | — | 200 `[]` (hoặc tự chặn 400 nếu đề yêu cầu) |
+
+### 9b. Mảng chứa giá trị
+
+```js
+if (genre) filter.genre = genre;                        // mảng CÓ phần tử bằng genre
+// filter.genre = { $in: genre.split(',') }             // chứa BẤT KỲ giá trị nào
+// filter.genre = { $all: genre.split(',') }            // chứa TẤT CẢ
+// filter.genre = { $size: 2 }                          // mảng đúng 2 phần tử
+```
+
+> Với mảng, viết `{ genre: 'action' }` là đủ — Mongo tự hiểu "có phần tử bằng".
+> Không cần `$elemMatch` trừ khi phần tử là object và cần khớp **nhiều điều kiện cùng lúc**:
+> `filter.seats = { $elemMatch: { type: 'VIP', status: 'FREE' } }`
+
+### 9c. Field bên trong object lồng
+
+```js
+if (city) filter['meta.city'] = city;     // dùng dấu chấm, nhớ bọc nháy
+```
+
+### 9d. Tìm trên nhiều field
+
+```js
+if (q) {
+    filter.$or = [
+        { title:       { $regex: q, $options: 'i' } },
+        { description: { $regex: q, $options: 'i' } }
+    ];
+}
+```
+
+> ⚠️ Nếu dùng cả `$or` và điều kiện khác, chúng được **AND** với nhau — đúng như mong đợi.
+> Nhưng đừng gán `filter.$or` hai lần, lần sau sẽ ghi đè lần trước.
+
+### 9e. Chọn / loại field, và `lean()`
+
+```js
+await Child.find(filter).select('-__v -description');   // loại field
+await Child.find(filter).select('title price');         // chỉ lấy field này
+await Child.find(filter).lean();                        // trả object JS thường, nhanh hơn
+```
+
+> `lean()` trả về object thuần, **không có** method Mongoose (`.save()`). Chỉ dùng khi chỉ đọc.
+
+---
+
+## 10. Populate lồng nhau
+
+Khi cần đi qua 2 cấp quan hệ:
+
+```js
+const children = await Child.find({ parentId })
+    .populate({
+        path: 'roomId',
+        select: 'roomName capacity',
+        populate: { path: 'managerId', select: 'name' }   // cấp 2
+    });
+```
+
+Populate nhiều field cùng lúc:
+
+```js
+.populate('movieId', 'title').populate('roomId', 'roomName')
+```
+
+| Case | Kết quả |
+|---|---|
+| Cả 2 cấp đều có dữ liệu | Lồng đủ |
+| Cấp 1 là `null` | `c.roomId` là `null` → **phải** kiểm tra trước khi `.roomName` |
+| Hai bên lệch kiểu id | `null` âm thầm, không báo lỗi |
+
+---
+
+## 11. Biến thể aggregation đề có thể ra
+
+### 11a. Lọc trước khi gom — luôn đặt `$match` đầu tiên
+
+```js
+{ $match: { status: { $ne: 'canceled' } } },   // nhanh hơn nhiều, dùng được index
+{ $group: { _id: '$proId', total: { $sum: '$workHours' } } }
+```
+
+> ⚠️ `$match` đặt **sau** `$group` thì phải dùng **tên field mới** (`total`), không phải tên gốc.
+
+### 11b. Nhiều phép tính trong một `$group`
+
+```js
+{
+    $group: {
+        _id: '$proId',
+        totalAmount: { $sum: '$amount' },
+        avgAmount:   { $avg: '$amount' },
+        maxAmount:   { $max: '$amount' },
+        minAmount:   { $min: '$amount' },
+        count:       { $sum: 1 },                  // đếm bản ghi (có trùng)
+        userIds:     { $addToSet: '$empId' }       // đếm KHÔNG trùng
+    }
+}
+```
+
+### 11c. Làm tròn, chia, chống chia cho 0
+
+```js
+{
+    $project: {
+        _id: 0,
+        avgAmount: { $round: ['$avgAmount', 2] },
+        avgPerUser: {
+            $cond: [
+                { $eq: [{ $size: '$userIds' }, 0] },
+                0,
+                { $round: [{ $divide: ['$totalAmount', { $size: '$userIds' }] }, 2] }
+            ]
+        }
+    }
+}
+```
+
+### 11d. Top-N
+
+```js
+{ $sort: { totalAmount: -1 } },
+{ $limit: 5 }
+```
+
+### 11e. Đếm theo nhóm (không cần join)
+
+```js
+Link.aggregate([
+    { $group: { _id: '$status', count: { $sum: 1 } } },
+    { $project: { _id: 0, status: '$_id', count: 1 } },
+    { $sort: { count: -1 } }
+]);
+// -> [ { status: "paid", count: 5 }, { status: "booked", count: 2 } ]
+```
+
+### 11f. Giữ cả bản ghi không có dữ liệu liên quan
+
+```js
+{ $unwind: { path: '$project', preserveNullAndEmptyArrays: true } }
+```
+
+> Mặc định `$unwind` **loại bỏ** document có mảng rỗng. Đề muốn liệt kê cả dự án chưa ai làm
+> thì phải thêm option này — hoặc đổi hướng, aggregate từ `projects` rồi `$lookup` sang `worksOns`.
+
+### 11g. Không cần aggregate — chỉ đếm hoặc lấy giá trị duy nhất
+
+```js
+const total = await Child.countDocuments({ parentId });        // chỉ đếm
+const genres = await Movie.distinct('genre');                  // danh sách giá trị duy nhất
+const genresOfActive = await Movie.distinct('genre', { status: 'NOW_SHOWING' });
+```
+
+---
+
 ## Checklist trước khi sang câu khác
 
 - [ ] Có `isValid()` trước mọi `findById` chưa? (thiếu → CastError → 500 thay vì 400)

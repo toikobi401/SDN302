@@ -2,11 +2,31 @@
 
 | Method | File | Dùng khi | Tag trong `server.js` |
 |---|---|---|---|
-| GET | [GET.md](GET.md) | Lấy dữ liệu, không đổi gì trong DB | `@GET-*` `@REPORT-AGG` `@PAGINATION` |
-| POST | [POST.md](POST.md) | Tạo mới, hoặc hành động có tác dụng phụ | `@POST-CREATE` `@LOGIN-JWT` |
+| **(đọc trước tiên)** | [MODELS.md](MODELS.md) | Khai schema, kiểu dữ liệu, validation, map lỗi → status | `@MODEL-*` `@HELPER` `@ERROR-MAP` |
+| GET | [GET.md](GET.md) | Lấy dữ liệu, không đổi gì trong DB | `@GET-*` `@REPORT-AGG` `@REPORT-AGG2` `@PAGINATION` |
+| POST | [POST.md](POST.md) | Tạo mới, hoặc hành động có tác dụng phụ | `@POST-CREATE` `@POST-OVERLAP` `@POST-CAPACITY` |
 | PUT | [PUT.md](PUT.md) | Thay **toàn bộ** một bản ghi | `@PUT-UPDATE` |
-| PATCH | [PATCH.md](PATCH.md) | Sửa **một phần**, thường là đổi trạng thái | `@PATCH-STATUS` |
+| PATCH | [PATCH.md](PATCH.md) | Sửa **một phần**, đổi trạng thái, sửa phần tử mảng | `@PATCH-STATUS` `@PATCH-ARRAY` `@INC` |
 | DELETE | [DELETE.md](DELETE.md) | Xoá bản ghi | `@DELETE` |
+| *(mọi method)* | [AUTH.md](AUTH.md) | Route có bảo vệ: `access_key` hoặc JWT, phân quyền role | `@AUTH-KEY` `@AUTH-JWT` `@AUTH-ROLE` `@LOGIN-JWT` |
+
+## Tra ngược: đề ra dạng này → mở file nào
+
+| Đề nhắc tới | Mở |
+|---|---|
+| "between", "from/to", khoảng ngày | [GET.md §9a](GET.md#9a-khoảng-thời-gian) |
+| "genre contains", mảng chứa giá trị | [GET.md §9b](GET.md#9b-mảng-chứa-giá-trị) |
+| "average", "highest", "top 5", "percentage" | [GET.md §11](GET.md#11-biến-thể-aggregation-đề-có-thể-ra) |
+| "same room at the same time", "schedule conflict" | [POST.md §8](POST.md#8-chống-trùng-lịch--trùng-khung-giờ) |
+| "exceeds capacity", "sold out", "hết chỗ" | [POST.md §9](POST.md#9-kiểm-tra-sức-chứa) |
+| "already registered", email trùng | [POST.md §10](POST.md#10-trùng-dữ-liệu-unique) |
+| "update a seat", sửa 1 phần tử trong mảng | [PATCH.md §5](PATCH.md#5-sửa-một-phần-tử-cụ-thể-bên-trong-mảng) |
+| "stock", "remaining", trừ kho | [PATCH.md §6](PATCH.md#6-tăng--giảm-số-lượng-tồn) |
+| "cancel", "approve", đổi trạng thái | [PATCH.md §2](PATCH.md#2-đổi-trạng-thái-có-ràng-buộc) |
+| "replace all employees of" | [PUT.md §6](PUT.md#6-thay-toàn-bộ-mảng-con) |
+| "cannot delete if", còn ràng buộc | [DELETE.md §2](DELETE.md#2-chặn-xoá-khi-còn-ràng-buộc) |
+| "remove a seat from the room" | [DELETE.md §6](DELETE.md#6-xoá-một-phần-tử-bên-trong-mảng) |
+| "Validate input data" (không nói rõ rule) | [MODELS.md §4](MODELS.md#4-ràng-buộc-trong-schema) |
 
 ---
 

@@ -191,6 +191,124 @@ if (!removed) {
 
 ---
 
+## 5. Sửa một phần tử cụ thể bên trong mảng
+
+Dùng toán tử vị trí `$` — nó trỏ tới phần tử **đầu tiên khớp với điều kiện ở phần filter**.
+
+```js
+app.patch('/api/rooms/:roomId/seats/:code', async (req, res) => {
+    try {
+        const { roomId, code } = req.params;
+        const { type } = req.body;
+
+        if (!mongoose.Types.ObjectId.isValid(roomId)) {
+            return res.status(400).json({ error: `Invalid ObjectId: ${roomId}` });
+        }
+        if (!type) {
+            return res.status(400).json({ error: 'type is required' });
+        }
+
+        // ⚠️ BẮT BUỘC có 'seats._id' trong filter, nếu không Mongo báo lỗi
+        //    "The positional operator did not find the match needed"
+        const result = await Room.updateOne(
+            { _id: roomId, 'seats._id': code },
+            { $set: { 'seats.$.type': type } }
+        );
+
+        // matchedCount = 0: không có room đó, HOẶC room có nhưng không có mã ghế đó
+        if (result.matchedCount === 0) {
+            return res.status(404).json({ error: `Seat ${code} not found in room ${roomId}` });
+        }
+
+        const room = await Room.findById(roomId);
+        return res.status(200).json({ message: 'Updated successfully', seats: room.seats });
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+});
+```
+
+Sửa **tất cả** phần tử khớp điều kiện thì dùng `arrayFilters`:
+
+```js
+await Room.updateOne(
+    { _id: roomId },
+    { $set: { 'seats.$[el].type': 'NORMAL' } },
+    { arrayFilters: [{ 'el.type': 'VIP' }] }      // mọi ghế VIP -> NORMAL
+);
+```
+
+| # | Case | Kết quả | Đã test |
+|---|---|---|---|
+| 1 | Room và mã ghế đều tồn tại | 200, chỉ ghế đó đổi | ✅ |
+| 2 | Mã ghế không có trong room | 404 | ✅ |
+| 3 | Room không tồn tại | 404 (cùng nhánh `matchedCount === 0`) | |
+| 4 | Thiếu `type` trong body | 400 | ✅ |
+| 5 | Quên `'seats._id'` trong filter | Mongo ném lỗi → 500 | |
+
+> ⚠️ `updateOne` trả `{ matchedCount, modifiedCount }`, **không** trả document.
+> Muốn trả dữ liệu mới thì query lại, hoặc dùng `findOneAndUpdate(..., { new: true })`.
+
+> ⚠️ `modifiedCount === 0` **không** có nghĩa là thất bại — gán đúng giá trị đang có
+> thì Mongo không ghi gì. Kiểm tra 404 bằng `matchedCount`, không phải `modifiedCount`.
+
+---
+
+## 6. Tăng / giảm số lượng tồn
+
+**Mẹo quan trọng:** đặt điều kiện "còn đủ" **ngay trong filter**. Nếu không đủ thì không
+document nào khớp → trả `null` → 409. Cách này đúng cả khi 2 request chạy cùng lúc.
+
+```js
+app.patch('/api/rooms/:roomId/capacity', async (req, res) => {
+    try {
+        const { roomId } = req.params;
+        const amount = Number(req.body.amount);        // âm = giảm, dương = tăng
+
+        if (!mongoose.Types.ObjectId.isValid(roomId)) {
+            return res.status(400).json({ error: `Invalid ObjectId: ${roomId}` });
+        }
+        // ⚠️ Number.isFinite, KHÔNG dùng !amount — vì !0 là true
+        if (!Number.isFinite(amount) || amount === 0) {
+            return res.status(400).json({ error: 'amount must be a non-zero number' });
+        }
+
+        const filter = amount < 0
+            ? { _id: roomId, capacity: { $gte: -amount } }    // chỉ khớp khi còn đủ
+            : { _id: roomId };
+
+        const updated = await Room.findOneAndUpdate(filter, { $inc: { capacity: amount } }, { new: true });
+
+        if (!updated) {
+            // Phân biệt "không tồn tại" với "không đủ chỗ"
+            const exists = await Room.findById(roomId);
+            return exists
+                ? res.status(409).json({ error: `Not enough capacity, only ${exists.capacity} left` })
+                : res.status(404).json({ error: `Room with _id='${roomId}' not found` });
+        }
+
+        return res.status(200).json({ message: 'Capacity updated', capacity: updated.capacity });
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+});
+```
+
+| # | Case (capacity = 3) | `amount` | Kết quả | Đã test |
+|---|---|---|---|---|
+| 1 | Giảm vừa đủ | `-2` | 200, còn 1 | ✅ |
+| 2 | Giảm quá số còn lại | `-5` | 409 `only 1 left` | ✅ |
+| 3 | Tăng | `+10` | 200, thành 13 | |
+| 4 | `amount = 0` | `0` | 400 | ✅ |
+| 5 | `amount` không phải số | `"abc"` | 400 | |
+| 6 | Room không tồn tại | `-1` | 404 | |
+
+> ⚠️ Nếu viết `const c = room.capacity - n; room.capacity = c; await room.save();`
+> thì hai request đồng thời cùng đọc giá trị cũ → trừ sai. `$inc` + điều kiện trong filter
+> tránh được chuyện đó.
+
+---
+
 ## Bẫy hay gặp
 
 | Bẫy | Hiện tượng | Cách xử lý |

@@ -1,0 +1,25 @@
+[{
+  "_id": {
+    "$oid": "64916b3b7f8a6ac6119055fa"
+  },
+  "nationName": "Vietnam", 
+  "continent": "Asia"
+},{
+  "_id": {
+    "$oid": "64916b697f8a6ac6119055fc"
+  },
+  "nationName": "France", 
+  "continent": "Europe"
+},{
+  "_id": {
+    "$oid": "64916be07f8a6ac6119055fe"
+  },
+  "nationName": "Mexico", 
+  "continent": "America"
+},{
+  "_id": {
+    "$oid": "64916c557f8a6ac611905600"
+  },
+  "nationName": "Egypt", 
+  "continent": "Africa"
+}]
