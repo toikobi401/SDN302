@@ -3,33 +3,44 @@
 
    CÁCH DÙNG: Ctrl+F gõ mã tag (vd: @GET-FILTER) để nhảy thẳng tới khối code.
               Gõ "@" để xem lướt toàn bộ danh sách khối.
+              Chi tiết từng dạng + bảng case: xem thư mục methods/
 
-   ┌─────────────────┬──────────────────────────────────────────────────────┐
-   │ MÃ TAG          │ DÙNG KHI ĐỀ YÊU CẦU                                  │
-   ├─────────────────┼──────────────────────────────────────────────────────┤
-   │ @MODEL-BASIC    │ Khai báo model thường                                │
-   │ @MODEL-REF      │ Model có khoá ngoại (quan hệ 1-n)                    │
-   │ @MODEL-NESTED   │ Model có mảng object lồng (seats, location...)       │
-   │ @MODEL-LINK     │ Bảng trung gian n-n (worksOns, tickets)              │
-   │ @HELPER         │ Hàm dùng chung - LUÔN COPY                           │
-   ├─────────────────┼──────────────────────────────────────────────────────┤
-   │ @AUTH-KEY       │ "Protected endpoint", access_key từ header           │
-   │ @AUTH-JWT       │ Đăng nhập bằng token Bearer                          │
-   │ @AUTH-ROLE      │ "Role must be admin/customer"                        │
-   ├─────────────────┼──────────────────────────────────────────────────────┤
-   │ @GET-FILTER     │ "?status=X", lọc danh sách bằng query param          │
-   │ @GET-DETAIL     │ Lấy 1 bản ghi theo :id, kèm tên từ bảng khác         │
-   │ @GET-CHILDREN   │ Lấy danh sách con của 1 bản ghi cha                  │
-   │ @GET-NN         │ Lấy qua bảng trung gian (nhân viên của dự án...)     │
-   │ @GET-NESTED     │ Trạng thái từng phần tử mảng lồng (ghế trống/đặt)    │
-   ├─────────────────┼──────────────────────────────────────────────────────┤
-   │ @REPORT-AGG     │ "Use Aggregation Pipeline", báo cáo thống kê         │
-   │ @POST-CREATE    │ Tạo mới + kiểm tra hợp lệ + ghi nhiều bản ghi        │
-   │ @PUT-UPDATE     │ Sửa bản ghi                                          │
-   │ @PATCH-STATUS   │ Đổi trạng thái có ràng buộc                         │
-   │ @DELETE         │ Xoá, chặn khi còn dữ liệu liên quan                 │
-   │ @PAGINATION     │ Phân trang / sắp xếp / tìm kiếm                     │
-   └─────────────────┴──────────────────────────────────────────────────────┘
+   ┌──────────────────┬─────────────────────────────────────────────────────┐
+   │ MÃ TAG           │ DÙNG KHI ĐỀ YÊU CẦU                                 │
+   ├──────────────────┼─────────────────────────────────────────────────────┤
+   │ @MODEL-BASIC     │ Khai báo model thường                               │
+   │ @MODEL-REF       │ Model có khoá ngoại (quan hệ 1-n)                   │
+   │ @MODEL-NESTED    │ Model có mảng object lồng (seats, location...)      │
+   │ @MODEL-LINK      │ Bảng trung gian n-n (worksOns, tickets)             │
+   │ @MODEL-VALIDATE  │ Schema có required / enum / min / unique / default  │
+   │ @HELPER          │ Hàm dùng chung - LUÔN COPY                          │
+   │ @ERROR-MAP       │ Đổi lỗi Mongoose thành status code đúng             │
+   ├──────────────────┼─────────────────────────────────────────────────────┤
+   │ @AUTH-KEY        │ "Protected endpoint", access_key từ header          │
+   │ @AUTH-JWT        │ Đăng nhập bằng token Bearer                         │
+   │ @AUTH-ROLE       │ "Role must be admin/customer"                       │
+   ├──────────────────┼─────────────────────────────────────────────────────┤
+   │ @GET-FILTER      │ "?status=X", lọc danh sách bằng query param         │
+   │ @GET-FILTER2     │ Lọc nâng cao: khoảng ngày, mảng chứa, field lồng    │
+   │ @GET-DETAIL      │ Lấy 1 bản ghi theo :id, kèm tên từ bảng khác        │
+   │ @GET-CHILDREN    │ Lấy danh sách con của 1 bản ghi cha                 │
+   │ @GET-NN          │ Lấy qua bảng trung gian (nhân viên của dự án...)    │
+   │ @GET-NESTED      │ Trạng thái từng phần tử mảng lồng (ghế trống/đặt)   │
+   ├──────────────────┼─────────────────────────────────────────────────────┤
+   │ @REPORT-AGG      │ "Use Aggregation Pipeline", báo cáo thống kê        │
+   │ @REPORT-AGG2     │ Trung bình, phần trăm, top-N, lọc trước khi gom     │
+   │ @POST-CREATE     │ Tạo mới + kiểm tra hợp lệ + ghi nhiều bản ghi       │
+   │ @POST-OVERLAP    │ Chống trùng lịch / trùng khung giờ                  │
+   │ @POST-CAPACITY   │ Kiểm tra sức chứa, số chỗ còn lại                   │
+   │ @PUT-UPDATE      │ Sửa bản ghi                                         │
+   │ @PATCH-STATUS    │ Đổi trạng thái có ràng buộc                        │
+   │ @PATCH-ARRAY     │ Sửa 1 phần tử bên trong mảng lồng                   │
+   │ @INC             │ Tăng/giảm số lượng tồn an toàn                      │
+   │ @DELETE          │ Xoá, chặn khi còn dữ liệu liên quan                │
+   │ @PAGINATION      │ Phân trang / sắp xếp / tìm kiếm                    │
+   │ @LOGIN-JWT       │ Đăng ký / đăng nhập                                 │
+   │ @NOT-FOUND       │ Bắt route không tồn tại - ĐẶT CUỐI CÙNG             │
+   └──────────────────┴─────────────────────────────────────────────────────┘
 
    BẢNG QUY ĐỔI TÊN - đổi 5 model này theo đề là xong 80% công việc:
 
@@ -82,6 +93,7 @@ const Parent = mongoose.model('Parent', new mongoose.Schema({
 // ║ LƯU Ý  : chỉ khai ObjectId + ref khi CHẮC CHẮN DB lưu dạng ObjectId,     ║
 // ║          vì populate chỉ chạy khi hai bên cùng kiểu.                     ║
 // ║          Field thời gian: để String nếu DB lưu chuỗi ISO -> trả y nguyên ║
+// ║          Để Date nếu file json dùng { "$date": ... }                     ║
 // ╚══════════════════════════════════════════════════════════════════════════╝
 const Child = mongoose.model('Child', new mongoose.Schema({
     title: String,
@@ -94,18 +106,32 @@ const Child = mongoose.model('Child', new mongoose.Schema({
 
 
 // ╔══════════════════════════════════════════════════════════════════════════╗
-// ║ @MODEL-NESTED  —  Model có MẢNG OBJECT LỒNG                              ║
+// ║ @MODEL-NESTED  —  Model có MẢNG OBJECT LỒNG, hoặc OBJECT ĐƠN             ║
 // ╟──────────────────────────────────────────────────────────────────────────╢
-// ║ Từ khoá: seats, location, mảng lồng, subdocument, nested array           ║
-// ║ ⚠️ BẪY  : nếu phần tử có key tên là "type"  vd { _id:"A1", type:"VIP" }   ║
-// ║          thì KHÔNG viết [{ _id: String, type: String }] — Mongoose hiểu  ║
-// ║          "type" là khai báo kiểu cho cả object, đọc ra toàn undefined.   ║
+// ║ Từ khoá: seats, location, mảng lồng, subdocument, nested array, object  ║
+// ║ ⚠️ BẪY  : nếu object (dù trong mảng hay đứng một mình) có key tên "type", ║
+// ║          vd { _id:"A1", type:"VIP" }, thì KHÔNG viết                     ║
+// ║          { _id: String, type: String } — Mongoose coi "type" là khai báo ║
+// ║          kiểu cho CẢ object, đọc ra undefined.                           ║
 // ║          Dùng Mixed là an toàn tuyệt đối.                                ║
+// ║                                                                          ║
+// ║ OBJECT ĐƠN (không phải mảng) — xem mục dưới, 3 cách đều đã test:         ║
+// ║   KHÔNG có key "type"  ->  viết thẳng: meta: { city: String }            ║
+// ║   CÓ key "type"        ->  Mixed, hoặc bọc: { type: { type: String } }   ║
 // ╚══════════════════════════════════════════════════════════════════════════╝
 const Side = mongoose.model('Side', new mongoose.Schema({
     sideName: String,
     capacity: Number,
-    items: [mongoose.Schema.Types.Mixed]      // vd: seats: [{ _id:"A1", type:"VIP" }]
+
+    // MẢNG object lồng — vd: seats: [{ _id:"A1", type:"VIP" }]
+    items: [mongoose.Schema.Types.Mixed],
+
+    // OBJECT ĐƠN không có key "type" — viết thẳng, truy cập side.meta.city
+    meta: { city: String, zip: String },
+
+    // OBJECT ĐƠN CÓ key "type" — phải Mixed, nếu không side.info ra undefined.
+    // Cách thay thế nếu muốn giữ kiểu:  info: { type: { type: String }, code: String }
+    info: mongoose.Schema.Types.Mixed
 }), 'sides');
 
 
@@ -136,6 +162,26 @@ const User = mongoose.model('User', new mongoose.Schema({
 
 
 // ╔══════════════════════════════════════════════════════════════════════════╗
+// ║ @MODEL-VALIDATE  —  Schema có ràng buộc, để Mongoose tự validate         ║
+// ╟──────────────────────────────────────────────────────────────────────────╢
+// ║ Từ khoá: required, enum, min, max, unique, default, timestamps           ║
+// ║ DÙNG   : khi đề ghi "Validate input data" mà không liệt kê rõ từng rule. ║
+// ║          Lỗi phát sinh có name='ValidationError' -> @ERROR-MAP đổi về 400║
+// ║ LƯU Ý  : ở đây "type" LÀ khai báo kiểu thật, khác hẳn bẫy @MODEL-NESTED  ║
+// ║          (bẫy chỉ xảy ra khi DỮ LIỆU có field tên là "type").            ║
+// ╚══════════════════════════════════════════════════════════════════════════╝
+const Validated = mongoose.model('Validated', new mongoose.Schema({
+    code: { type: String, required: true, trim: true, uppercase: true },
+    title: { type: String, required: [true, 'title is required'], minlength: 2, maxlength: 100 },
+    price: { type: Number, required: true, min: [0, 'price must be >= 0'] },
+    status: { type: String, enum: ['DRAFT', 'ACTIVE', 'STOPPED'], default: 'DRAFT' },
+    quantity: { type: Number, default: 0 },
+    startAt: Date,                            // kiểu Date thật, không phải String
+    meta: { city: String, zip: String }       // object lồng (KHÔNG phải mảng)
+}, { timestamps: true, versionKey: false }), 'validateds');   // timestamps -> createdAt, updatedAt
+
+
+// ╔══════════════════════════════════════════════════════════════════════════╗
 // ║ @HELPER  —  Hàm dùng chung                                               ║
 // ╟──────────────────────────────────────────────────────────────────────────╢
 // ║ LUÔN COPY CẢ CỤM NÀY, mọi câu đều dùng tới.                              ║
@@ -146,6 +192,35 @@ const idForms = id => [id, new mongoose.Types.ObjectId(id)];
 
 // Kiểm tra ObjectId hợp lệ
 const isId = id => mongoose.Types.ObjectId.isValid(id);
+
+
+// ╔══════════════════════════════════════════════════════════════════════════╗
+// ║ @ERROR-MAP  —  Đổi lỗi Mongoose thành status code đúng                   ║
+// ╟──────────────────────────────────────────────────────────────────────────╢
+// ║ Vì sao cần: mặc định mọi lỗi rơi vào catch -> 500. Nhưng id sai định     ║
+// ║ dạng phải là 400, vi phạm unique phải là 409. Trả 500 là mất điểm.       ║
+// ║ DÙNG   : trong catch viết  return sendError(res, error);                 ║
+// ║          (các khối cũ vẫn dùng catch thường - đổi hay không tuỳ bạn)     ║
+// ╚══════════════════════════════════════════════════════════════════════════╝
+const sendError = (res, error) => {
+    // Vi phạm required / enum / min / maxlength khai trong schema
+    if (error.name === 'ValidationError') {
+        return res.status(400).json({
+            error: Object.values(error.errors).map(e => e.message).join(', ')
+        });
+    }
+    // Ép kiểu thất bại: truyền "abc" vào field ObjectId hoặc Number
+    if (error.name === 'CastError') {
+        return res.status(400).json({ error: `Invalid ${error.path}: ${error.value}` });
+    }
+    // Trùng giá trị ở field có unique index
+    if (error.code === 11000) {
+        return res.status(409).json({
+            error: `Duplicate value for ${Object.keys(error.keyValue || {}).join(', ')}`
+        });
+    }
+    return res.status(500).json({ error: error.message });
+};
 
 
 // ╔══════════════════════════════════════════════════════════════════════════╗
@@ -184,6 +259,7 @@ const requireCustomer = async (req, res, next) => {
 // ╟──────────────────────────────────────────────────────────────────────────╢
 // ║ Từ khoá: JWT, token, Bearer, Authorization header, đăng nhập             ║
 // ║ DÙNG   : app.get('/x', requireToken, requireRole('admin'), handler)      ║
+// ║ ⚠️ JWT_SECRET có sẵn trong .env KHÔNG có nghĩa là đề yêu cầu JWT.         ║
 // ╚══════════════════════════════════════════════════════════════════════════╝
 const jwt = require('jsonwebtoken');
 
@@ -205,6 +281,14 @@ const requireToken = (req, res, next) => {
 const requireRole = role => (req, res, next) => {
     if (req.user.role !== role) {
         return res.status(403).json({ error: `${role} access required` });
+    }
+    next();
+};
+
+// Cho phép nhiều role: requireAnyRole('admin', 'staff')
+const requireAnyRole = (...roles) => (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+        return res.status(403).json({ error: 'Insufficient permissions' });
     }
     next();
 };
@@ -238,6 +322,62 @@ app.get('/api/parents', async (req, res) => {
         })));
     } catch (error) {
         return res.status(500).json({ error: error.message });
+    }
+});
+
+
+// ╔══════════════════════════════════════════════════════════════════════════╗
+// ║ @GET-FILTER2  —  Lọc nâng cao                                            ║
+// ╟──────────────────────────────────────────────────────────────────────────╢
+// ║ Từ khoá: khoảng ngày, from/to, between, genre contains, nested field,   ║
+// ║          tìm theo nhiều field, date range, price range                   ║
+// ║ MẸO    : chỉ thêm điều kiện vào filter KHI param có mặt -> 1 route lo    ║
+// ║          được mọi tổ hợp, không cần if lồng nhau.                        ║
+// ╚══════════════════════════════════════════════════════════════════════════╝
+app.get('/api/children-filter', async (req, res) => {
+    try {
+        const { from, to, tag, city, q, minPrice, maxPrice } = req.query;
+        const filter = {};
+
+        // 1. Khoảng thời gian.
+        // startTime lưu dạng String ISO ("2026-03-10T18:30:00.000Z") thì so sánh
+        // chuỗi vẫn ĐÚNG thứ tự, không cần đổi kiểu.
+        // Nếu field khai là Date thì phải bọc new Date(from) / new Date(to).
+        if (from || to) {
+            filter.startTime = {};
+            if (from) filter.startTime.$gte = from;
+            if (to) filter.startTime.$lte = to;
+        }
+
+        // 2. Mảng CHỨA giá trị — viết thẳng, Mongo tự hiểu là "có phần tử bằng"
+        if (tag) filter.tags = tag;
+        // Chứa BẤT KỲ giá trị nào trong danh sách:   filter.tags = { $in: tag.split(',') }
+        // Chứa TẤT CẢ:                               filter.tags = { $all: tag.split(',') }
+
+        // 3. Field bên trong object lồng — dùng dấu chấm, nhớ bọc nháy
+        if (city) filter['meta.city'] = city;
+
+        // 4. Tìm trên nhiều field cùng lúc
+        if (q) {
+            filter.$or = [
+                { title: { $regex: q, $options: 'i' } },
+                { description: { $regex: q, $options: 'i' } }
+            ];
+        }
+
+        // 5. Khoảng số
+        if (minPrice || maxPrice) {
+            filter.price = {};
+            if (minPrice) filter.price.$gte = Number(minPrice);
+            if (maxPrice) filter.price.$lte = Number(maxPrice);
+        }
+
+        // select: '-__v -description' loại field | lean(): trả object thường, nhanh hơn
+        const docs = await Child.find(filter).select('-__v').lean();
+
+        return res.status(200).json(docs);
+    } catch (error) {
+        return sendError(res, error);
     }
 });
 
@@ -282,6 +422,10 @@ app.get('/api/parents/:parentId', async (req, res) => {
 // ║ Từ khoá: showtimes of a movie, Include room name, sub-resource           ║
 // ║ TRẢ VỀ : 200 mảng | 400 id sai | 404 cha không tồn tại                   ║
 // ║ ĐÃ RA  : Q2 đề 2 — GET /api/movies/:movieId/showtimes                    ║
+// ║ LƯU Ý  : cha KHÔNG tồn tại -> 404. Cha có mà chưa có con -> 200 []       ║
+// ║ POPULATE LỒNG:                                                           ║
+// ║   .populate({ path:'sideId', select:'sideName',                          ║
+// ║               populate:{ path:'managerId', select:'name' } })            ║
 // ╚══════════════════════════════════════════════════════════════════════════╝
 app.get('/api/parents/:parentId/children', async (req, res) => {
     try {
@@ -319,6 +463,7 @@ app.get('/api/parents/:parentId/children', async (req, res) => {
 // ║ ĐÃ RA  : Q2 đề 1 — GET /api/projects/:proId/employees                    ║
 // ║ CÁCH   : lấy Link -> gom id -> query 1 lần -> map theo thứ tự Link.      ║
 // ║          KHÔNG dùng populate vì khoá ngoại có thể là string.             ║
+// ║ ⚠️ TUYỆT ĐỐI không await bên trong .map() — N bản ghi = N query.          ║
 // ╚══════════════════════════════════════════════════════════════════════════╝
 app.get('/api/children/:childId/users', async (req, res) => {
     try {
@@ -356,7 +501,7 @@ app.get('/api/children/:childId/users', async (req, res) => {
 // ║ Từ khoá: seat availability, BOOKED, AVAILABLE, ghế trống, Determine status
 // ║ TRẢ VỀ : 200 mảng | 400 id sai | 404 không tồn tại                       ║
 // ║ ĐÃ RA  : Q3 đề 2 — GET /api/showtimes/:showtimeId/seats                  ║
-// ║ CÁCH   : lấy mảng gốc từ bảng tra cứu, đối chiếu với Set các mã đã dùng  ║
+// ║ ⚠️ $ne:'canceled' — bản ghi đã huỷ KHÔNG tính là đã chiếm chỗ.            ║
 // ╚══════════════════════════════════════════════════════════════════════════╝
 app.get('/api/children/:childId/items', async (req, res) => {
     try {
@@ -447,6 +592,72 @@ app.get('/api/reports/children/summary', async (req, res) => {
 
 
 // ╔══════════════════════════════════════════════════════════════════════════╗
+// ║ @REPORT-AGG2  —  Biến thể aggregation hay ra                             ║
+// ╟──────────────────────────────────────────────────────────────────────────╢
+// ║ Từ khoá: average, highest, top, percentage, count by, revenue, doanh thu ║
+// ║ 4 MẪU  : lọc trước khi gom | trung bình & min/max | top-N | đếm theo nhóm║
+// ╚══════════════════════════════════════════════════════════════════════════╝
+app.get('/api/reports/children/stats', async (req, res) => {
+    try {
+        const stats = await Link.aggregate([
+            // MẪU 1 — $match đặt ĐẦU TIÊN để lọc bớt trước khi gom (nhanh hơn nhiều).
+            // Lọc sau $group thì phải dùng tên field mới, không phải tên gốc.
+            { $match: { status: { $ne: 'canceled' } } },
+
+            // MẪU 2 — nhiều phép tính trong cùng một $group
+            {
+                $group: {
+                    _id: '$parentRef',
+                    totalAmount: { $sum: '$amount' },
+                    avgAmount: { $avg: '$amount' },
+                    maxAmount: { $max: '$amount' },
+                    minAmount: { $min: '$amount' },
+                    count: { $sum: 1 },                      // đếm bản ghi (tính cả trùng)
+                    userIds: { $addToSet: '$userRef' }       // đếm KHÔNG trùng
+                }
+            },
+
+            // Làm tròn 2 chữ số, tính phần trăm
+            {
+                $project: {
+                    _id: 0,
+                    childId: '$_id',
+                    totalAmount: 1,
+                    avgAmount: { $round: ['$avgAmount', 2] },
+                    maxAmount: 1,
+                    minAmount: 1,
+                    uniqueUsers: { $size: '$userIds' },
+                    // ⚠️ $cond chống chia cho 0
+                    avgPerUser: {
+                        $cond: [
+                            { $eq: [{ $size: '$userIds' }, 0] },
+                            0,
+                            { $round: [{ $divide: ['$totalAmount', { $size: '$userIds' }] }, 2] }
+                        ]
+                    }
+                }
+            },
+
+            // MẪU 3 — top-N: sort rồi limit
+            { $sort: { totalAmount: -1 } },
+            { $limit: 10 }
+        ]);
+
+        // MẪU 4 — đếm theo nhóm trên chính collection đó, không cần join
+        const byStatus = await Link.aggregate([
+            { $group: { _id: '$status', count: { $sum: 1 } } },
+            { $project: { _id: 0, status: '$_id', count: 1 } },
+            { $sort: { count: -1 } }
+        ]);
+
+        return res.status(200).json({ stats, byStatus });
+    } catch (error) {
+        return sendError(res, error);
+    }
+});
+
+
+// ╔══════════════════════════════════════════════════════════════════════════╗
 // ║ @POST-CREATE  —  Tạo mới + kiểm tra hợp lệ + ghi nhiều bản ghi           ║
 // ╟──────────────────────────────────────────────────────────────────────────╢
 // ║ Từ khoá: Create, POST, Validate, Insert records, Reject if, 201 Created  ║
@@ -514,7 +725,130 @@ app.post('/api/children', requireCustomer, async (req, res) => {
             newChild: { childId: child._id, childName: child.title }
         });
     } catch (error) {
-        return res.status(500).json({ error: error.message });
+        return sendError(res, error);
+    }
+});
+
+
+// ╔══════════════════════════════════════════════════════════════════════════╗
+// ║ @POST-OVERLAP  —  Chống trùng lịch / trùng khung giờ                     ║
+// ╟──────────────────────────────────────────────────────────────────────────╢
+// ║ Từ khoá: overlap, conflict, same room at the same time, trùng lịch,     ║
+// ║          "room is already booked", schedule conflict                     ║
+// ║ CÔNG THỨC: hai khoảng [s1,e1) và [s2,e2) GIAO NHAU khi  s1 < e2 && s2 < e1
+// ║            -> query: { startTime: { $lt: end }, endTime: { $gt: start } }║
+// ║ ⚠️ Đừng viết $gte/$lte, nếu không suất 18:00-21:00 và 21:00-23:00 sẽ bị   ║
+// ║    coi là trùng dù chúng chỉ chạm nhau tại một điểm.                     ║
+// ╚══════════════════════════════════════════════════════════════════════════╝
+app.post('/api/children-schedule', async (req, res) => {
+    try {
+        const { sideId, startTime, endTime, title } = req.body;
+
+        if (!sideId || !startTime || !endTime) {
+            return res.status(400).json({ error: 'sideId, startTime and endTime required' });
+        }
+        if (!isId(sideId)) {
+            return res.status(400).json({ error: `Invalid ObjectId: ${sideId}` });
+        }
+        // Khoảng thời gian phải hợp lệ
+        if (startTime >= endTime) {
+            return res.status(400).json({ error: 'startTime must be before endTime' });
+        }
+
+        const side = await Side.findById(sideId);
+        if (!side) {
+            return res.status(404).json({ error: `Room with _id='${sideId}' not found` });
+        }
+
+        // Tìm suất nào trong CÙNG phòng bị chồng giờ
+        const clash = await Child.findOne({
+            sideId,
+            startTime: { $lt: endTime },
+            endTime: { $gt: startTime }
+        });
+        if (clash) {
+            return res.status(409).json({
+                error: `Room is already booked from ${clash.startTime} to ${clash.endTime}`
+            });
+        }
+
+        const child = await Child.create({ sideId, startTime, endTime, title });
+
+        return res.status(201).json({ message: 'Created successfully', childId: child._id });
+    } catch (error) {
+        return sendError(res, error);
+    }
+});
+
+
+// ╔══════════════════════════════════════════════════════════════════════════╗
+// ║ @POST-CAPACITY  —  Kiểm tra sức chứa / số chỗ còn lại                    ║
+// ╟──────────────────────────────────────────────────────────────────────────╢
+// ║ Từ khoá: capacity, sold out, hết chỗ, "exceeds room capacity",          ║
+// ║          maximum number of, không vượt quá                               ║
+// ║ ⚠️ So sánh  đã bán + đang đặt > sức chứa , đừng quên cộng số đang đặt.    ║
+// ╚══════════════════════════════════════════════════════════════════════════╝
+app.post('/api/children/:childId/bookings', requireCustomer, async (req, res) => {
+    try {
+        const { childId } = req.params;
+        const { codes } = req.body;                   // vd: ["A1","A2"]
+
+        if (!isId(childId)) {
+            return res.status(400).json({ error: `Invalid ObjectId: ${childId}` });
+        }
+        if (!Array.isArray(codes) || !codes.length) {
+            return res.status(400).json({ error: 'codes required' });
+        }
+        // Gửi trùng trong cùng 1 request
+        if (new Set(codes).size !== codes.length) {
+            return res.status(400).json({ error: 'Duplicate codes in request' });
+        }
+
+        const child = await Child.findById(childId);
+        if (!child) {
+            return res.status(404).json({ error: `Showtime with Id: ${childId} not found` });
+        }
+
+        const side = await Side.findById(child.sideId);
+        const types = new Map((side ? side.items : []).map(i => [i._id, i.type]));
+
+        // Mã không thuộc phòng này
+        const unknown = codes.find(c => !types.has(c));
+        if (unknown) {
+            return res.status(400).json({ error: `Seat ${unknown} does not belong to the room` });
+        }
+
+        const taken = await Link.find({ parentRef: { $in: idForms(childId) }, status: { $ne: 'canceled' } });
+
+        // Đã bị người khác đặt
+        const booked = new Set(taken.map(l => l.itemCode));
+        const conflict = codes.find(c => booked.has(c));
+        if (conflict) {
+            return res.status(409).json({ error: `Seat ${conflict} already booked` });
+        }
+
+        // Vượt sức chứa — nhớ CỘNG số đang đặt
+        if (side && taken.length + codes.length > side.capacity) {
+            return res.status(409).json({
+                error: `Only ${side.capacity - taken.length} seats left`
+            });
+        }
+
+        const created = await Link.insertMany(codes.map(c => ({
+            parentRef: child._id,
+            userRef: req.user._id,                    // ⚠️ lấy từ middleware, KHÔNG từ body
+            itemCode: c,
+            amount: types.get(c) === 'VIP' ? child.price * 1.2 : child.price,
+            status: 'booked'
+        })));
+
+        return res.status(201).json({
+            message: 'Tickets created',
+            count: created.length,
+            totalAmount: created.reduce((s, l) => s + l.amount, 0)
+        });
+    } catch (error) {
+        return sendError(res, error);
     }
 });
 
@@ -524,7 +858,8 @@ app.post('/api/children', requireCustomer, async (req, res) => {
 // ╟──────────────────────────────────────────────────────────────────────────╢
 // ║ Từ khoá: Update, PUT, modify, chỉnh sửa                                  ║
 // ║ TRẢ VỀ : 200 | 400 id sai | 404 không tồn tại                            ║
-// ║ LƯU Ý  : new:true -> trả bản ghi SAU khi sửa (mặc định trả bản ghi CŨ)   ║
+// ║ ⚠️ new:true -> trả bản ghi SAU khi sửa. KHÔNG có thì trả bản ghi CŨ.      ║
+// ║ ⚠️ runValidators:true -> mới áp dụng required/enum/min của schema.        ║
 // ╚══════════════════════════════════════════════════════════════════════════╝
 app.put('/api/children/:childId', async (req, res) => {
     try {
@@ -545,7 +880,7 @@ app.put('/api/children/:childId', async (req, res) => {
 
         return res.status(200).json({ message: 'Updated successfully', child: updated });
     } catch (error) {
-        return res.status(500).json({ error: error.message });
+        return sendError(res, error);
     }
 });
 
@@ -553,8 +888,10 @@ app.put('/api/children/:childId', async (req, res) => {
 // ╔══════════════════════════════════════════════════════════════════════════╗
 // ║ @PATCH-STATUS  —  Đổi trạng thái có ràng buộc luồng                      ║
 // ╟──────────────────────────────────────────────────────────────────────────╢
-// ║ Từ khoá: cancel, confirm, change status, chuyển trạng thái, PATCH        ║
-// ║ TRẢ VỀ : 200 | 400 chuyển trạng thái không hợp lệ | 404 không tồn tại    ║
+// ║ Từ khoá: cancel, confirm, approve, change status, chuyển trạng thái      ║
+// ║ TRẢ VỀ : 200 | 400 thiếu status | 404 không tồn tại | 409 chuyển sai     ║
+// ║ CÁCH   : khai BẢNG chuyển trạng thái rồi tra, đừng viết chuỗi if.        ║
+// ║ ⚠️ Phải findById để đọc trạng thái CŨ -> không dùng findByIdAndUpdate.    ║
 // ╚══════════════════════════════════════════════════════════════════════════╝
 const ALLOWED_FLOW = { booked: ['paid', 'canceled'], paid: ['canceled'], canceled: [] };
 
@@ -566,14 +903,18 @@ app.patch('/api/links/:linkId/status', async (req, res) => {
         if (!isId(linkId)) {
             return res.status(400).json({ error: `Invalid ObjectId: ${linkId}` });
         }
+        if (!status) {
+            return res.status(400).json({ error: 'status is required' });
+        }
 
         const link = await Link.findById(linkId);
         if (!link) {
             return res.status(404).json({ error: `Link with _id='${linkId}' not found` });
         }
 
-        if (!ALLOWED_FLOW[link.status] || !ALLOWED_FLOW[link.status].includes(status)) {
-            return res.status(400).json({ error: `Cannot change status from ${link.status} to ${status}` });
+        // || [] chống trường hợp DB có trạng thái lạ không nằm trong bảng
+        if (!(ALLOWED_FLOW[link.status] || []).includes(status)) {
+            return res.status(409).json({ error: `Cannot change status from ${link.status} to ${status}` });
         }
 
         link.status = status;
@@ -581,7 +922,120 @@ app.patch('/api/links/:linkId/status', async (req, res) => {
 
         return res.status(200).json({ message: 'Status updated', link });
     } catch (error) {
-        return res.status(500).json({ error: error.message });
+        return sendError(res, error);
+    }
+});
+
+
+// ╔══════════════════════════════════════════════════════════════════════════╗
+// ║ @PATCH-ARRAY  —  Sửa / thêm / xoá 1 phần tử bên trong mảng lồng          ║
+// ╟──────────────────────────────────────────────────────────────────────────╢
+// ║ Từ khoá: update a seat, add location to, remove item from, sửa phần tử  ║
+// ║ 4 TOÁN TỬ:                                                               ║
+// ║   $push       thêm, cho phép trùng                                       ║
+// ║   $addToSet   thêm, bỏ qua nếu đã có                                     ║
+// ║   $pull       xoá mọi phần tử khớp điều kiện                             ║
+// ║   'arr.$.x'   sửa phần tử ĐẦU TIÊN khớp điều kiện ở phần find            ║
+// ╚══════════════════════════════════════════════════════════════════════════╝
+app.patch('/api/sides/:sideId/items/:code', async (req, res) => {
+    try {
+        const { sideId, code } = req.params;
+        const { type } = req.body;
+
+        if (!isId(sideId)) {
+            return res.status(400).json({ error: `Invalid ObjectId: ${sideId}` });
+        }
+        if (!type) {
+            return res.status(400).json({ error: 'type is required' });
+        }
+
+        // Dấu $ trong 'items.$.type' = phần tử khớp với 'items._id' ở điều kiện find.
+        // BẮT BUỘC phải có 'items._id' trong filter, nếu không Mongo báo lỗi.
+        const result = await Side.updateOne(
+            { _id: sideId, 'items._id': code },
+            { $set: { 'items.$.type': type } }
+        );
+
+        // matchedCount = 0 nghĩa là không có side đó, HOẶC side có nhưng không có mã đó
+        if (result.matchedCount === 0) {
+            return res.status(404).json({ error: `Seat ${code} not found in room ${sideId}` });
+        }
+
+        const side = await Side.findById(sideId);
+        return res.status(200).json({ message: 'Updated successfully', items: side.items });
+    } catch (error) {
+        return sendError(res, error);
+    }
+});
+
+// Thêm / xoá phần tử — cùng route, phân biệt bằng action trong body
+app.patch('/api/sides/:sideId/items', async (req, res) => {
+    try {
+        const { sideId } = req.params;
+        const { action, item } = req.body;      // action: 'add' | 'remove'
+
+        if (!isId(sideId)) {
+            return res.status(400).json({ error: `Invalid ObjectId: ${sideId}` });
+        }
+        if (!item || !item._id) {
+            return res.status(400).json({ error: 'item with _id is required' });
+        }
+
+        const change = action === 'remove'
+            ? { $pull: { items: { _id: item._id } } }
+            : { $addToSet: { items: item } };       // $push nếu đề cho phép trùng
+
+        const side = await Side.findByIdAndUpdate(sideId, change, { new: true });
+        if (!side) {
+            return res.status(404).json({ error: `Room with _id='${sideId}' not found` });
+        }
+
+        return res.status(200).json({ message: 'Updated successfully', items: side.items });
+    } catch (error) {
+        return sendError(res, error);
+    }
+});
+
+
+// ╔══════════════════════════════════════════════════════════════════════════╗
+// ║ @INC  —  Tăng / giảm số lượng tồn                                        ║
+// ╟──────────────────────────────────────────────────────────────────────────╢
+// ║ Từ khoá: stock, quantity, remaining, số lượng còn lại, trừ kho          ║
+// ║ MẸO    : đặt điều kiện "còn đủ hàng" NGAY TRONG filter của query.        ║
+// ║          Nếu không đủ thì không có document nào khớp -> trả null -> 409. ║
+// ║          Cách này tránh được trường hợp 2 request trừ kho cùng lúc.      ║
+// ╚══════════════════════════════════════════════════════════════════════════╝
+app.patch('/api/sides/:sideId/capacity', async (req, res) => {
+    try {
+        const { sideId } = req.params;
+        const amount = Number(req.body.amount);
+
+        if (!isId(sideId)) {
+            return res.status(400).json({ error: `Invalid ObjectId: ${sideId}` });
+        }
+        // ⚠️ dùng Number.isFinite, KHÔNG dùng !amount — vì !0 là true
+        if (!Number.isFinite(amount) || amount === 0) {
+            return res.status(400).json({ error: 'amount must be a non-zero number' });
+        }
+
+        // Giảm: chỉ khớp khi capacity còn đủ. Tăng: không cần điều kiện.
+        const filter = amount < 0
+            ? { _id: sideId, capacity: { $gte: -amount } }
+            : { _id: sideId };
+
+        const updated = await Side.findOneAndUpdate(filter, { $inc: { capacity: amount } }, { new: true });
+
+        if (!updated) {
+            // Phân biệt "không tồn tại" với "không đủ chỗ"
+            const exists = await Side.findById(sideId);
+            return exists
+                ? res.status(409).json({ error: `Not enough capacity, only ${exists.capacity} left` })
+                : res.status(404).json({ error: `Room with _id='${sideId}' not found` });
+        }
+
+        return res.status(200).json({ message: 'Capacity updated', capacity: updated.capacity });
+    } catch (error) {
+        return sendError(res, error);
     }
 });
 
@@ -591,6 +1045,8 @@ app.patch('/api/links/:linkId/status', async (req, res) => {
 // ╟──────────────────────────────────────────────────────────────────────────╢
 // ║ Từ khoá: Delete, remove, xoá, Reject if referenced                       ║
 // ║ TRẢ VỀ : 200 | 400 id sai | 404 không tồn tại | 409 còn ràng buộc        ║
+// ║ ⚠️ Kiểm tra 404 TRƯỚC, 409 SAU. Đảo lại thì bản ghi không tồn tại cũng   ║
+// ║    trả 409 (vì countDocuments ra 0 nên lọt qua).                         ║
 // ╚══════════════════════════════════════════════════════════════════════════╝
 app.delete('/api/children/:childId', async (req, res) => {
     try {
@@ -611,12 +1067,15 @@ app.delete('/api/children/:childId', async (req, res) => {
             return res.status(409).json({ error: `Cannot delete: ${linked} related records exist` });
         }
 
+        // Nếu đề yêu cầu XOÁ LAN thay vì chặn, thay 3 dòng trên bằng:
+        //   await Link.deleteMany({ parentRef: { $in: idForms(childId) } });
+
         await Child.findByIdAndDelete(childId);
 
         return res.status(200).json({ message: 'Deleted successfully' });
         // Nếu đề yêu cầu không trả body: return res.status(204).send();
     } catch (error) {
-        return res.status(500).json({ error: error.message });
+        return sendError(res, error);
     }
 });
 
@@ -643,7 +1102,7 @@ app.get('/api/children-search', async (req, res) => {
 
         const total = await Child.countDocuments(filter);
         const data = await Child.find(filter)
-            .sort(sort || '-_id')        // '-price' giảm dần, 'price' tăng dần
+            .sort(sort || '-_id')        // '-price' giảm dần | 'price,-title' nhiều tiêu chí
             .skip((page - 1) * limit)
             .limit(limit);
 
@@ -655,7 +1114,7 @@ app.get('/api/children-search', async (req, res) => {
             data
         });
     } catch (error) {
-        return res.status(500).json({ error: error.message });
+        return sendError(res, error);
     }
 });
 
@@ -664,7 +1123,8 @@ app.get('/api/children-search', async (req, res) => {
 // ║ @LOGIN-JWT  —  Đăng ký / đăng nhập / route cần token                     ║
 // ╟──────────────────────────────────────────────────────────────────────────╢
 // ║ Từ khoá: login, register, JWT, bcrypt, hash password, token             ║
-// ║ ⚠️ Nếu DB lưu password KHÔNG hash thì đổi dòng so sánh ở trong hàm.       ║
+// ║ ⚠️ Dữ liệu đề THƯỜNG lưu password dạng thô (vd "pass123"). Mở Compass     ║
+// ║    xem trước — nếu không hash thì bcrypt.compare luôn trả false.         ║
 // ╚══════════════════════════════════════════════════════════════════════════╝
 const bcrypt = require('bcryptjs');
 
@@ -691,7 +1151,7 @@ app.post('/api/auth/register', async (req, res) => {
 
         return res.status(201).json({ message: 'Registered', userId: user._id });
     } catch (error) {
-        return res.status(500).json({ error: error.message });
+        return sendError(res, error);
     }
 });
 
@@ -705,6 +1165,7 @@ app.post('/api/auth/login', async (req, res) => {
         //    const ok = user && user.password === password;
         const ok = user && await bcrypt.compare(password, user.password);
         if (!ok) {
+            // Sai email và sai mật khẩu phải trả CÙNG message, tránh lộ tài khoản nào có thật
             return res.status(401).json({ error: 'Invalid email or password' });
         }
 
@@ -716,7 +1177,7 @@ app.post('/api/auth/login', async (req, res) => {
 
         return res.status(200).json({ token });
     } catch (error) {
-        return res.status(500).json({ error: error.message });
+        return sendError(res, error);
     }
 });
 
@@ -725,11 +1186,25 @@ app.get('/api/me', requireToken, async (req, res) => {
         const user = await User.findById(req.user._id, '-password');   // '-password' = loại field này ra
         return res.status(200).json(user);
     } catch (error) {
-        return res.status(500).json({ error: error.message });
+        return sendError(res, error);
     }
 });
 
 
-// ============================================================================
+// ╔══════════════════════════════════════════════════════════════════════════╗
+// ║ @NOT-FOUND  —  Bắt route không tồn tại + lỗi chưa bắt                    ║
+// ╟──────────────────────────────────────────────────────────────────────────╢
+// ║ ⚠️ PHẢI ĐẶT SAU TẤT CẢ CÁC ROUTE, ngay trước app.listen.                  ║
+// ║    Đặt trên cùng thì nó nuốt hết mọi request.                            ║
+// ║ Middleware xử lý lỗi BẮT BUỘC có đủ 4 tham số (err, req, res, next),     ║
+// ║ thiếu next thì Express coi nó là middleware thường và không gọi.         ║
+// ╚══════════════════════════════════════════════════════════════════════════╝
+app.use((req, res) => {
+    res.status(404).json({ error: `Route ${req.method} ${req.originalUrl} not found` });
+});
+
+app.use((error, req, res, next) => sendError(res, error));
+
+
 const PORT = process.env.PORT || 9999;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

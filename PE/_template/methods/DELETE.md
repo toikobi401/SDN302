@@ -211,6 +211,75 @@ if (String(ticket.userId) !== String(req.user._id)) {
 
 ---
 
+## 6. Xoá một phần tử bên trong mảng
+
+```js
+app.delete('/api/rooms/:roomId/seats/:code', async (req, res) => {
+    try {
+        const { roomId, code } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(roomId)) {
+            return res.status(400).json({ error: `Invalid ObjectId: ${roomId}` });
+        }
+
+        const room = await Room.findById(roomId);
+        if (!room) {
+            return res.status(404).json({ error: `Room with _id='${roomId}' not found` });
+        }
+        // $pull chạy êm kể cả khi không có phần tử nào khớp -> phải tự kiểm tra
+        if (!room.seats.some(s => s._id === code)) {
+            return res.status(404).json({ error: `Seat ${code} not found in room ${roomId}` });
+        }
+
+        const updated = await Room.findByIdAndUpdate(
+            roomId,
+            { $pull: { seats: { _id: code } } },
+            { new: true }
+        );
+
+        return res.status(200).json({ message: 'Deleted successfully', seats: updated.seats });
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+});
+```
+
+| Case | Kết quả |
+|---|---|
+| Room và mã ghế đều tồn tại | 200, mảng đã bớt 1 phần tử |
+| Mã ghế không tồn tại | 404 — **nhờ bước `.some()`**, nếu bỏ thì luôn trả 200 |
+| Room không tồn tại | 404 |
+| Ghế đó đã có người đặt | Tuỳ đề: thường phải 409 trước khi xoá |
+
+> ⚠️ `$pull` **không báo lỗi** khi không có gì để xoá. Không tự kiểm tra thì API luôn trả 200,
+> kể cả với mã ghế bịa.
+
+---
+
+## 7. Xoá hàng loạt theo điều kiện
+
+```js
+// Xoá mọi vé đã huỷ của một suất chiếu
+const result = await Ticket.deleteMany({ showTimeId, status: 'canceled' });
+
+return res.status(200).json({ message: 'Deleted successfully', deletedCount: result.deletedCount });
+```
+
+| Case | Kết quả |
+|---|---|
+| Có bản ghi khớp | 200, `deletedCount: n` |
+| Không có bản ghi nào khớp | 200, `deletedCount: 0` — không phải 404 |
+| Điều kiện là `undefined` | **Xoá sạch collection** ← kiểm tra biến trước khi chạy |
+
+```js
+// Chốt chặn bắt buộc trước mọi deleteMany
+if (!showTimeId) {
+    return res.status(400).json({ error: 'showtimeId is required' });
+}
+```
+
+---
+
 ## Bẫy hay gặp
 
 | Bẫy | Hiện tượng | Cách xử lý |

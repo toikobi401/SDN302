@@ -183,6 +183,76 @@ return res.status(200).json({ message: 'Updated successfully', ticket });
 
 ---
 
+## 5. Đổi lịch — kiểm tra chồng giờ khi sửa
+
+Giống [POST overlap](POST.md#8-chống-trùng-lịch--trùng-khung-giờ), nhưng phải **loại chính nó** ra
+khỏi phép kiểm tra, nếu không bản ghi luôn tự báo trùng với chính mình.
+
+```js
+const clash = await Showtime.findOne({
+    _id: { $ne: showtimeId },          // ⚠️ dòng quyết định, thiếu là luôn 409
+    roomId: req.body.roomId,
+    startTime: { $lt: req.body.endTime },
+    endTime: { $gt: req.body.startTime }
+});
+if (clash) {
+    return res.status(409).json({ error: 'Room is already booked in that time range' });
+}
+```
+
+| Case | Kết quả |
+|---|---|
+| Sửa giờ sang khung còn trống | 200 |
+| Sửa giờ đè lên suất khác | 409 |
+| Lưu lại **đúng giờ cũ** (không đổi gì) | 200 — nhờ `_id: { $ne: ... }` |
+| Thiếu `_id: { $ne: ... }` | **Luôn 409**, kể cả khi không đổi gì |
+
+---
+
+## 6. Thay toàn bộ mảng con
+
+Khi đề cho PUT với cả danh sách con (vd: đổi toàn bộ nhân viên của dự án):
+
+```js
+const child = await Child.findById(childId);
+if (!child) {
+    return res.status(404).json({ error: `Project with _id='${childId}' not found` });
+}
+
+// Validate TRƯỚC khi xoá, để không mất dữ liệu nếu input sai
+const ids = (employees || []).map(e => e.empId);
+const found = await User.find({ _id: { $in: ids.filter(isId) } }, '_id');
+const foundIds = new Set(found.map(u => String(u._id)));
+const invalid = ids.filter(id => !foundIds.has(String(id)));
+if (invalid.length) {
+    return res.status(400).json({ error: 'Some employees do not exist', invalidEmployees: invalid });
+}
+
+// Xoá hết rồi ghi lại
+await Link.deleteMany({ proId: { $in: idForms(childId) } });
+if (ids.length) {
+    await Link.insertMany(employees.map(e => ({
+        proId: child._id,
+        empId: new mongoose.Types.ObjectId(e.empId),
+        workHours: e.workHours
+    })));
+}
+
+return res.status(200).json({ message: 'Updated successfully', count: ids.length });
+```
+
+| Case | Kết quả |
+|---|---|
+| Danh sách mới hợp lệ | 200, thay toàn bộ |
+| Danh sách rỗng `[]` | 200, xoá hết bản ghi con |
+| Có id không tồn tại | 400, **không xoá gì cả** |
+| Validate sau khi đã `deleteMany` | Mất sạch dữ liệu cũ dù input sai ← **đừng làm vậy** |
+
+> ⚠️ Thứ tự bắt buộc: **validate → xoá → ghi lại**. Xoá trước rồi mới phát hiện input sai
+> là mất dữ liệu không khôi phục được (MongoDB không có transaction nếu chưa cấu hình replica set).
+
+---
+
 ## Bẫy hay gặp
 
 | Bẫy | Hiện tượng | Cách xử lý |

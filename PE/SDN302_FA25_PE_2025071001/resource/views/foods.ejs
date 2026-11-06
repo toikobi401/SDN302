@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>FOODEX — Foods</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .food-img { height: 180px; object-fit: cover; }
+        .stars { color: #f5a623; letter-spacing: 2px; }
+    </style>
+</head>
+<body class="bg-light">
+
+<nav class="navbar navbar-dark bg-dark mb-4">
+    <div class="container">
+        <span class="navbar-brand mb-0 h1">FOODEX</span>
+        <div class="d-flex align-items-center gap-3">
+            <span class="text-white-50">Hi, <%= user.name %></span>
+            <a class="btn btn-outline-light btn-sm" href="/auth/logout">Logout</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container pb-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0">Foods (<%= foods.length %>)</h4>
+        <button class="btn btn-primary" onclick="openModal()">+ Add food</button>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        <% foods.forEach(function (food) { %>
+            <div class="col">
+                <div class="card h-100 shadow-sm">
+                    <img class="card-img-top food-img" src="<%= food.imageUrl %>" alt="<%= food.foodName %>">
+                    <div class="card-body">
+                        <h5 class="card-title"><%= food.foodName %></h5>
+                        <p class="stars mb-1">
+                            <%= '★'.repeat(food.rating) %><span class="text-muted"><%= '☆'.repeat(5 - food.rating) %></span>
+                            <small class="text-muted">(<%= food.rating %>)</small>
+                        </p>
+                        <p class="mb-1"><strong>Calories:</strong> <%= food.calories %></p>
+                        <p class="mb-1">
+                            <strong>Vegetarian:</strong>
+                            <span class="badge <%= food.isVegetarian ? 'bg-success' : 'bg-secondary' %>">
+                                <%= food.isVegetarian ? 'Yes' : 'No' %>
+                            </span>
+                        </p>
+                        <p class="mb-0"><strong>Nation:</strong> <%= food.nation ? food.nation.nationName : '-' %></p>
+                    </div>
+                    <div class="card-footer bg-white d-flex gap-2">
+                        <button class="btn btn-sm btn-outline-primary" onclick="openModal('<%= food._id %>')">Edit</button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="removeFood('<%= food._id %>', '<%= food.foodName %>')">Delete</button>
+                    </div>
+                </div>
+            </div>
+        <% }); %>
+    </div>
+</div>
+
+<!-- Add / Update modal -->
+<div class="modal fade" id="foodModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="foodModalTitle">Add food</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger d-none" id="formError"></div>
+                <form id="foodForm" novalidate>
+                    <input type="hidden" id="foodId">
+
+                    <div class="mb-3">
+                        <label class="form-label" for="foodName">Food name *</label>
+                        <input class="form-control" id="foodName" pattern="[A-Za-z ]+" required>
+                        <div class="form-text">Letters (a-z, A-Z) and spaces only. Must be unique.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" for="foodDescription">Description *</label>
+                        <textarea class="form-control" id="foodDescription" rows="3" required></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" for="imageUrl">Image URL *</label>
+                        <input class="form-control" id="imageUrl" required>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="calories">Calories * (700 - 1500)</label>
+                            <input class="form-control" id="calories" type="number" min="700" max="1500" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="rating">Rating * (1 - 5)</label>
+                            <input class="form-control" id="rating" type="number" min="1" max="5" step="1" required
+                                   oninput="document.getElementById('ratingStars').textContent = '★'.repeat(Math.max(0, Math.min(5, this.value || 0)))">
+                            <div class="stars fs-5" id="ratingStars"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" id="isVegetarian">
+                        <label class="form-check-label" for="isVegetarian">Vegetarian</label>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" for="nation">Nation *</label>
+                        <select class="form-select" id="nation" required>
+                            <option value="">-- Select a nation --</option>
+                            <% nations.forEach(function (n) { %>
+                                <option value="<%= n._id %>"><%= n.nationName %></option>
+                            <% }); %>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button class="btn btn-primary" id="saveBtn" onclick="saveFood()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const FOODS = <%- foodsJson %>;
+    let modal;
+
+    function showError(message) {
+        const box = document.getElementById('formError');
+        box.textContent = message;
+        box.classList.toggle('d-none', !message);
+    }
+
+    function openModal(id) {
+        const food = id ? FOODS.find(f => f._id === id) : null;
+
+        document.getElementById('foodModalTitle').textContent = food ? 'Update food' : 'Add food';
+        document.getElementById('foodId').value = food ? food._id : '';
+        document.getElementById('foodName').value = food ? food.foodName : '';
+        document.getElementById('foodDescription').value = food ? food.foodDescription : '';
+        document.getElementById('imageUrl').value = food ? food.imageUrl : '';
+        document.getElementById('calories').value = food ? food.calories : '';
+        document.getElementById('rating').value = food ? food.rating : '';
+        document.getElementById('isVegetarian').checked = food ? !!food.isVegetarian : false;
+        document.getElementById('nation').value = food && food.nation ? food.nation._id : '';
+        document.getElementById('ratingStars').textContent = food ? '★'.repeat(food.rating) : '';
+        showError('');
+
+        modal = modal || new bootstrap.Modal(document.getElementById('foodModal'));
+        modal.show();
+    }
+
+    async function saveFood() {
+        const form = document.getElementById('foodForm');
+        if (!form.reportValidity()) return;
+
+        const id = document.getElementById('foodId').value;
+        const payload = {
+            foodName: document.getElementById('foodName').value.trim(),
+            foodDescription: document.getElementById('foodDescription').value.trim(),
+            imageUrl: document.getElementById('imageUrl').value.trim(),
+            calories: document.getElementById('calories').value,
+            rating: document.getElementById('rating').value,
+            isVegetarian: document.getElementById('isVegetarian').checked,
+            nation: document.getElementById('nation').value
+        };
+
+        const response = await fetch(id ? '/page/foods/' + id : '/page/foods', {
+            method: id ? 'PUT' : 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        const result = await response.json();
+
+        if (!response.ok) return showError(result.error || 'Request failed');
+
+        alert(result.message);
+        window.location.reload();
+    }
+
+    async function removeFood(id, name) {
+        if (!confirm('Delete "' + name + '"?')) return;
+
+        const response = await fetch('/page/foods/' + id, { method: 'DELETE' });
+        const result = await response.json();
+
+        alert(response.ok ? result.message : (result.error || 'Delete failed'));
+        if (response.ok) window.location.reload();
+    }
+</script>
+</body>
+</html>

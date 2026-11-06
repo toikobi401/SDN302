@@ -1,0 +1,128 @@
+[
+  {
+    "_id": {
+      "$oid": "64916da37f8a6ac611905603"
+    },
+    "foodName": "Tacos made with a carnitas filling",
+    "foodDescription": "which are cooked in water with onions, garlic, and bay leaves for several hours until tender and soft, then sliced and sautéed in a small amount of oil.",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Carnitas.jpg/1024px-Carnitas.jpg",
+    "rating": 4,
+    "isVegetarian": false,
+    "calories": 990,
+    "nation": {
+      "$oid": "64916be07f8a6ac6119055fe"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "64916de77f8a6ac611905607"
+    },
+    "foodName": "Churros",
+    "foodDescription": "The first sweet entry in this Mexican food guide is something you've probably heard of before. Churros originated in Spain but are now incredibly popular in Mexico. The locals will (of course) tell you that theirs are the better version, served with cinnamon sugar and a dip of either chocolate, cajata (Mexican caramel sauce) or condensed milk.",
+    "imageUrl": "https://www.wheregoesrose.com/wp-content/uploads/2021/06/Churreria-puebla.jpg",
+    "rating": 3,
+    "isVegetarian": true,
+    "calories": 788,
+    "nation": {
+      "$oid": "64916be07f8a6ac6119055fe"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "64916e0b7f8a6ac61190560a"
+    },
+    "foodName": "Papas con Valentina",
+    "foodDescription": "The final entry is this Mexico food guide might be the simplest yet most addictive. These potato chips (or crisps as us Brits would call them) are named papas which means potato. You'll find them in every Mexican city and I couldn't be happier because I love them drizzled with spicy Valentina sauce.",
+    "imageUrl": "https://www.wheregoesrose.com/wp-content/uploads/2019/12/ACS_2857-2-930x1024.jpg",
+    "rating": 2,
+    "calories": 872,
+    "isVegetarian": true,
+    "nation": {
+      "$oid": "64916be07f8a6ac6119055fe"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "64916e727f8a6ac611905610"
+    },
+    "foodName": "Spinach and Goat Cheese Quiche",
+    "foodDescription": "With an all-butter crust, a whole pound of sautéed spinach, and an entire log of crumbled goat cheese, this savory egg custard tart is an absolutely divine addition to any brunch spread.",
+    "imageUrl": "https://www.foodandwine.com/thmb/Ct_9DwdIyag9vwN7Aq0Thrikp2M=/750x0/filters:no_upscale():max_bytes(150000):strip_icc():format(webp)/Spinach-and-goat-cheese-quiche-FT-RECIPE0424-31f60644bf2a4c60aabd8aca4c2cca38.jpg",
+    "rating": 5,
+    "calories": 1281,
+    "isVegetarian": true,
+    "nation": {
+      "$oid": "64916b697f8a6ac6119055fc"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "64916ea17f8a6ac611905612"
+    },
+    "foodName": "Chanterelle Omelets with Fines Herbes Sauce",
+    "foodDescription": "The creamy chanterelle filling matches beautifully with an herb sauce made from pureed parsley, chives, chervil, and tarragon.",
+    "imageUrl":"https://www.foodandwine.com/thmb/RfL9Hj3HDmTdXu2JekOqyHzeGSE=/750x0/filters:no_upscale():max_bytes(150000):strip_icc():format(webp)/200707-r-xl-chanterelle-omelets-with-fines-herbes-sauce-6cda508c6a9c432980f412c48ab7546b.jpg",
+    "rating": 4,
+    "calories": 978,
+    "isVegetarian": false,
+    "nation": {
+      "$oid": "64916b697f8a6ac6119055fc"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "64916f047f8a6ac611905616"
+    },
+    "foodName": "Kebab and Kofta",
+    "foodDescription": "Flame-grilled chunks of lamb (kebab) and spiced minced meat made into a sausage and grilled on a skewer (kofta) are a favorite Egyptian food meal. It is typically eaten with a simple chopped tomato and cucumber salad and a disc of flatbread.",
+    "imageUrl":"https://www.cleopatraegypttours.com/wp-content/uploads/2018/12/Kofta.png",
+    "rating": 4,
+    "calories": 1474,
+    "isVegetarian": false,
+    "nation": {
+      "$oid": "64916c557f8a6ac611905600"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "64916f317f8a6ac611905619"
+    },
+    "foodName": "Ful Medames",
+    "foodDescription": "The most popular street food snack in Egypt, Ful is a paste of mashed broad (fava) beans flavored with garlic and olive oil. It is labeled out of large copper pots, often into pockets of pitta bread and typically sold as an inexpensive takeaway sandwich.",
+    "imageUrl":"https://www.cleopatraegypttours.com/wp-content/uploads/2018/12/Fuul.png",
+    "rating": 3,
+    "calories": 1068,
+    "isVegetarian": true,
+    "nation": {
+      "$oid": "64916c557f8a6ac611905600"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "64916f877f8a6ac61190561d"
+    },
+    "foodName": "Mi Quang",
+    "foodDescription":"The dish typically features wide, flat rice noodles. Common ingredients include shrimp, chicken, and pork, sometimes all three, and various fresh herbs and vegetables, such as lettuce, basil, and peanuts, for garnish.",
+    "imageUrl":"https://feastio.com/wp-content/uploads/2023/07/Mi-Quang-noodle-soup.jpg",
+    "rating": 5,
+    "calories": 1384,
+    "isVegetarian": false,
+    "nation": {
+      "$oid": "64916b3b7f8a6ac6119055fa"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "64916fb07f8a6ac61190561f"
+    },
+    "foodName": "Bo La Lot",
+    "foodDescription": "Bo la lot is a popular Southern Vietnamese dish featuring minced beef wrapped in betel leaves and then grilled. The meat is seasoned with garlic, shallots, lemongrass, and fish sauce, which provides a savory and aromatic base. The slightly peppery betel leaves add a unique herbal note to the dish.",
+    "imageUrl":"https://feastio.com/wp-content/uploads/2023/07/Pork-and-beef-skewers.jpg",
+    "rating": 5,
+    "calories": 1183,
+    "isVegetarian": false,
+    "nation": {
+      "$oid": "64916b3b7f8a6ac6119055fa"
+    }
+  }
+  ]

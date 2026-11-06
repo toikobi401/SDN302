@@ -99,12 +99,14 @@ bảng liệt kê mọi case kèm status code, và bẫy hay gặp:
 
 | | |
 |---|---|
-| [methods/README.md](methods/README.md) | Bảng status code, 401 vs 403, thứ tự khai báo route |
+| [methods/README.md](methods/README.md) | Bảng status code, 401 vs 403, thứ tự route, **tra ngược "đề ra dạng này → mở file nào"** |
+| [methods/MODELS.md](methods/MODELS.md) | **Đọc ở phút 6-8.** Kiểu dữ liệu, bẫy key `type`, validation, map lỗi → status |
 | [methods/GET.md](methods/GET.md) | 8 dạng GET: lọc, populate, bảng trung gian, aggregation, phân trang |
 | [methods/POST.md](methods/POST.md) | Thứ tự validate, kiểm tra mảng id, chống trùng, tính tiền server |
 | [methods/PUT.md](methods/PUT.md) | `new: true`, `runValidators`, chặn sửa theo trạng thái |
 | [methods/PATCH.md](methods/PATCH.md) | Bảng chuyển trạng thái, sửa field lẻ, thao tác mảng |
 | [methods/DELETE.md](methods/DELETE.md) | 200 vs 204, chặn ràng buộc, cascade, xoá mềm |
+| [methods/AUTH.md](methods/AUTH.md) | `access_key` vs JWT, login/bcrypt, phân quyền role — **"0 points if no authorization"** |
 
 **Copy y nguyên message lỗi trong đề, từng dấu câu.** Đề viết `Movie with id = X not found`
 thì không được viết `Movie with _id='X' not found`. Hai câu khác nhau trong cùng một đề
