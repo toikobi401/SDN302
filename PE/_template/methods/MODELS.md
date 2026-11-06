@@ -101,6 +101,33 @@ info: { type: { type: String }, code: String }
 > phần tử khi bạn `create`. Muốn bỏ thì khai `[{ _id: false, locId: ... }]`.
 > **Object đơn** không sinh `_id`, không cần lo.
 
+### ⚠️ `.lean()` che mất bẫy này — chỗ dễ kết luận nhầm nhất
+
+Bẫy vẫn còn nguyên trên **mongoose 9** (đã test lại). Nhưng nó chỉ lộ ra khi đọc kiểu thường:
+
+```js
+// schema SAI:  items: [{ _id: String, type: String }],  info: { type: String, code: String }
+
+await Trap.findOne()          // info = undefined      items[0] = "A1"   ← object bị ép thành chuỗi
+await Trap.findOne().lean()   // info = {type,code}    ← TRÔNG NHƯ KHÔNG SAO
+```
+
+`.lean()` trả thẳng dữ liệu thô từ driver, **không chạy bước cast**, nên nhìn thì đủ field.
+Bỏ `.lean()` ra là mất. Mà `res.json()` của document thường mới là cái đề chấm.
+
+**Cách kiểm tra chắc chắn nhất** — hỏi thẳng schema, không cần dữ liệu:
+
+```js
+console.log(Side.schema.path('info').constructor.name);
+// SchemaString  -> ĐANG DÍNH BẪY (lẽ ra phải là Mixed / SchemaSubdocument)
+console.log(Side.schema.path('info.code'));
+// undefined     -> path con không tồn tại, xác nhận đã dính
+```
+
+> Thêm một điểm dễ nhầm: **query vẫn chạy đúng** dù schema sai —
+> `find({ 'items.type': 'VIP' })` vẫn khớp, vì MongoDB lọc trên dữ liệu thô ở server,
+> không đi qua schema của Mongoose. Lọc ra đúng số bản ghi **không** chứng minh schema đúng.
+
 ---
 
 ## 3. Khoá ngoại: ObjectId hay string

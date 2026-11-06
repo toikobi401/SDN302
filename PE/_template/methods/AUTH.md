@@ -1,5 +1,9 @@
 # AUTH — Bảo vệ route
 
+> **Mở `package.json` trước khi đọc tiếp.** Không thấy `bcryptjs` và `jsonwebtoken`
+> trong `dependencies` thì đề **không hỏi login** — đóng file này lại, khỏi mất thời gian.
+> Nhiều kỳ còn **cấm cài thêm thư viện lúc đang thi**, nên không có sẵn là không làm được.
+
 > Đề ghi **"0 points if no authorization"** — làm thiếu phần này là mất trắng điểm cả câu đó,
 > dù logic nghiệp vụ đúng hết.
 

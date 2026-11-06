@@ -49,7 +49,24 @@
      Link    ->  WorksOn    (đề 1)  |  Ticket    (đề 2)   <- bảng trung gian
      Side    ->  Location   (đề 1)  |  Room      (đề 2)   <- bảng tra cứu
      User    ->  Employee   (đề 1)  |  User      (đề 2)
-============================================================================ */
+
+   ──────────────────────────────────────────────────────────────────────────
+   VIỆC ĐẦU TIÊN: MỞ package.json RA ĐỌC. Mỗi kỳ thi một bộ thư viện khác.
+
+     express 4.x  -> mọi thứ dưới đây chạy nguyên
+     express 5.x  -> CẤM 3 cú pháp, viết vào là app CHẾT LÚC KHỞI ĐỘNG:
+                       app.get('*', ...)        -> dùng app.use(...) thay
+                       app.get('/old/*', ...)   -> đổi thành '/old/*splat'
+                       app.get('/x/:id?', ...)  -> đổi thành '/x{/:id}'
+                     (bù lại: async handler throw sẽ TỰ vào error middleware)
+     mongoose 9.x -> { new: true } chỉ còn là cảnh báo deprecated, vẫn chạy.
+                     Muốn sạch log thì đổi sang { returnDocument: 'after' }.
+
+     KHÔNG có bcryptjs / jsonwebtoken trong dependencies
+       -> đề CHẮC CHẮN không hỏi login, bỏ qua @AUTH-JWT @AUTH-ROLE @LOGIN-JWT
+     KHÔNG có ejs / hbs / pug
+       -> đề là REST API thuần, không phải làm giao diện
+   ────────────────────────────────────────────────────────────────────────── */
 
 // ╔══════════════════════════════════════════════════════════════════════════╗
 // ║ @SETUP  —  Phần khởi tạo, giữ nguyên                                     ║
@@ -118,6 +135,14 @@ const Child = mongoose.model('Child', new mongoose.Schema({
 // ║ OBJECT ĐƠN (không phải mảng) — xem mục dưới, 3 cách đều đã test:         ║
 // ║   KHÔNG có key "type"  ->  viết thẳng: meta: { city: String }            ║
 // ║   CÓ key "type"        ->  Mixed, hoặc bọc: { type: { type: String } }   ║
+// ║                                                                          ║
+// ║ ⚠️ .lean() CHE MẤT BẪY NÀY. Còn nguyên trên mongoose 9, đã test:          ║
+// ║      findOne()        -> info = undefined   (bị cast hỏng, mất field)   ║
+// ║      findOne().lean() -> info = {...}       (lean bỏ qua cast, thấy đủ) ║
+// ║    Đang .lean() mà thấy đúng thì ĐỪNG yên tâm — bỏ .lean() ra thử lại,  ║
+// ║    vì res.json() của document thường mới là cái đề chấm.                ║
+// ║    Query thì vẫn chạy: find({'items.type':'VIP'}) khớp bình thường,     ║
+// ║    do MongoDB lọc trên dữ liệu thô, không qua schema.                   ║
 // ╚══════════════════════════════════════════════════════════════════════════╝
 const Side = mongoose.model('Side', new mongoose.Schema({
     sideName: String,
@@ -1198,6 +1223,8 @@ app.get('/api/me', requireToken, async (req, res) => {
 // ║    Đặt trên cùng thì nó nuốt hết mọi request.                            ║
 // ║ Middleware xử lý lỗi BẮT BUỘC có đủ 4 tham số (err, req, res, next),     ║
 // ║ thiếu next thì Express coi nó là middleware thường và không gọi.         ║
+// ║ ⚠️ Dùng app.use() như dưới đây, ĐỪNG viết app.get('*', ...):              ║
+// ║    trên express 5 dấu '*' trần làm app throw ngay lúc khởi động.         ║
 // ╚══════════════════════════════════════════════════════════════════════════╝
 app.use((req, res) => {
     res.status(404).json({ error: `Route ${req.method} ${req.originalUrl} not found` });

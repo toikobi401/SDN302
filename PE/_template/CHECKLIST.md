@@ -4,15 +4,37 @@ Làm đúng thứ tự. Chưa xong bước này thì chưa sang bước sau.
 
 ---
 
-## PHÚT 0–2 · Dựng project
+## PHÚT 0–2 · Dựng project + **ĐỌC package.json**
 
 ```
 1. Giải nén đề → mở thư mục SDN302_given/resource bằng VS Code
 2. Mở terminal tại đó:  npm install
-3. Copy server.js của template này đè lên server.js của đề
+3. MỞ package.json RA ĐỌC  ← đừng bỏ qua bước này
+4. Copy các khối cần dùng từ template này sang server.js của đề
 ```
 
 > Nếu `npm install` lỗi/không có mạng: copy cả thư mục `node_modules` từ một project SDN302 cũ sang (dependencies giống hệt nhau).
+> Một số kỳ **cấm cài thêm thư viện trong lúc thi** — phải cài sẵn ở nhà trước khi vào phòng.
+
+### package.json quyết định bạn được làm gì
+
+| Thấy gì trong `dependencies` | Kết luận ngay |
+|---|---|
+| **không có** `bcryptjs` / `jsonwebtoken` | Đề **không** hỏi login → bỏ qua `@AUTH-JWT` `@AUTH-ROLE` `@LOGIN-JWT` |
+| **không có** `ejs` / `hbs` / `pug` | REST API thuần, **không** phải làm giao diện |
+| có `ejs` + `bcryptjs` + `jsonwebtoken` | Đề kiểu FA25: API có JWT **+** web client có login |
+| `"express": "^5..."` | ⚠️ 3 cú pháp route bị cấm — xem bảng dưới |
+| `"mongoose": "^9..."` | `{ new: true }` chỉ còn cảnh báo deprecated, vẫn chạy đúng |
+
+### ⚠️ express 5 — viết sai là app chết lúc khởi động, không phải lỗi runtime
+
+| Express 4 quen tay | Express 5 bắt viết |
+|---|---|
+| `app.get('*', ...)` | `app.use((req, res) => ...)` |
+| `app.get('/old/*', ...)` | `app.get('/old/*splat', ...)` |
+| `app.get('/x/:id?', ...)` | `app.get('/x{/:id}', ...)` |
+
+Đổi lại express 5 cho không một thứ: `async` handler **throw** ra lỗi sẽ **tự** chạy vào error middleware. Vẫn nên giữ `try/catch` vì còn phải map lỗi sang 400/404/409.
 
 ---
 
@@ -101,6 +123,7 @@ bảng liệt kê mọi case kèm status code, và bẫy hay gặp:
 |---|---|
 | [methods/README.md](methods/README.md) | Bảng status code, 401 vs 403, thứ tự route, **tra ngược "đề ra dạng này → mở file nào"** |
 | [methods/MODELS.md](methods/MODELS.md) | **Đọc ở phút 6-8.** Kiểu dữ liệu, bẫy key `type`, validation, map lỗi → status |
+| [methods/QUERY.md](methods/QUERY.md) | Cú pháp `$gte` `$regex` `$group` `$lookup`… + bảng đổi shell → Mongoose |
 | [methods/GET.md](methods/GET.md) | 8 dạng GET: lọc, populate, bảng trung gian, aggregation, phân trang |
 | [methods/POST.md](methods/POST.md) | Thứ tự validate, kiểm tra mảng id, chống trùng, tính tiền server |
 | [methods/PUT.md](methods/PUT.md) | `new: true`, `runValidators`, chặn sửa theo trạng thái |
@@ -135,3 +158,6 @@ có thể dùng format khác nhau — đề 2 đã như vậy.
 | `__v` thừa trong response | Lệch so với đáp án mẫu | `{ versionKey: false }` khi khai schema |
 | Thiếu `app.use(express.json())` | `req.body` là `undefined` ở route POST | Thêm ngay sau `const app = express()` |
 | Hoa/thường trong tên field | `showTimeId` vs `showtimeId` | Copy tên field trực tiếp từ Compass |
+| `app.get('*')` trên express 5 | App **không khởi động nổi**, `Missing parameter name` | Đổi sang `app.use(...)` |
+| `.lean()` che mất bẫy key `type` | `.lean()` ra đủ field, bỏ `.lean()` lại mất | Test bằng `findOne()` thường, không phải `.lean()` |
+| Regex literal trong thẻ `<%- %>` của EJS | View không render, trả JSON `Invalid regular expression` | Xử lý chuỗi trong `server.js` rồi truyền sang view |

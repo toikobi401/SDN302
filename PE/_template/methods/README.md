@@ -3,6 +3,7 @@
 | Method | File | Dùng khi | Tag trong `server.js` |
 |---|---|---|---|
 | **(đọc trước tiên)** | [MODELS.md](MODELS.md) | Khai schema, kiểu dữ liệu, validation, map lỗi → status | `@MODEL-*` `@HELPER` `@ERROR-MAP` |
+| *(mọi method)* | [QUERY.md](QUERY.md) | Cú pháp filter / update / aggregation — tra khi bí cách viết câu truy vấn | dùng chung mọi khối |
 | GET | [GET.md](GET.md) | Lấy dữ liệu, không đổi gì trong DB | `@GET-*` `@REPORT-AGG` `@REPORT-AGG2` `@PAGINATION` |
 | POST | [POST.md](POST.md) | Tạo mới, hoặc hành động có tác dụng phụ | `@POST-CREATE` `@POST-OVERLAP` `@POST-CAPACITY` |
 | PUT | [PUT.md](PUT.md) | Thay **toàn bộ** một bản ghi | `@PUT-UPDATE` |
@@ -27,6 +28,8 @@
 | "cannot delete if", còn ràng buộc | [DELETE.md §2](DELETE.md#2-chặn-xoá-khi-còn-ràng-buộc) |
 | "remove a seat from the room" | [DELETE.md §6](DELETE.md#6-xoá-một-phần-tử-bên-trong-mảng) |
 | "Validate input data" (không nói rõ rule) | [MODELS.md §4](MODELS.md#4-ràng-buộc-trong-schema) |
+| Không nhớ cú pháp `$gte` / `$regex` / `$group` / `$lookup` | [QUERY.md](QUERY.md) |
+| Chép câu truy vấn từ Compass vào code | [QUERY.md §1](QUERY.md#1-chuyển-từ-shell-sang-mongoose) |
 
 ---
 
@@ -79,6 +82,23 @@ app.get('/api/projects/report', ...);   // không bao giờ chạy tới, ":id" 
 app.get('/api/projects/report', ...);
 app.get('/api/projects/:id', ...);
 ```
+
+### ⚠️ express 5 đổi cú pháp đường dẫn
+
+Kiểm tra `"express"` trong `package.json` trước. Nếu là `^5.x`, ba cách viết dưới đây
+làm **app throw ngay lúc khởi động** (`Missing parameter name` / `Unexpected ?`) —
+không phải lỗi lúc gọi API, mà là app không chạy được → đúng điều kiện 0 điểm.
+
+| Express 4 | Express 5 |
+|---|---|
+| `app.get('*', ...)` | `app.use((req, res) => ...)` |
+| `app.get('/old/*', ...)` | `app.get('/old/*splat', ...)` — wildcard phải **có tên** |
+| `app.get('/x/:id?', ...)` | `app.get('/x{/:id}', ...)` |
+
+Vẫn chạy nguyên trên cả hai: `app.get('/x/:id', ...)` và `app.get(['/a/:id', '/b/:id'], ...)`.
+
+Express 5 bù lại: handler `async` **throw** lỗi sẽ tự động rơi vào error middleware,
+không cần `.catch(next)`. Nhưng vẫn giữ `try/catch` vì còn phải map sang 400/404/409.
 
 ---
 
