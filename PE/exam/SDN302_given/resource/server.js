@@ -1,19 +1,3 @@
-/* ============================================================================
-   SDN302 - PE
-
-   MÔI TRƯỜNG ĐỀ NÀY (đã kiểm tra):  express 5.3  |  mongoose 9.11
-     - KHÔNG có bcryptjs / jsonwebtoken  -> đề không hỏi login
-     - KHÔNG có ejs / hbs / pug          -> REST API thuần, không làm giao diện
-     - CẤM app.get('*')  /  '/old/*'  /  '/x/:id?'   (express 5 throw lúc chạy)
-       thay bằng  app.use(...)  /  '/old/*splat'  /  '/x{/:id}'
-
-   VIỆC ĐẦU TIÊN:
-     1. Sửa MONGO_URI trong .env cho đúng tên DB của đề
-     2. Import JSON vào Compass đúng tên collection
-     3. npm start  -> phải thấy "Đã kết nối CSDL" trước khi viết dòng code nào
-
-   Code mẫu từng dạng: xem PE/_template/server.js (Ctrl+F theo mã @TAG)
-============================================================================ */
 
 const express = require('express');
 const mongoose = require('mongoose');
@@ -23,7 +7,7 @@ require('dotenv').config();
 const { connectDb } = require('./dal/database');
 
 const app = express();
-app.use(express.json());                      // thiếu dòng này req.body = undefined
+app.use(express.json());                      
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
 
