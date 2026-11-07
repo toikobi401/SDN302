@@ -21,6 +21,7 @@
    │ @AUTH-ROLE       │ "Role must be admin/customer"                       │
    ├──────────────────┼─────────────────────────────────────────────────────┤
    │ @GET-FILTER      │ "?status=X", lọc danh sách bằng query param         │
+   │ @GET-JS          │ Làm MỌI câu GET bằng JS thuần, không populate/agg   │
    │ @GET-FILTER2     │ Lọc nâng cao: khoảng ngày, mảng chứa, field lồng    │
    │ @GET-DETAIL      │ Lấy 1 bản ghi theo :id, kèm tên từ bảng khác        │
    │ @GET-CHILDREN    │ Lấy danh sách con của 1 bản ghi cha                 │
@@ -81,6 +82,7 @@ const connectDB = require('./config/db');
 
 const app = express();
 app.use(express.json());          // BẮT BUỘC, thiếu dòng này req.body sẽ undefined
+app.set('json spaces', 2);   // chi de DEBUG: JSON tra ve co thut le, de doc
 connectDB();
 
 app.get('/', async (req, res) => {
@@ -352,6 +354,145 @@ app.get('/api/parents', async (req, res) => {
 
 
 // ╔══════════════════════════════════════════════════════════════════════════╗
+// ║ @GET-JS  —  LÀM MỌI CÂU GET BẰNG JAVASCRIPT THUẦN (không populate/agg)   ║
+// ╟──────────────────────────────────────────────────────────────────────────╢
+// ║ Dùng khi: bí cú pháp populate / aggregation, hoặc populate trả về null.  ║
+// ║ Ý TƯỞNG: tải CẢ hai collection về, rồi ghép bằng .find() của JavaScript. ║
+// ║                                                                          ║
+// ║ ƯU  : không cần khai `ref`, không cần $lookup/$toObjectId.               ║
+// ║       .equals() ăn được CẢ ObjectId LẪN string -> miễn nhiễm bẫy         ║
+// ║       khoá ngoại lẫn kiểu (đã test: 0 bản ghi lỗi).                      ║
+// ║ NHƯỢC: tải hết collection về RAM, ghép O(n×m). Dữ liệu đề thi vài chục   ║
+// ║       bản ghi nên vô tư. Vài nghìn bản ghi trở lên mới nên đổi sang Map. ║
+// ║                                                                          ║
+// ║ ⚠️ BẮT BUỘC: query hết TRƯỚC vòng lặp. Không bao giờ await trong .map(). ║
+// ║ ⚠️ a._id === b.fk LUÔN sai (so 2 object). Phải .equals() hoặc String().  ║
+// ╚══════════════════════════════════════════════════════════════════════════╝
+
+// --- A. Danh sách + lấy tên từ bảng khác (thay cho populate) ---
+app.get('/api/children-js', async (req, res) => {
+    try {
+        const children = await Child.find();
+        const parents = await Parent.find();          // tải 1 lần, KHÔNG query trong map
+
+        return res.status(200).json(children.map(c => ({
+            title: c.title,
+            price: c.price,
+            // ?. tránh crash khi không tìm thấy; || đặt giá trị mặc định
+            parentName: parents.find(p => p._id.equals(c.parentId))?.name || 'Unknown'
+        })));
+    } catch (error) {
+        return sendError(res, error);
+    }
+});
+
+// --- B. Chi tiết 1 bản ghi + tên bảng khác ---
+app.get('/api/children-js/:childId', async (req, res) => {
+    try {
+        const { childId } = req.params;
+        if (!isId(childId)) return res.status(400).json({ error: `Invalid ObjectId: ${childId}` });
+
+        const child = await Child.findById(childId);
+        if (!child) return res.status(404).json({ error: `Child with _id='${childId}' not found` });
+
+        const parents = await Parent.find();
+
+        return res.status(200).json({
+            title: child.title,
+            parentName: parents.find(p => p._id.equals(child.parentId))?.name || 'Unknown'
+        });
+    } catch (error) {
+        return sendError(res, error);
+    }
+});
+
+// --- C. Qua BẢNG TRUNG GIAN (n-n) — thay cho @GET-NN ---
+app.get('/api/children-js/:childId/users', async (req, res) => {
+    try {
+        const { childId } = req.params;
+        if (!isId(childId)) return res.status(400).json({ error: `Invalid ObjectId: ${childId}` });
+
+        const child = await Child.findById(childId);
+        if (!child) return res.status(404).json({ error: `Child with _id='${childId}' not found` });
+
+        const links = await Link.find();
+        const users = await User.find();
+
+        return res.status(200).json({
+            title: child.title,
+            users: links
+                .filter(l => child._id.equals(l.parentRef))          // lọc link của child này
+                .map(l => ({
+                    name: users.find(u => u._id.equals(l.userRef))?.name || 'Unknown',
+                    amount: l.amount
+                }))
+        });
+    } catch (error) {
+        return sendError(res, error);
+    }
+});
+
+// --- D. BÁO CÁO gom nhóm — thay cho @REPORT-AGG ---
+// Đã test: cho kết quả GIỐNG HỆT bản aggregation, kể cả khi khoá ngoại lẫn kiểu.
+app.get('/api/reports-js/parents', async (req, res) => {
+    try {
+        const links = await Link.find();
+        const parents = await Parent.find();
+
+        const groups = {};
+        for (const l of links) {
+            const p = parents.find(x => x._id.equals(l.parentRef));
+            if (!p) continue;                                   // bỏ bản ghi mồ côi
+
+            const key = String(p._id);
+            groups[key] ??= { parentName: p.name, total: 0, count: 0, userIds: new Set() };
+            groups[key].total += l.amount || 0;
+            groups[key].count += 1;
+            groups[key].userIds.add(String(l.userRef));         // Set -> đếm giá trị KHÁC NHAU
+        }
+
+        const report = Object.values(groups)
+            .map(g => ({
+                parentName: g.parentName,
+                total: g.total,
+                totalRecords: g.count,
+                totalUsers: g.userIds.size
+            }))
+            .sort((a, b) => b.total - a.total);                 // sort giảm dần
+
+        return res.status(200).json(report);
+    } catch (error) {
+        return sendError(res, error);
+    }
+});
+
+// --- E. TRUNG BÌNH khi có bản ghi THIẾU field (bẫy $avg) ---
+app.get('/api/reports-js/avg', async (req, res) => {
+    try {
+        const parents = await Parent.find();
+        const children = await Child.find();
+
+        const report = parents.map(p => {
+            const list = children.filter(c => p._id.equals(c.parentId));
+            // $avg của MongoDB chia cho số doc CÓ field; ở JS phải tự lọc cho khớp
+            const withPrice = list.filter(c => typeof c.price === 'number');
+            return {
+                parentName: p.name,
+                totalChildren: list.length,          // parent rỗng vẫn có mặt -> totalChildren: 0
+                avgPrice: withPrice.length
+                    ? Math.round(withPrice.reduce((s, c) => s + c.price, 0) / withPrice.length)
+                    : 0
+            };
+        }).sort((a, b) => b.totalChildren - a.totalChildren);
+
+        return res.status(200).json(report);
+    } catch (error) {
+        return sendError(res, error);
+    }
+});
+
+
+// ╔══════════════════════════════════════════════════════════════════════════╗
 // ║ @GET-FILTER2  —  Lọc nâng cao                                            ║
 // ╟──────────────────────────────────────────────────────────────────────────╢
 // ║ Từ khoá: khoảng ngày, from/to, between, genre contains, nested field,   ║
@@ -410,6 +551,8 @@ app.get('/api/children-filter', async (req, res) => {
 // ╔══════════════════════════════════════════════════════════════════════════╗
 // ║ @GET-DETAIL  —  Lấy 1 bản ghi theo :id, kèm tên lấy từ bảng khác         ║
 // ╟──────────────────────────────────────────────────────────────────────────╢
+// ║ 👉 Ngại populate? Xem @GET-JS mục B — ghép bằng .find() của JavaScript.  ║
+// ╟──────────────────────────────────────────────────────────────────────────╢
 // ║ Từ khoá: Validate ObjectId, populate, manager name, 404 not found        ║
 // ║ TRẢ VỀ : 200 | 400 id sai định dạng | 404 không tồn tại                  ║
 // ║ ĐÃ RA  : Q1 đề 1 — GET /api/projects/department/:depId                   ║
@@ -443,6 +586,8 @@ app.get('/api/parents/:parentId', async (req, res) => {
 
 // ╔══════════════════════════════════════════════════════════════════════════╗
 // ║ @GET-CHILDREN  —  Danh sách con của 1 bản ghi cha + join bảng tra cứu    ║
+// ╟──────────────────────────────────────────────────────────────────────────╢
+// ║ 👉 Ngại populate? Xem @GET-JS mục A — ghép bằng .find() của JavaScript.  ║
 // ╟──────────────────────────────────────────────────────────────────────────╢
 // ║ Từ khoá: showtimes of a movie, Include room name, sub-resource           ║
 // ║ TRẢ VỀ : 200 mảng | 400 id sai | 404 cha không tồn tại                   ║
@@ -482,6 +627,8 @@ app.get('/api/parents/:parentId/children', async (req, res) => {
 
 // ╔══════════════════════════════════════════════════════════════════════════╗
 // ║ @GET-NN  —  Lấy dữ liệu qua BẢNG TRUNG GIAN (n-n)                        ║
+// ╟──────────────────────────────────────────────────────────────────────────╢
+// ║ 👉 Cách dễ nhớ hơn: @GET-JS mục C (không cần Map, chỉ .filter + .find).  ║
 // ╟──────────────────────────────────────────────────────────────────────────╢
 // ║ Từ khoá: employees of a project, worksOns, work hours, bảng trung gian   ║
 // ║ TRẢ VỀ : 200 | 400 id sai | 404 không tồn tại                            ║
@@ -558,6 +705,8 @@ app.get('/api/children/:childId/items', async (req, res) => {
 
 // ╔══════════════════════════════════════════════════════════════════════════╗
 // ║ @REPORT-AGG  —  Báo cáo bằng Aggregation Pipeline                        ║
+// ╟──────────────────────────────────────────────────────────────────────────╢
+// ║ 👉 Bí pipeline? @GET-JS mục D làm cùng kết quả bằng vòng for + Set.      ║
 // ╟──────────────────────────────────────────────────────────────────────────╢
 // ║ Từ khoá: Aggregation Pipeline, Group by, total, report, thống kê, $lookup
 // ║ TRẢ VỀ : 200 mảng                                                        ║

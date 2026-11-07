@@ -124,6 +124,7 @@ bảng liệt kê mọi case kèm status code, và bẫy hay gặp:
 | [methods/README.md](methods/README.md) | Bảng status code, 401 vs 403, thứ tự route, **tra ngược "đề ra dạng này → mở file nào"** |
 | [methods/MODELS.md](methods/MODELS.md) | **Đọc ở phút 6-8.** Kiểu dữ liệu, bẫy key `type`, validation, map lỗi → status |
 | [methods/QUERY.md](methods/QUERY.md) | Cú pháp `$gte` `$regex` `$group` `$lookup`… + bảng đổi shell → Mongoose |
+| [methods/JS-JOIN.md](methods/JS-JOIN.md) | **Dự phòng khi bí.** Bỏ populate/aggregation, ghép bằng JavaScript thuần |
 | [methods/GET.md](methods/GET.md) | 8 dạng GET: lọc, populate, bảng trung gian, aggregation, phân trang |
 | [methods/POST.md](methods/POST.md) | Thứ tự validate, kiểm tra mảng id, chống trùng, tính tiền server |
 | [methods/PUT.md](methods/PUT.md) | `new: true`, `runValidators`, chặn sửa theo trạng thái |

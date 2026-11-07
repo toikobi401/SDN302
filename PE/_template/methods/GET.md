@@ -587,6 +587,29 @@ const genresOfActive = await Movie.distinct('genre', { status: 'NOW_SHOWING' });
 
 ---
 
+## 12. Cách dự phòng: bỏ populate, ghép bằng JavaScript thuần
+
+Bí `populate` / `$lookup`, hoặc `populate` cứ trả `null`? Tải cả hai collection về
+rồi ghép bằng `.find()`:
+
+```js
+const products   = await Product.find();
+const categories = await Category.find();        // tải TRƯỚC vòng lặp
+
+const data = products.map(p => ({
+    productName: p.productName,
+    categoryName: categories.find(c => c._id.equals(p.categoryId))?.categoryName || 'Unknown'
+}));
+```
+
+`.equals()` nhận cả ObjectId lẫn chuỗi nên **không dính bẫy khoá ngoại lẫn kiểu** —
+chỗ mà `populate` trả `null`.
+
+**→ Đầy đủ 7 công thức (chi tiết, con, n-n, báo cáo, trung bình) + bảng dịch
+aggregation sang JavaScript: [JS-JOIN.md](JS-JOIN.md)**
+
+---
+
 ## Checklist trước khi sang câu khác
 
 - [ ] Có `isValid()` trước mọi `findById` chưa? (thiếu → CastError → 500 thay vì 400)

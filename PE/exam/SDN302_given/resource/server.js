@@ -11,6 +11,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
 
+// Chi de DEBUG: tra JSON da thut le cho de doc trong Postman/Thunder Client.
+app.set('json spaces', 2);
+
 
 // ===== MODELS =========================================== @MODEL-* trong template
 // Tham số thứ 3 = TÊN COLLECTION THẬT trong Compass (số nhiều, chữ thường).

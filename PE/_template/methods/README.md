@@ -4,6 +4,7 @@
 |---|---|---|---|
 | **(đọc trước tiên)** | [MODELS.md](MODELS.md) | Khai schema, kiểu dữ liệu, validation, map lỗi → status | `@MODEL-*` `@HELPER` `@ERROR-MAP` |
 | *(mọi method)* | [QUERY.md](QUERY.md) | Cú pháp filter / update / aggregation — tra khi bí cách viết câu truy vấn | dùng chung mọi khối |
+| *(dự phòng)* | [JS-JOIN.md](JS-JOIN.md) | Bỏ populate/aggregation, ghép dữ liệu bằng JavaScript thuần | `@GET-JS` |
 | GET | [GET.md](GET.md) | Lấy dữ liệu, không đổi gì trong DB | `@GET-*` `@REPORT-AGG` `@REPORT-AGG2` `@PAGINATION` |
 | POST | [POST.md](POST.md) | Tạo mới, hoặc hành động có tác dụng phụ | `@POST-CREATE` `@POST-OVERLAP` `@POST-CAPACITY` |
 | PUT | [PUT.md](PUT.md) | Thay **toàn bộ** một bản ghi | `@PUT-UPDATE` |
@@ -29,6 +30,7 @@
 | "remove a seat from the room" | [DELETE.md §6](DELETE.md#6-xoá-một-phần-tử-bên-trong-mảng) |
 | "Validate input data" (không nói rõ rule) | [MODELS.md §4](MODELS.md#4-ràng-buộc-trong-schema) |
 | Không nhớ cú pháp `$gte` / `$regex` / `$group` / `$lookup` | [QUERY.md](QUERY.md) |
+| `populate` trả về `null`, hoặc bí `$lookup` / aggregation | [JS-JOIN.md](JS-JOIN.md) — ghép bằng JS thuần |
 | Chép câu truy vấn từ Compass vào code | [QUERY.md §1](QUERY.md#1-chuyển-từ-shell-sang-mongoose) |
 
 ---
