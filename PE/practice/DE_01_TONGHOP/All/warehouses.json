@@ -1,0 +1,53 @@
+[
+  {
+    "_id": {
+      "$oid": "660000000005a1b2c3d4e5f6"
+    },
+    "warehouseName": "Kho Ha Noi",
+    "city": "Ha Noi",
+    "zones": [
+      {
+        "_id": "Z1",
+        "type": "COLD",
+        "capacity": 200
+      },
+      {
+        "_id": "Z2",
+        "type": "DRY",
+        "capacity": 500
+      },
+      {
+        "_id": "Z3",
+        "type": "DRY",
+        "capacity": 300
+      }
+    ]
+  },
+  {
+    "_id": {
+      "$oid": "660000000006a1b2c3d4e5f6"
+    },
+    "warehouseName": "Kho Da Nang",
+    "city": "Da Nang",
+    "zones": [
+      {
+        "_id": "Z1",
+        "type": "DRY",
+        "capacity": 150
+      },
+      {
+        "_id": "Z2",
+        "type": "COLD",
+        "capacity": 100
+      }
+    ]
+  },
+  {
+    "_id": {
+      "$oid": "660000000007a1b2c3d4e5f6"
+    },
+    "warehouseName": "Kho Ho Chi Minh",
+    "city": "Ho Chi Minh",
+    "zones": []
+  }
+]

@@ -1,0 +1,30 @@
+[
+  {
+    "_id": {
+      "$oid": "660000000024a1b2c3d4e5f6"
+    },
+    "depName": "Noi tong quat",
+    "location": "Tang 2"
+  },
+  {
+    "_id": {
+      "$oid": "660000000025a1b2c3d4e5f6"
+    },
+    "depName": "Ngoai chan thuong",
+    "location": "Tang 3"
+  },
+  {
+    "_id": {
+      "$oid": "660000000026a1b2c3d4e5f6"
+    },
+    "depName": "Nhi khoa",
+    "location": "Tang 4"
+  },
+  {
+    "_id": {
+      "$oid": "660000000027a1b2c3d4e5f6"
+    },
+    "depName": "Da lieu",
+    "location": "Tang 5"
+  }
+]

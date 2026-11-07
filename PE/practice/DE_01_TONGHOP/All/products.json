@@ -1,0 +1,105 @@
+[
+  {
+    "_id": {
+      "$oid": "660000000008a1b2c3d4e5f6"
+    },
+    "productName": "Smart TV 55 inch",
+    "price": 12000000,
+    "unit": "chiec",
+    "categoryId": {
+      "$oid": "660000000001a1b2c3d4e5f6"
+    },
+    "specs": {
+      "type": "BOX",
+      "weight": 18.5
+    }
+  },
+  {
+    "_id": {
+      "$oid": "660000000009a1b2c3d4e5f6"
+    },
+    "productName": "Laptop Pro 14",
+    "price": 28000000,
+    "unit": "chiec",
+    "categoryId": {
+      "$oid": "660000000001a1b2c3d4e5f6"
+    },
+    "specs": {
+      "type": "BOX",
+      "weight": 1.6
+    }
+  },
+  {
+    "_id": {
+      "$oid": "660000000010a1b2c3d4e5f6"
+    },
+    "productName": "Ca hoi dong lanh",
+    "price": 450000,
+    "unit": "kg",
+    "categoryId": {
+      "$oid": "660000000002a1b2c3d4e5f6"
+    },
+    "specs": {
+      "type": "COLD",
+      "weight": 1
+    }
+  },
+  {
+    "_id": {
+      "$oid": "660000000011a1b2c3d4e5f6"
+    },
+    "productName": "Rau cu tuoi",
+    "price": 35000,
+    "unit": "kg",
+    "categoryId": {
+      "$oid": "660000000002a1b2c3d4e5f6"
+    },
+    "specs": {
+      "type": "COLD",
+      "weight": 1
+    }
+  },
+  {
+    "_id": {
+      "$oid": "660000000012a1b2c3d4e5f6"
+    },
+    "productName": "But bi xanh",
+    "unit": "hop",
+    "categoryId": {
+      "$oid": "660000000003a1b2c3d4e5f6"
+    },
+    "specs": {
+      "type": "PACK",
+      "weight": 0.3
+    }
+  },
+  {
+    "_id": {
+      "$oid": "660000000013a1b2c3d4e5f6"
+    },
+    "productName": "Giay A4",
+    "unit": "ram",
+    "categoryId": {
+      "$oid": "660000000003a1b2c3d4e5f6"
+    },
+    "specs": {
+      "type": "PACK",
+      "weight": 2.5
+    }
+  },
+  {
+    "_id": {
+      "$oid": "660000000014a1b2c3d4e5f6"
+    },
+    "productName": "Ban lam viec",
+    "price": 2400000,
+    "unit": "chiec",
+    "categoryId": {
+      "$oid": "660000000004a1b2c3d4e5f6"
+    },
+    "specs": {
+      "type": "BULK",
+      "weight": 25
+    }
+  }
+]

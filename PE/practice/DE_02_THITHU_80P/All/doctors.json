@@ -1,0 +1,57 @@
+[
+  {
+    "_id": {
+      "$oid": "660000000028a1b2c3d4e5f6"
+    },
+    "doctorName": "Nguyen Van An",
+    "depId": {
+      "$oid": "660000000024a1b2c3d4e5f6"
+    },
+    "specialty": "Tim mach",
+    "fee": 300000
+  },
+  {
+    "_id": {
+      "$oid": "660000000029a1b2c3d4e5f6"
+    },
+    "doctorName": "Tran Thi Binh",
+    "depId": {
+      "$oid": "660000000024a1b2c3d4e5f6"
+    },
+    "specialty": "Tieu hoa",
+    "fee": 250000
+  },
+  {
+    "_id": {
+      "$oid": "660000000030a1b2c3d4e5f6"
+    },
+    "doctorName": "Le Manh Cuong",
+    "depId": {
+      "$oid": "660000000025a1b2c3d4e5f6"
+    },
+    "specialty": "Chan thuong",
+    "fee": 400000
+  },
+  {
+    "_id": {
+      "$oid": "660000000031a1b2c3d4e5f6"
+    },
+    "doctorName": "Pham Thi Dung",
+    "depId": {
+      "$oid": "660000000026a1b2c3d4e5f6"
+    },
+    "specialty": "Ho hap nhi",
+    "fee": 350000
+  },
+  {
+    "_id": {
+      "$oid": "660000000032a1b2c3d4e5f6"
+    },
+    "doctorName": "Hoang Van Em",
+    "depId": {
+      "$oid": "660000000025a1b2c3d4e5f6"
+    },
+    "specialty": "Cot song",
+    "fee": 450000
+  }
+]

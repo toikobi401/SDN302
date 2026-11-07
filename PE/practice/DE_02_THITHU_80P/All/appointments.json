@@ -1,0 +1,107 @@
+[
+  {
+    "_id": {
+      "$oid": "660000000037a1b2c3d4e5f6"
+    },
+    "doctorId": {
+      "$oid": "660000000028a1b2c3d4e5f6"
+    },
+    "patientId": {
+      "$oid": "660000000033a1b2c3d4e5f6"
+    },
+    "startTime": "2026-03-02T08:00",
+    "endTime": "2026-03-02T09:00",
+    "status": "BOOKED",
+    "fee": 300000
+  },
+  {
+    "_id": {
+      "$oid": "660000000038a1b2c3d4e5f6"
+    },
+    "doctorId": {
+      "$oid": "660000000028a1b2c3d4e5f6"
+    },
+    "patientId": {
+      "$oid": "660000000034a1b2c3d4e5f6"
+    },
+    "startTime": "2026-03-02T09:00",
+    "endTime": "2026-03-02T10:00",
+    "status": "DONE",
+    "fee": 300000
+  },
+  {
+    "_id": {
+      "$oid": "660000000039a1b2c3d4e5f6"
+    },
+    "doctorId": {
+      "$oid": "660000000028a1b2c3d4e5f6"
+    },
+    "patientId": {
+      "$oid": "660000000036a1b2c3d4e5f6"
+    },
+    "startTime": "2026-03-03T14:00",
+    "endTime": "2026-03-03T15:00",
+    "status": "BOOKED",
+    "fee": 300000
+  },
+  {
+    "_id": {
+      "$oid": "660000000040a1b2c3d4e5f6"
+    },
+    "doctorId": {
+      "$oid": "660000000029a1b2c3d4e5f6"
+    },
+    "patientId": {
+      "$oid": "660000000033a1b2c3d4e5f6"
+    },
+    "startTime": "2026-03-02T10:00",
+    "endTime": "2026-03-02T11:00",
+    "status": "DONE",
+    "fee": 250000
+  },
+  {
+    "_id": {
+      "$oid": "660000000041a1b2c3d4e5f6"
+    },
+    "doctorId": {
+      "$oid": "660000000030a1b2c3d4e5f6"
+    },
+    "patientId": {
+      "$oid": "660000000035a1b2c3d4e5f6"
+    },
+    "startTime": "2026-03-04T08:30",
+    "endTime": "2026-03-04T09:30",
+    "status": "BOOKED",
+    "fee": 400000
+  },
+  {
+    "_id": {
+      "$oid": "660000000042a1b2c3d4e5f6"
+    },
+    "doctorId": {
+      "$oid": "660000000030a1b2c3d4e5f6"
+    },
+    "patientId": {
+      "$oid": "660000000034a1b2c3d4e5f6"
+    },
+    "startTime": "2026-03-04T10:00",
+    "endTime": "2026-03-04T11:00",
+    "status": "CANCELED",
+    "fee": 400000
+  },
+  {
+    "_id": {
+      "$oid": "660000000043a1b2c3d4e5f6"
+    },
+    "doctorId": {
+      "$oid": "660000000031a1b2c3d4e5f6"
+    },
+    "patientId": {
+      "$oid": "660000000035a1b2c3d4e5f6"
+    },
+    "startTime": "2026-03-05T09:00",
+    "endTime": "2026-03-05T09:45",
+    "status": "DONE",
+    "fee": 350000
+  }
+]

@@ -1,0 +1,116 @@
+[
+  {
+    "_id": {
+      "$oid": "660000000015a1b2c3d4e5f6"
+    },
+    "productId": {
+      "$oid": "660000000008a1b2c3d4e5f6"
+    },
+    "warehouseId": {
+      "$oid": "660000000005a1b2c3d4e5f6"
+    },
+    "quantity": 30,
+    "moveType": "IN",
+    "movedAt": "2026-01-05"
+  },
+  {
+    "_id": {
+      "$oid": "660000000016a1b2c3d4e5f6"
+    },
+    "productId": {
+      "$oid": "660000000008a1b2c3d4e5f6"
+    },
+    "warehouseId": {
+      "$oid": "660000000005a1b2c3d4e5f6"
+    },
+    "quantity": 8,
+    "moveType": "OUT",
+    "movedAt": "2026-01-11"
+  },
+  {
+    "_id": {
+      "$oid": "660000000017a1b2c3d4e5f6"
+    },
+    "productId": {
+      "$oid": "660000000009a1b2c3d4e5f6"
+    },
+    "warehouseId": {
+      "$oid": "660000000005a1b2c3d4e5f6"
+    },
+    "quantity": 15,
+    "moveType": "IN",
+    "movedAt": "2026-01-07"
+  },
+  {
+    "_id": {
+      "$oid": "660000000018a1b2c3d4e5f6"
+    },
+    "productId": {
+      "$oid": "660000000010a1b2c3d4e5f6"
+    },
+    "warehouseId": {
+      "$oid": "660000000006a1b2c3d4e5f6"
+    },
+    "quantity": 120,
+    "moveType": "IN",
+    "movedAt": "2026-01-09"
+  },
+  {
+    "_id": {
+      "$oid": "660000000019a1b2c3d4e5f6"
+    },
+    "productId": {
+      "$oid": "660000000010a1b2c3d4e5f6"
+    },
+    "warehouseId": {
+      "$oid": "660000000006a1b2c3d4e5f6"
+    },
+    "quantity": 45,
+    "moveType": "OUT",
+    "movedAt": "2026-01-15"
+  },
+  {
+    "_id": {
+      "$oid": "660000000020a1b2c3d4e5f6"
+    },
+    "productId": {
+      "$oid": "660000000011a1b2c3d4e5f6"
+    },
+    "warehouseId": {
+      "$oid": "660000000006a1b2c3d4e5f6"
+    },
+    "quantity": 60,
+    "moveType": "IN",
+    "movedAt": "2026-01-12"
+  },
+  {
+    "_id": {
+      "$oid": "660000000021a1b2c3d4e5f6"
+    },
+    "productId": "660000000012a1b2c3d4e5f6",
+    "warehouseId": "660000000007a1b2c3d4e5f6",
+    "quantity": 200,
+    "moveType": "IN",
+    "movedAt": "2026-01-14"
+  },
+  {
+    "_id": {
+      "$oid": "660000000022a1b2c3d4e5f6"
+    },
+    "productId": "660000000013a1b2c3d4e5f6",
+    "warehouseId": "660000000007a1b2c3d4e5f6",
+    "quantity": 150,
+    "moveType": "IN",
+    "movedAt": "2026-01-16"
+  },
+  {
+    "_id": {
+      "$oid": "660000000023a1b2c3d4e5f6"
+    },
+    "productId": "660000000013a1b2c3d4e5f6",
+    "warehouseId": "660000000007a1b2c3d4e5f6",
+    "quantity": 40,
+    "moveType": "OUT",
+    "movedAt": "2026-01-20"
+  }
+]
