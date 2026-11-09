@@ -172,7 +172,7 @@ Backend lấy giá/thông tin sách từ DB, tự tính subtotal/shippingFee/tot
 
 - `GET /admin/orders`, `GET /admin/orders/:id`.
 - `PATCH /admin/orders/:id/status`: `{ "status": "CONFIRMED" }`.
-- `GET /admin/orders` lọc thêm theo `paymentStatus=UNPAID|PAID|REFUNDED`.
+- `GET /admin/orders` lọc thêm theo `paymentStatus=UNPAID|PAID|REFUNDED`, `customer` (một phần tên hoặc số điện thoại, không phân biệt hoa thường; khớp người nhận trong địa chỉ giao hàng hoặc tài khoản khách) và `from`, `to` (ISO date, theo thời điểm tạo đơn).
 - `POST /admin/orders/:id/payment`: xác nhận đã thu tiền COD, chỉ khi SHIPPING hoặc COMPLETED. Gửi lại không thu/ghi nhận thêm. Không áp dụng cho đơn PAYOS.
 - `POST /admin/orders/:id/payment/sync`: hỏi payOS và cập nhật đơn.
 - `POST /admin/orders/:id/refund`: chuyển đơn CANCELLED + PAID sang REFUNDED sau khi đã hoàn tiền ngoài hệ thống.

@@ -1,5 +1,5 @@
-const { Book, Order } = require('../models');
-const { assert, id, list, found, dateRange } = require('../lib/http');
+const { Book, Order, User } = require('../models');
+const { assert, id, list, found, dateRange, text } = require('../lib/http');
 const { pdfPath, pdfExists } = require('../services/pdf');
 const commerce = require('../services/commerce');
 const payos = require('../services/payos');
@@ -64,6 +64,13 @@ async function adminList(req, res) {
   if (req.query.paymentStatus !== undefined) {
     assert(['UNPAID', 'PAID', 'REFUNDED'].includes(req.query.paymentStatus), 400, 'INVALID_QUERY', 'Invalid payment status');
     conditions.paymentStatus = req.query.paymentStatus;
+  }
+  if (req.query.customer !== undefined) {
+    const escaped = text(req.query.customer, 'customer', { max: 200 }).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const match = { $regex: escaped, $options: 'i' };
+    // PDF-only orders have no delivery address, so the customer's account is searched as well.
+    const users = await User.find({ $or: [{ name: match }, { phone: match }] }).distinct('_id');
+    conditions.$or = [{ 'shippingAddress.recipientName': match }, { 'shippingAddress.phone': match }, { user: { $in: users } }];
   }
   res.json(await list(Order, conditions, req.query));
 }

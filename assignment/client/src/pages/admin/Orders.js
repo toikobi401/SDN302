@@ -57,12 +57,22 @@ export default function AdminOrders() {
   const [status, setStatus] = useState('');
   const [paymentStatus, setPaymentStatus] = useState('');
   const [error, setError] = useState('');
-  const params = new URLSearchParams({ page, limit: 15, ...(status ? { status } : {}), ...(paymentStatus ? { paymentStatus } : {}) });
+  const [customer, setCustomer] = useState('');
+  const [from, setFrom] = useState('');
+  const [to, setTo] = useState('');
+  // Whole days in the admin's own time zone, sent as exact times.
+  const placed = { ...(from ? { from: new Date(`${from}T00:00:00`).toISOString() } : {}), ...(to ? { to: new Date(`${to}T23:59:59.999`).toISOString() } : {}) };
+  const params = new URLSearchParams({ page, limit: 15, ...(status ? { status } : {}), ...(paymentStatus ? { paymentStatus } : {}), ...(customer ? { customer } : {}), ...placed });
   const { data, pagination, loading, error: loadError, reload } = useApi(`/admin/orders?${params}`);
 
   return <>
     <h1>Orders</h1>
     <div className="toolbar">
+      <form role="search" onSubmit={event => { event.preventDefault(); setCustomer(new FormData(event.currentTarget).get('customer').trim()); setPage(1); }}>
+        <label>Customer name or phone<input name="customer" type="search" maxLength={200} /></label>
+      </form>
+      <label>Placed from<input type="date" value={from} max={to || undefined} onChange={event => { setFrom(event.target.value); setPage(1); }} /></label>
+      <label>Placed to<input type="date" value={to} min={from || undefined} onChange={event => { setTo(event.target.value); setPage(1); }} /></label>
       <label>Status
         <select value={status} onChange={event => { setStatus(event.target.value); setPage(1); }}>
           <option value="">All</option>

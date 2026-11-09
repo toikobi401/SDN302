@@ -34,11 +34,14 @@ async function savePdf(stream, maxBytes = MAX_PDF_BYTES) {
       yield chunk;
     }
   }
+  const out = fs.createWriteStream(part, { flags: 'wx' });
   try {
-    await pipeline(checked, fs.createWriteStream(part, { flags: 'wx' }));
+    await pipeline(checked, out);
     assert(head.length === PDF_SIGNATURE.length, 400, 'INVALID_PDF', 'This file is not a PDF');
     await fs.promises.rename(part, pdfPath(name));
   } catch (error) {
+    // A file rejected on its first chunk can fail before the .part file is even opened; removing it earlier would miss it.
+    if (!out.closed) await new Promise(resolve => out.once('close', resolve));
     await fs.promises.rm(part, { force: true });
     throw error;
   }

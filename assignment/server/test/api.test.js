@@ -636,3 +636,24 @@ test('coupon admin input is validated and the code cannot be renamed', async t =
   t.mock.method(Coupon, 'findOne', () => query(coupon));
   await assert.rejects(() => update({ params: { id: String(coupon._id) }, body: { code: 'OTHER' } }, res), { status: 400 });
 });
+
+test("admin order search matches a customer name or phone, literally, and the order date", async t => {
+  const { adminList } = require("../controllers/order");
+  const accountId = new mongoose.Types.ObjectId();
+  let userFilter;
+  t.mock.method(User, "find", filter => { userFilter = filter; return { distinct: async () => [accountId] }; });
+  let orderFilter;
+  t.mock.method(Order, "find", filter => {
+    orderFilter = filter;
+    const cursor = { sort: () => cursor, skip: () => cursor, limit: () => cursor, select: () => cursor, then: resolve => resolve([]) };
+    return cursor;
+  });
+  t.mock.method(Order, "countDocuments", async () => 0);
+  await adminList({ query: { customer: "+84 90", from: "2026-11-01T00:00:00.000Z", status: "PENDING" } }, { json() {} });
+  const match = { $regex: "\\+84 90", $options: "i" };
+  assert.deepEqual(userFilter.$or, [{ name: match }, { phone: match }]);
+  assert.deepEqual(orderFilter.$or, [{ "shippingAddress.recipientName": match }, { "shippingAddress.phone": match }, { user: { $in: [accountId] } }]);
+  assert.equal(orderFilter.status, "PENDING");
+  assert.equal(orderFilter.createdAt.$gte.toISOString(), "2026-11-01T00:00:00.000Z");
+  await assert.rejects(() => adminList({ query: { customer: "   " } }, { json() {} }), { status: 400 });
+});
