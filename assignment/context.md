@@ -45,8 +45,9 @@ assignment/
 | **Khách** (chưa đăng nhập) | Xem, tìm kiếm, lọc, sắp xếp sách |
 | **Khách hàng** (`CUSTOMER`) | Giỏ hàng, đặt hàng, thanh toán, xem và huỷ đơn của mình |
 | **Chủ cửa hàng** (`ADMIN`) | Quản lí sách, ảnh, danh mục, tồn kho, đơn hàng; xem thống kê |
+| **Người giao hàng** (`SHIPPER`) | Một màn hình `/shipper`: xem đơn `CONFIRMED` và `SHIPPING`, ghi nhận đã thu tiền COD |
 
-Đăng ký luôn tạo `CUSTOMER`. Tài khoản `ADMIN` chỉ được tạo bằng `npm run db:seed`.
+Đăng ký luôn tạo `CUSTOMER`. Tài khoản `ADMIN` và `SHIPPER` chỉ được tạo bằng `npm run db:seed`. Shipper đăng nhập ở `/login` và được chuyển tới `/shipper`.
 
 ## 4. Chức năng
 
@@ -288,7 +289,8 @@ stateDiagram-v2
 - Server từ chối mọi chuyển trạng thái không có trong sơ đồ.
 - Đơn `PAYOS` chưa thanh toán không được `CONFIRMED`.
 - Khách không tự huỷ được đơn đã thanh toán, chỉ admin mới huỷ được.
-- Đơn COD do admin bấm ghi nhận đã thu tiền, khi đơn đang `SHIPPING` hoặc đã `COMPLETED`. Đơn `PAYOS` không ghi nhận tay được.
+- Đơn COD được ghi nhận đã thu tiền bởi shipper khi đơn đang `CONFIRMED` hoặc `SHIPPING`, hoặc bởi admin khi đơn đang `SHIPPING` hoặc đã `COMPLETED`. Đơn `PAYOS` không ghi nhận tay được.
+- Shipper không đổi trạng thái đơn và không thấy tài khoản khách, lịch sử hay mã giao dịch; mọi shipper thấy chung một danh sách, chưa phân đơn theo người.
 - Doanh thu chỉ tính đơn `COMPLETED` và `PAID`.
 
 ### Đặt hàng và tồn kho
@@ -371,6 +373,8 @@ Xem đầy đủ ở [server/API.md](server/API.md). Phần mới cho thanh toá
 | POST | `/api/admin/orders/:id/payment/sync` | Admin | Như trên, cho mọi đơn |
 | POST | `/api/admin/orders/:id/refund` | Admin | Chuyển `CANCELLED` + `PAID` sang `REFUNDED` |
 | POST | `/api/admin/uploads/signature` | Admin | Cấp chữ ký tải ảnh lên Cloudinary |
+| GET | `/api/shipper/orders` | Shipper | Đơn `CONFIRMED` và `SHIPPING`, cũ nhất trước, chỉ gồm thông tin giao hàng |
+| POST | `/api/shipper/orders/:id/payment` | Shipper | Ghi nhận đã thu tiền COD |
 
 API cho mã giảm giá:
 

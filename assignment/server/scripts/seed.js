@@ -24,22 +24,23 @@ const books = [
   ['Peaceful Enlightment', 'Marmik Lama', 'travel', 130000, 'tab-item5.jpg'],
 ];
 
-async function ensureAdmin() {
-  const email = process.env.ADMIN_EMAIL?.trim().toLowerCase();
-  const name = process.env.ADMIN_NAME?.trim() || 'Bookstore Admin';
-  const password = process.env.ADMIN_PASSWORD;
+// Reads <prefix>_EMAIL, <prefix>_NAME and <prefix>_PASSWORD, e.g. ADMIN_EMAIL.
+async function ensureAccount(role, prefix, defaultName) {
+  const email = process.env[`${prefix}_EMAIL`]?.trim().toLowerCase();
+  const name = process.env[`${prefix}_NAME`]?.trim() || defaultName;
+  const password = process.env[`${prefix}_PASSWORD`];
   const existing = email && await User.findOne({ email });
   if (existing) {
     // Never change the role or password of an account that already exists.
-    if (existing.role !== 'ADMIN') throw new Error(`Setup: ${email} already exists and is not an administrator; no account was changed`);
+    if (existing.role !== role) throw new Error(`Setup: ${email} already exists with another role; no account was changed`);
     return existing;
   }
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !password || password.length < 12 || Buffer.byteLength(password) > 72) {
-    throw new Error('Setup: set a valid ADMIN_EMAIL and ADMIN_PASSWORD (12+ characters, max 72 bytes) in .env');
+    throw new Error(`Setup: set a valid ${prefix}_EMAIL and ${prefix}_PASSWORD (12+ characters, max 72 bytes) in .env`);
   }
-  const admin = await User.create({ name, email, passwordHash: await bcrypt.hash(password, 12), role: 'ADMIN' });
-  console.log('Administrator created. Remove ADMIN_PASSWORD from .env after use.');
-  return admin;
+  const account = await User.create({ name, email, passwordHash: await bcrypt.hash(password, 12), role });
+  console.log(`${defaultName} account created. Remove ${prefix}_PASSWORD from .env after use.`);
+  return account;
 }
 
 async function coverFields(file) {
@@ -51,7 +52,9 @@ async function coverFields(file) {
 
 async function seed() {
   await connectDB();
-  const admin = await ensureAdmin();
+  const admin = await ensureAccount('ADMIN', 'ADMIN', 'Bookstore Admin');
+  // The shipper account is optional.
+  if (process.env.SHIPPER_EMAIL?.trim()) await ensureAccount('SHIPPER', 'SHIPPER', 'Shipper');
   const ids = {};
   for (const [name, slug] of categories) {
     ids[slug] = (await Category.findOneAndUpdate({ slug }, { $setOnInsert: { name, slug } }, { upsert: true, returnDocument: 'after' }))._id;

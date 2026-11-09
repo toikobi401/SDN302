@@ -251,6 +251,49 @@ test('unpaid online orders cannot be confirmed or marked paid by hand', async t 
   await assert.rejects(() => commerce.markPaid(adminUser, String(order._id)), { code: 'INVALID_TRANSITION' });
 });
 
+test('only shippers reach shipper APIs, and they collect COD before delivery is completed', async t => {
+  const { requireShipper } = require('../middleware/auth');
+  const shipper = { ...user, role: 'SHIPPER' };
+  assert.throws(() => requireShipper({ user }, {}, () => {}), { status: 403 });
+  assert.throws(() => requireShipper({ user: { ...user, role: 'ADMIN' } }, {}, () => {}), { status: 403 });
+  assert.throws(() => requireAdmin({ user: shipper }, {}, () => {}), { status: 403 });
+  let called = false;
+  requireShipper({ user: shipper }, {}, () => { called = true; });
+  assert.equal(called, true);
+
+  stockMocks(t);
+  const codOrder = status => new Order({ orderNumber: 'ORD-cod', user: user._id, idempotencyKey: 'cod', requestHash: 'hash', shippingAddress: address,
+    status, items: [{ book: bookId, title: 'Book', unitPrice: 100, quantity: 1 }] });
+  let current;
+  t.mock.method(Order, 'findOne', () => query(current));
+  current = codOrder('CONFIRMED');
+  const paid = await commerce.markPaid(shipper, String(current._id));
+  assert.equal(paid.paymentStatus, 'PAID');
+  assert.equal(paid.status, 'CONFIRMED');
+  assert.equal(String(paid.statusHistory.at(-1).changedBy), String(shipper._id));
+  current = codOrder('COMPLETED');
+  await assert.rejects(() => commerce.markPaid(shipper, String(current._id)), { code: 'INVALID_TRANSITION' });
+  current = codOrder('CONFIRMED');
+  await assert.rejects(() => commerce.markPaid({ ...user, role: 'ADMIN' }, String(current._id)), { code: 'INVALID_TRANSITION' });
+  current = paymentOrder({ status: 'CONFIRMED', paymentStatus: 'PAID', paidAt: new Date() });
+  await assert.rejects(() => commerce.markPaid(shipper, String(current._id)), { code: 'INVALID_TRANSITION' });
+});
+
+test('the shipper list holds confirmed and shipping orders without customer account data', async t => {
+  const { shipperList } = require('../controllers/order');
+  let args;
+  t.mock.method(Order, 'find', filter => {
+    args = { filter };
+    const cursor = { sort: () => cursor, skip: () => cursor, limit: () => cursor, select: value => { args.select = value; return cursor; }, then: resolve => resolve([]) };
+    return cursor;
+  });
+  t.mock.method(Order, 'countDocuments', async () => 0);
+  await shipperList({ query: {} }, { json() {} });
+  assert.deepEqual(args.filter.status.$in, ['CONFIRMED', 'SHIPPING']);
+  assert.ok(args.select.includes('shippingAddress'));
+  assert.ok(!/\buser\b|paymentReference|statusHistory|idempotencyKey/.test(args.select));
+});
+
 const cloudinary = require('../services/cloudinary');
 const { update: updateBook } = require('../controllers/book');
 

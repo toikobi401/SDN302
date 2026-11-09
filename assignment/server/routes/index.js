@@ -1,5 +1,5 @@
 const { Router } = require('express');
-const { requireAuth, requireAdmin, rateLimit } = require('../middleware/auth');
+const { requireAuth, requireAdmin, requireShipper, rateLimit } = require('../middleware/auth');
 const auth = require('../controllers/auth');
 const book = require('../controllers/book');
 const category = require('../controllers/category');
@@ -14,6 +14,7 @@ const coupon = require('../controllers/coupon');
 
 const router = Router();
 const admin = [requireAuth, requireAdmin];
+const shipper = [requireAuth, requireShipper];
 const loginLimit = rateLimit({ limit: 15, windowMs: 15 * 60 * 1000 });
 const uploadLimit = rateLimit({ limit: 30, windowMs: 60 * 1000 });
 const couponLimit = rateLimit({ limit: 20, windowMs: 60 * 1000 });
@@ -74,6 +75,8 @@ router.patch('/admin/orders/:id/status', admin, order.updateStatus);
 router.post('/admin/orders/:id/payment', admin, order.markPaid);
 router.post('/admin/orders/:id/payment/sync', admin, payment.adminSync);
 router.post('/admin/orders/:id/refund', admin, order.markRefunded);
+router.get('/shipper/orders', shipper, order.shipperList);
+router.post('/shipper/orders/:id/payment', shipper, order.markPaid);
 
 router.post('/payments/payos/webhook', payment.webhook);
 

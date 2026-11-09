@@ -125,6 +125,11 @@ function Navbar() {
                         <Link to="/orders" className="nav-link" onClick={closeMenu}>My Orders</Link>
                       </li>
                     )}
+                    {user?.role === "SHIPPER" && (
+                      <li className="menu-item">
+                        <Link to="/shipper" className="nav-link" onClick={closeMenu}>Deliveries</Link>
+                      </li>
+                    )}
                     {user?.role === "ADMIN" && (
                       <li className="menu-item">
                         <Link to="/admin" className="nav-link" onClick={closeMenu}>Manage Store</Link>

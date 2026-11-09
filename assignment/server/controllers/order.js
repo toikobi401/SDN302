@@ -78,6 +78,13 @@ async function updateStatus(req, res) {
     : await commerce.transitionOrder(req.user, req.params.id, req.body?.status) });
 }
 
+// Only what a delivery needs: no customer account, payment references or history.
+const DELIVERY_FIELDS = 'orderNumber shippingAddress items.title items.format items.quantity total paymentMethod paymentStatus status note createdAt';
+
+async function shipperList(req, res) {
+  res.json(await list(Order, { status: { $in: ['CONFIRMED', 'SHIPPING'] } }, req.query, { sort: { createdAt: 1, _id: 1 }, select: DELIVERY_FIELDS }));
+}
+
 async function markPaid(req, res) {
   res.json({ data: await commerce.markPaid(req.user, req.params.id) });
 }
@@ -86,4 +93,4 @@ async function markRefunded(req, res) {
   res.json({ data: await commerce.markRefunded(req.user, req.params.id) });
 }
 
-module.exports = { create, mine, get, cancel, download, adminList, adminGet, updateStatus, markPaid, markRefunded };
+module.exports = { create, mine, get, cancel, download, adminList, adminGet, updateStatus, shipperList, markPaid, markRefunded };

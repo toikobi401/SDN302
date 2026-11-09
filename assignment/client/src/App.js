@@ -20,6 +20,7 @@ import AdminBooks from './pages/admin/Books';
 import AdminCategories from './pages/admin/Categories';
 import AdminOrders from './pages/admin/Orders';
 import AdminCoupons from './pages/admin/Coupons';
+import ShipperOrders from './pages/Shipper';
 
 function ScrollManager() {
   const { pathname, hash } = useLocation();
@@ -69,6 +70,7 @@ export default function App() {
               <Route path="*" element={<NotFound admin />} />
             </Route>
           </Route>
+          <Route path="/shipper" element={<ProtectedRoute shipper><ShipperOrders /></ProtectedRoute>} />
           <Route element={<Storefront />}>
             <Route path="/" element={<Home />} />
             <Route path="/books" element={<Browse />} />

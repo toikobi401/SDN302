@@ -9,7 +9,7 @@ Node.js, ExpressJS, MongoDB/Mongoose, JWT, Cloudinary và payOS. Mã nguồn dù
 3. Đặt `JWT_SECRET` ngẫu nhiên ít nhất 32 ký tự. Điều chỉnh `CORS_ORIGINS`, `SHIPPING_FEE_VND`, `PORT` nếu cần.
 4. Dùng MongoDB replica set hoặc Atlas để hỗ trợ transaction; MongoDB cài mặc định (standalone) không đặt được đơn. URI mẫu giả định replica set `rs0` đã được cấu hình. Với MongoDB trên máy: thêm `replication:` và `  replSetName: rs0` vào `mongod.cfg`, khởi động lại service, rồi chạy `mongosh --eval "rs.initiate({_id:'rs0',members:[{_id:0,host:'127.0.0.1:27017'}]})"` một lần.
 5. Chạy `npm run db:init` để tạo 8 collection và các unique index bắt buộc.
-6. Điền `ADMIN_NAME`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, chạy `npm run db:seed` để tạo admin, danh mục và sách mẫu, rồi xóa ADMIN_PASSWORD khỏi `.env`. Chạy lại không đổi dữ liệu đã có. Có key Cloudinary thì ảnh mẫu được tải lên Cloudinary, chưa có thì dùng ảnh trong `client/public`.
+6. Điền `ADMIN_NAME`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, chạy `npm run db:seed` để tạo admin, danh mục và sách mẫu, rồi xóa ADMIN_PASSWORD khỏi `.env`. Điền thêm `SHIPPER_EMAIL`, `SHIPPER_PASSWORD` (tuỳ chọn) để tạo tài khoản giao hàng theo cùng cách. Chạy lại không đổi dữ liệu đã có. Có key Cloudinary thì ảnh mẫu được tải lên Cloudinary, chưa có thì dùng ảnh trong `client/public`.
 7. Điền `PAYOS_*` để bật thanh toán online. Để trống thì COD vẫn chạy, còn đặt đơn payOS trả 503. Đăng ký webhook trên my.payos.vn với URL `https://<domain>/api/payments/payos/webhook`.
 8. Chạy `npm run db:import` để nhập 213 sách trong `data/books/catalog.json`. Database chỉ lưu đường dẫn và link, không lưu file.
 9. Chạy `npm start`. API có tiền tố `/api`. Client chạy cổng 3001 bằng `npm start` trong `client/`.

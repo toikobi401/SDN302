@@ -179,6 +179,12 @@ Backend lấy giá/thông tin sách từ DB, tự tính subtotal/shippingFee/tot
 
 Luồng: PENDING → CONFIRMED → SHIPPING → COMPLETED. Admin hủy PENDING/CONFIRMED bằng `{ "status": "CANCELLED", "reason": "..." }`. Đơn PAYOS phải PAID mới được CONFIRMED. Admin hủy đơn đã thu tiền thì đơn ở CANCELLED + PAID cho đến khi được đánh dấu hoàn tiền. Trạng thái thanh toán độc lập, COMPLETED có thể UNPAID cho đến khi admin xác nhận thu tiền. Mỗi thay đổi lưu người thực hiện và thời gian.
 
+## Giao hàng — tài khoản SHIPPER
+
+- `GET /shipper/orders`: đơn CONFIRMED và SHIPPING, cũ nhất trước, có phân trang. Chỉ trả `orderNumber`, `shippingAddress`, tên/định dạng/số lượng sách, `total`, `paymentMethod`, `paymentStatus`, `status`, `note`, `createdAt`.
+- `POST /shipper/orders/:id/payment`: ghi nhận đã thu tiền COD, chỉ khi CONFIRMED hoặc SHIPPING. Không đổi trạng thái đơn. Gửi lại không ghi nhận thêm. Không áp dụng cho đơn PAYOS.
+- Tài khoản khác gọi các API này nhận 403; shipper gọi API quản trị cũng nhận 403.
+
 ## Nhập hàng
 
 - `GET /admin/purchase-receipts`, lọc status/from/to và phân trang.

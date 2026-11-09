@@ -16,7 +16,7 @@ export default function Auth({ register = false, admin = false }) {
     if (typeof from === 'string' && from.startsWith('/') && !from.startsWith('//') &&
         !/^\/(?:admin\/)?(?:login|register)(?:[/?#]|$)/.test(from) &&
         (!adminPath || account.role === 'ADMIN') && (!admin || adminPath)) return from;
-    return account.role === 'ADMIN' ? '/admin' : '/';
+    return { ADMIN: '/admin', SHIPPER: '/shipper' }[account.role] || '/';
   }
 
   if (admin && !ready) return <p className="container page" role="status">Loading your account...</p>;

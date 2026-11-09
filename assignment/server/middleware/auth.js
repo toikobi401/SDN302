@@ -23,6 +23,11 @@ function requireAdmin(req, res, next) {
   next();
 }
 
+function requireShipper(req, res, next) {
+  assert(req.user?.role === 'SHIPPER', 403, 'FORBIDDEN', 'Shipper permission is required');
+  next();
+}
+
 function rateLimit({ limit, windowMs }) {
   const clients = new Map();
   return (req, res, next) => {
@@ -39,4 +44,4 @@ function rateLimit({ limit, windowMs }) {
   };
 }
 
-module.exports = { requireAuth, requireAdmin, rateLimit };
+module.exports = { requireAuth, requireAdmin, requireShipper, rateLimit };

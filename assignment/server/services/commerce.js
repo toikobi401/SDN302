@@ -160,7 +160,9 @@ async function markPaid(user, value) {
   return mongoose.connection.transaction(async session => {
     const order = await found(Order, value, {}, session);
     assert(order.paymentMethod === 'COD', 409, 'INVALID_TRANSITION', 'Online payments are confirmed by the payment provider');
-    assert(['SHIPPING', 'COMPLETED'].includes(order.status), 409, 'INVALID_TRANSITION', 'Collect COD payment during shipping or after completion');
+    // The shipper collects cash at the door, before the store marks the delivery complete.
+    const collectable = user.role === 'SHIPPER' ? ['CONFIRMED', 'SHIPPING'] : ['SHIPPING', 'COMPLETED'];
+    assert(collectable.includes(order.status), 409, 'INVALID_TRANSITION', 'COD payment cannot be recorded for an order in this status');
     if (order.paymentStatus === 'PAID') return order;
     order.paymentStatus = 'PAID';
     order.paidAt = new Date();
