@@ -90,7 +90,9 @@ const list = (req, res) => books(req, res, false);
 const adminList = (req, res) => books(req, res, true);
 
 async function get(req, res) {
-  res.json({ data: await found(Book, req.params.id, { status: 'ACTIVE' }) });
+  const book = await found(Book, req.params.id, { status: 'ACTIVE' });
+  await book.populate({ path: 'categories', match: { isActive: true }, select: 'name slug' });
+  res.json({ data: book });
 }
 
 async function adminGet(req, res) {

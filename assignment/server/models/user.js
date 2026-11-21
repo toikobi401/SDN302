@@ -12,7 +12,7 @@ const schema = new Schema({
   // The authentication service must hash passwords before assigning this field.
   passwordHash: { type: String, required: true, select: false },
   tokenVersion: { type: Number, default: 0, select: false },
-  role: { type: String, enum: ['CUSTOMER', 'ADMIN'], default: 'CUSTOMER', required: true },
+  role: { type: String, enum: ['CUSTOMER', 'ADMIN', 'SHIPPER'], default: 'CUSTOMER', required: true },
   phone: { type: String, trim: true },
   addresses: { type: [savedAddressSchema], default: [] },
   isActive: { type: Boolean, default: true, required: true },

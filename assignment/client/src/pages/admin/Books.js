@@ -174,10 +174,12 @@ export default function AdminBooks() {
   const categories = useApi('/admin/categories?limit=100');
   const [actionError, setActionError] = useState('');
 
-  async function hide(book) {
+  async function setOnSale(book, onSale) {
     setActionError('');
-    try { await api(`/admin/books/${book._id}`, { method: 'DELETE' }); reload(); }
-    catch (err) { setActionError(err.message); }
+    try {
+      await api(`/admin/books/${book._id}`, onSale ? { method: 'PATCH', body: JSON.stringify({ status: 'ACTIVE' }) } : { method: 'DELETE' });
+      reload();
+    } catch (err) { setActionError(err.message); }
   }
 
   return <>
@@ -211,7 +213,9 @@ export default function AdminBooks() {
           <td>{book.status === 'ACTIVE' ? 'On sale' : 'Hidden'}</td>
           <td className="button-row">
             <button type="button" className="action outline" onClick={() => setEditing(book)}>Edit</button>
-            {book.status === 'ACTIVE' && <button type="button" className="action outline" onClick={() => hide(book)}>Hide</button>}
+            {book.status === 'ACTIVE'
+              ? <button type="button" className="action outline" onClick={() => setOnSale(book, false)}>Hide</button>
+              : <button type="button" className="action outline" onClick={() => setOnSale(book, true)}>Unhide</button>}
           </td>
         </tr>)}</tbody>
       </table></div>

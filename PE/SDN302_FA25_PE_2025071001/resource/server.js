@@ -65,8 +65,8 @@ const signToken = user => jwt.sign({ id: user._id, name: user.name }, JWT_SECRET
 // containing "</script>" closes the block early (stored XSS).
 const toScriptJson = value => JSON.stringify(value)
     .replaceAll('<', '\\u003c')
-    .replaceAll(' ', '\\u2028')
-    .replaceAll(' ', '\\u2029');
+    .replaceAll('', '\\u2028')
+    .replaceAll('', '\\u2029');
 
 // Shared by /auth/signin (API) and /auth/login (views): name + bcrypt key.
 const findAccount = async (name, key) => {

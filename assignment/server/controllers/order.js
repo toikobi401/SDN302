@@ -66,9 +66,8 @@ async function adminList(req, res) {
     conditions.paymentStatus = req.query.paymentStatus;
   }
   if (req.query.customer !== undefined) {
-    const escaped = text(req.query.customer, 'customer', { max: 200 }).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const escaped = text(req.query.customer, 'customer', { max: 200 });
     const match = { $regex: escaped, $options: 'i' };
-    // PDF-only orders have no delivery address, so the customer's account is searched as well.
     const users = await User.find({ $or: [{ name: match }, { phone: match }] }).distinct('_id');
     conditions.$or = [{ 'shippingAddress.recipientName': match }, { 'shippingAddress.phone': match }, { user: { $in: users } }];
   }

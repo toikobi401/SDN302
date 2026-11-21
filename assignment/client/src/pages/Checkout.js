@@ -4,11 +4,26 @@ import { api } from '../api';
 import { useCart } from '../context/CartContext';
 import { money } from '../data/placeholders';
 
+const deliveryFields = [
+  { name: 'recipientName', label: 'Recipient name', maxLength: 500, autoComplete: 'name' },
+  { name: 'phone', label: 'Phone number', type: 'tel', pattern: '[0-9+ ]{8,15}', autoComplete: 'tel' },
+  { name: 'addressLine', label: 'Street address', maxLength: 500, autoComplete: 'street-address' },
+  { name: 'ward', label: 'Ward (optional)', maxLength: 200, optional: true },
+  { name: 'province', label: 'Province or city', maxLength: 500 },
+];
+
+function deliveryError(input, label) {
+  if (!input.value.trim()) return `${label} is required.`;
+  if (input.validity.patternMismatch) return 'Phone number must contain 8 to 15 characters using digits, + or spaces.';
+  return input.validationMessage;
+}
+
 export default function Checkout() {
   const { cart, refreshCart } = useCart();
   const navigate = useNavigate();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [fieldErrors, setFieldErrors] = useState({});
   const [couponInput, setCouponInput] = useState('');
   const [coupon, setCoupon] = useState(null);
   const [couponError, setCouponError] = useState('');
@@ -27,6 +42,22 @@ export default function Checkout() {
 
   async function submit(event) {
     event.preventDefault();
+    const form = event.currentTarget;
+    const errors = {};
+    if (hasPhysical) {
+      for (const { name, label, optional } of deliveryFields) {
+        if (!optional) {
+          const message = deliveryError(form.elements.namedItem(name), label);
+          if (message) errors[name] = message;
+        }
+      }
+    }
+    setFieldErrors(errors);
+    setError('');
+    if (Object.keys(errors).length) {
+      form.elements.namedItem(Object.keys(errors)[0]).focus();
+      return;
+    }
     const { note, ward, paymentMethod, ...required } = Object.fromEntries(new FormData(event.currentTarget));
     const body = {
       items: items.map(item => ({ book: item.book._id, format: item.format, quantity: item.quantity })),
@@ -56,14 +87,18 @@ export default function Checkout() {
     <h1>Check out</h1>
     {error && <p className="message error" role="alert">{error}</p>}
     <div className="row">
-      <form className="stack col-md-7" onSubmit={submit}>
+      <form className="stack col-md-7" noValidate onSubmit={submit}>
         {hasPhysical && <>
           <h2>Delivery details</h2>
-          <label>Recipient name<input name="recipientName" required maxLength={500} autoComplete="name" /></label>
-          <label>Phone number<input name="phone" type="tel" required pattern="[0-9+ ]{8,15}" title="8 to 15 digits" autoComplete="tel" /></label>
-          <label>Street address<input name="addressLine" required maxLength={500} autoComplete="street-address" /></label>
-          <label>Ward (optional)<input name="ward" maxLength={200} /></label>
-          <label>Province or city<input name="province" required maxLength={500} /></label>
+          {deliveryFields.map(({ name, label, optional, ...attributes }) => <div key={name}>
+            <label htmlFor={`checkout-${name}`}>{label}</label>
+            <input {...attributes} id={`checkout-${name}`} name={name} required={!optional}
+              aria-invalid={Boolean(fieldErrors[name])} aria-describedby={fieldErrors[name] ? `checkout-${name}-error` : undefined}
+              onChange={event => {
+                if (fieldErrors[name]) setFieldErrors({ ...fieldErrors, [name]: deliveryError(event.target, label) });
+              }} />
+            {fieldErrors[name] && <p id={`checkout-${name}-error`} className="message error" role="alert">{fieldErrors[name]}</p>}
+          </div>)}
         </>}
         <label>Note for the store (optional)<textarea name="note" rows="2" maxLength={2000} /></label>
         <div className="inline-form coupon-form">
